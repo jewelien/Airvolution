@@ -1,8 +1,14 @@
 # Airvolution
+
+Problem: When you don’t have any change or cash and need to find a free air pump. Airvolution will help you find the closes gas station with free air pump.
+Marketing: Airvolution is a community based location finder app for gas stations that offers free air pump. 
+
+
 Features: Find gas stations with free air pumps.
           Be able to submit air pump info for gas stations.
           Users can verify stations that have been marked as free or paid. 
           Directions to the gas station selected. 
+
 
 Main View Controller:
 	Title label.
@@ -34,3 +40,23 @@ StationsController:
 	Save station info. (name, location, air pump status).
 	Update station’s air pump status. (free > paid, paid > free automatically based on “verify” submissions).
 	Retrieve stations info. 
+
+
+
+
+FEEDBACK:
+Opportunies:
+ 	Users can verify + get points.
+ 	Look at waze or gas buddy.
+ 	Add info on gas stations that are paid.
+ 	Add phone # of location to see if they’re open.
+ 	iAds.
+ 	Social networking 
+
+Challenges:
+	Getting users to act.
+	Data accuracy - important.
+	Data? free in CA w/gas.
+	Verifying data.
+	API.
+	Need a large backend.
