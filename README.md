@@ -1,49 +1,40 @@
 # Airvolution
 
 #### Problem 
-- When you need air for tires and don’t have any change or cash, Airvolution will help you find the closes gas station with free air pump.
+- When you need air for tires and don’t have any change or cash, Airvolution will help you find the closest locations with free air pumps.
 
 #### Marketing
-- Airvolution is a community based location finder app for gas stations that offers free air pump. 
+- Airvolution is a community based location finder app to locate places that offers free air pumps. 
 
 
 #### Features
-- Find gas stations with free air pumps.
-- Be able to submit air pump info for gas stations.
-- Users can verify stations that have been marked as free or paid. 
-- Directions to the gas station selected. 
+- Find locations with free air pumps.
+- Drop pin to add location of free air pump. 
+- Thumbs up, thumbs down buttons for users to verify locations. 
+- Directions to the location selected. 
 
 
-##### MainViewController:
-	-Title label.
-	-Tableview with 2 large cells OR 2 large buttons.
-		Add (gas station). Default to current location on map.  Show gas stations nearby.
-		Find (gas station). Default to current location on map.  Show gas stations nearby with free air pump. 
- 
-##### FindStationViewController: 
-	Map View with submitted info (gas stations that have been marked free/paid).
-	  -Select a gas station.
-	  -Present a pop up view at the bottom of the screen (directions | stop station name | verify).
-		Direction pressed = open in maps or present direction. 
-		Verify pressed = Present a new view or popup to verify Free or Paid. Submit. 
+##### MainViewController
+	- Title label.
+	- Add location button.
 
-##### AddStationViewController: 
-	Map View with gas stations to submit air pump status to. 
-	-Map View with gas stations nearby.
-	-Select a gas station. 
-	-Present submission form (new view or popup). Mark as free/paid. Submit
+##### FindLocationsViewController
+	Map View with submitted info (locations that have been marked with free air pumps).
+	-Select a location.
+	-Present a pop up view at the bottom of the screen (directions | location name | thumbs up/down).
+		-Direction pressed = open in maps or present directions.
+	-Drop pin to current location. Can move pin around. Once set present pop up view at the bottom to enter a location name and a submit button. 
 	
-
-##### Station: 
+##### Station 
 	-name
 	-location
-	-freeAirPump
-	-paidAirPump
+	-thumbsUp
+	-thumbsDown
 
-##### StationController:
-	-Save station info. (name, location, air pump status).
-	-Update station’s air pump status. (free > paid, paid > free automatically based on “verify” submissions).
-	-Retrieve stations info. 
+##### StationController
+	-Add location info. (name, location, air pump status).
+	-Remove location's air pump status. (based on thumbs down submissions).
+	-Retrieve locations info.
 
 
 
