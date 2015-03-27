@@ -7,6 +7,7 @@
 //
 
 #import "MainViewController.h"
+#import "SetLocationView.h"
 @import MapKit;
 
 @interface MainViewController () <CLLocationManagerDelegate, MKMapViewDelegate>
@@ -16,8 +17,11 @@
 @property (nonatomic) CLLocationManager *locationManager;
 
 @property (nonatomic, strong) UIButton *dropPinButton;
-@property (nonatomic) double latitude;
-@property (nonatomic) double longitude;
+@property (nonatomic) CLLocation *location;
+
+@property (nonatomic, strong) UIButton *setButton;
+@property (nonatomic, strong) SetLocationView *setLocationView;
+
 
 
 @end
@@ -52,12 +56,16 @@
     [self.view addSubview:self.dropPinButton];
     [self.dropPinButton addTarget:self action:@selector(addPin) forControlEvents:UIControlEventTouchUpInside];
     
+    self.setLocationView = [[SetLocationView alloc] initWithFrame:CGRectMake(self.view.frame.size.width, 0, 300, 300)];
+    [self.view addSubview:self.setLocationView];
+    
+    
 }
 
 - (void)addPin{
     MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
     annotation.coordinate = self.mapView.userLocation.coordinate;
-    annotation.title = @"HELLO!";
+    annotation.title = @"set location";
     for (id annotation in self.mapView.annotations) {
         [self.mapView removeAnnotation:annotation];
     }
@@ -75,16 +83,16 @@
     MKPinAnnotationView *pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"pin"];
     if (pinView == nil) {
         pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
-        pinView.pinColor = MKPinAnnotationColorPurple;
+//        pinView.pinColor = MKPinAnnotationColorPurple;
         pinView.draggable = YES;
         pinView.canShowCallout = YES;
         pinView.animatesDrop = YES;
         
-        UIButton* setButton = [[UIButton alloc] initWithFrame:CGRectMake(10, 10, 50, 25)];
-        [setButton setTitle:@"set" forState:UIControlStateNormal];
-        [setButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        setButton.backgroundColor = [UIColor blueColor];
-        pinView.rightCalloutAccessoryView = setButton;
+        self.setButton = [[UIButton alloc] initWithFrame:CGRectMake(10, 10, 50, 25)];
+        [self.setButton setTitle:@"set" forState:UIControlStateNormal];
+        [self.setButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+//        setButton.backgroundColor = [UIColor blueColor];
+        pinView.rightCalloutAccessoryView = self.setButton;
     }
     else {
         pinView.annotation = annotation;
@@ -101,21 +109,32 @@
 
 -(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control {
     
+
     if (view.rightCalloutAccessoryView) {
         NSLog(@"set button clicked");
+        [UIView animateWithDuration:0.5 animations:^{
+            self.setLocationView.frame = CGRectMake((self.view.frame.size.width/2) - 150, 100, 300, 200) ;
+            
+        }];
+//        [self.setButton addTarget:self action:@selector(presentView) forControlEvents:UIControlEventTouchUpInside];
+        
     }
     
 }
 
+- (void)presentView {
+    [UIView animateWithDuration:1.0 animations:^{
+        self.setLocationView.frame = self.view.bounds;
+        
+    }];
+}
 
 
 -(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view didChangeDragState:(MKAnnotationViewDragState)newState fromOldState:(MKAnnotationViewDragState)oldState {
     if (newState == MKAnnotationViewDragStateEnding) {
         CLLocationCoordinate2D droppedAt = view.annotation.coordinate;
-        NSLog(@"dropped at %f %f", droppedAt.latitude, droppedAt.longitude);
-        self.latitude = droppedAt.latitude;
-        self.longitude = droppedAt.longitude;
-        NSLog(@"dropped at %f, %f", self.latitude, self.longitude );
+        self.location = [[CLLocation alloc] initWithLatitude:droppedAt.latitude longitude:droppedAt.longitude];
+        NSLog(@"dropped at %@", self.location );
     }
 }
 

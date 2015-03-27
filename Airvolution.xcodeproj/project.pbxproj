@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		FC1F21CD1AC342AB00A8DCD8 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */; };
 		FC1F21CF1AC3563300A8DCD8 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC1F21CE1AC3563300A8DCD8 /* CoreLocation.framework */; };
+		FC799E411AC5D6F800F8BD70 /* Location.m in Sources */ = {isa = PBXBuildFile; fileRef = FC799E401AC5D6F800F8BD70 /* Location.m */; };
+		FC799E461AC5D89E00F8BD70 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC799E451AC5D89E00F8BD70 /* CloudKit.framework */; };
+		FC799E491AC5E9CA00F8BD70 /* SetLocationView.m in Sources */ = {isa = PBXBuildFile; fileRef = FC799E481AC5E9CA00F8BD70 /* SetLocationView.m */; };
 		FC8B18F61AC4B7E000051693 /* LocationController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8B18F51AC4B7E000051693 /* LocationController.m */; };
 		FCE4012E1AC0C9E800DBB19A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FCE4012D1AC0C9E800DBB19A /* main.m */; };
 		FCE401311AC0C9E800DBB19A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FCE401301AC0C9E800DBB19A /* AppDelegate.m */; };
@@ -32,6 +35,12 @@
 /* Begin PBXFileReference section */
 		FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		FC1F21CE1AC3563300A8DCD8 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		FC799E3F1AC5D6F800F8BD70 /* Location.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Location.h; sourceTree = "<group>"; };
+		FC799E401AC5D6F800F8BD70 /* Location.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Location.m; sourceTree = "<group>"; };
+		FC799E441AC5D89A00F8BD70 /* Airvolution.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Airvolution.entitlements; sourceTree = "<group>"; };
+		FC799E451AC5D89E00F8BD70 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		FC799E471AC5E9CA00F8BD70 /* SetLocationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetLocationView.h; sourceTree = "<group>"; };
+		FC799E481AC5E9CA00F8BD70 /* SetLocationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SetLocationView.m; sourceTree = "<group>"; };
 		FC8B18F41AC4B7E000051693 /* LocationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationController.h; sourceTree = "<group>"; };
 		FC8B18F51AC4B7E000051693 /* LocationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationController.m; sourceTree = "<group>"; };
 		FCE401281AC0C9E800DBB19A /* Airvolution.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Airvolution.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -54,6 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC799E461AC5D89E00F8BD70 /* CloudKit.framework in Frameworks */,
 				FC1F21CF1AC3563300A8DCD8 /* CoreLocation.framework in Frameworks */,
 				FC1F21CD1AC342AB00A8DCD8 /* MapKit.framework in Frameworks */,
 			);
@@ -72,6 +82,7 @@
 		FCE4011F1AC0C9E800DBB19A = {
 			isa = PBXGroup;
 			children = (
+				FC799E451AC5D89E00F8BD70 /* CloudKit.framework */,
 				FC1F21CE1AC3563300A8DCD8 /* CoreLocation.framework */,
 				FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */,
 				FCE4012A1AC0C9E800DBB19A /* Airvolution */,
@@ -92,12 +103,17 @@
 		FCE4012A1AC0C9E800DBB19A /* Airvolution */ = {
 			isa = PBXGroup;
 			children = (
+				FC799E441AC5D89A00F8BD70 /* Airvolution.entitlements */,
 				FCE4012F1AC0C9E800DBB19A /* AppDelegate.h */,
 				FCE401301AC0C9E800DBB19A /* AppDelegate.m */,
 				FCE401321AC0C9E800DBB19A /* MainViewController.h */,
 				FCE401331AC0C9E800DBB19A /* MainViewController.m */,
+				FC799E471AC5E9CA00F8BD70 /* SetLocationView.h */,
+				FC799E481AC5E9CA00F8BD70 /* SetLocationView.m */,
 				FC8B18F41AC4B7E000051693 /* LocationController.h */,
 				FC8B18F51AC4B7E000051693 /* LocationController.m */,
+				FC799E3F1AC5D6F800F8BD70 /* Location.h */,
+				FC799E401AC5D6F800F8BD70 /* Location.m */,
 				FCE401351AC0C9E800DBB19A /* Main.storyboard */,
 				FCE401381AC0C9E800DBB19A /* Images.xcassets */,
 				FCE4013A1AC0C9E800DBB19A /* LaunchScreen.xib */,
@@ -181,6 +197,7 @@
 				TargetAttributes = {
 					FCE401271AC0C9E800DBB19A = {
 						CreatedOnToolsVersion = 6.2;
+						DevelopmentTeam = TDKNZSR6G6;
 						SystemCapabilities = {
 							com.apple.Maps.iOS = {
 								enabled = 1;
@@ -238,6 +255,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				FC8B18F61AC4B7E000051693 /* LocationController.m in Sources */,
+				FC799E411AC5D6F800F8BD70 /* Location.m in Sources */,
+				FC799E491AC5E9CA00F8BD70 /* SetLocationView.m in Sources */,
 				FCE401341AC0C9E800DBB19A /* MainViewController.m in Sources */,
 				FCE401311AC0C9E800DBB19A /* AppDelegate.m in Sources */,
 				FCE4012E1AC0C9E800DBB19A /* main.m in Sources */,
@@ -362,9 +381,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Airvolution/Airvolution.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = Airvolution/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -372,9 +395,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Airvolution/Airvolution.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = Airvolution/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};
