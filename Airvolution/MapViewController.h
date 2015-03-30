@@ -7,8 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+@import MapKit;
 
-@interface MainViewController : UIViewController
+@interface MapViewController : UIViewController
+
 
 
 @end

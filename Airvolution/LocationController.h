@@ -12,7 +12,7 @@
 
 @interface LocationController : NSObject
 
-@property (nonatomic, strong) NSArray *locations;
+@property (nonatomic,strong) NSArray *locations;
 
 + (LocationController *)sharedInstance;
 

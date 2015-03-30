@@ -7,7 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Location.h"
+#import <MapKit/MapKit.h>
 
 @interface SetLocationView : UIView
+
+@property (nonatomic, strong) Location *location;
+@property (nonatomic) CLLocation *locationFromAnnotation;
 
 @end

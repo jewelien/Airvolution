@@ -41,5 +41,31 @@
     
 }
 
+- (NSArray *)locations {
+//    CKContainer *defaultContainer = [CKContainer defaultContainer];
+    NSMutableArray *array = [[NSMutableArray alloc] init];
+    CKQuery *query = [[CKQuery alloc] initWithRecordType:locationRecordKey predicate:[NSPredicate predicateWithFormat:@"TRUEPREDICATE"]];
+//    CKQueryOperation *operation = [[CKQueryOperation alloc] initWithQuery:query];
+//    operation.desiredKeys = @[@"%@, %@", nameKey, locationKey];
+//    [[LocationController publicDatabase]addOperation:operation];
+    [[LocationController publicDatabase] performQuery:query inZoneWithID:nil completionHandler:^(NSArray *results, NSError *error) {
+        
+        if (error) {
+            NSLog(@"fetch locations failed");
+        } else {
+            NSLog(@"fetched locations successfully");
+            for (CKRecord *record in results) {
+                //            NSLog(@"%@, %@", [record objectForKey:nameKey], [record objectForKey:locationKey]);
+                [array addObject:[record objectForKey:nameKey]];
+                [array addObject:[record objectForKey:locationKey]];
+            }
+        }
+    }];
+    return array;
+}
+
+
+
+
 
 @end

@@ -15,7 +15,7 @@
 		FC8B18F61AC4B7E000051693 /* LocationController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8B18F51AC4B7E000051693 /* LocationController.m */; };
 		FCE4012E1AC0C9E800DBB19A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FCE4012D1AC0C9E800DBB19A /* main.m */; };
 		FCE401311AC0C9E800DBB19A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FCE401301AC0C9E800DBB19A /* AppDelegate.m */; };
-		FCE401341AC0C9E800DBB19A /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCE401331AC0C9E800DBB19A /* MainViewController.m */; };
+		FCE401341AC0C9E800DBB19A /* MapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCE401331AC0C9E800DBB19A /* MapViewController.m */; };
 		FCE401371AC0C9E800DBB19A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FCE401351AC0C9E800DBB19A /* Main.storyboard */; };
 		FCE401391AC0C9E800DBB19A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FCE401381AC0C9E800DBB19A /* Images.xcassets */; };
 		FCE4013C1AC0C9E800DBB19A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCE4013A1AC0C9E800DBB19A /* LaunchScreen.xib */; };
@@ -48,8 +48,8 @@
 		FCE4012D1AC0C9E800DBB19A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		FCE4012F1AC0C9E800DBB19A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		FCE401301AC0C9E800DBB19A /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		FCE401321AC0C9E800DBB19A /* MainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
-		FCE401331AC0C9E800DBB19A /* MainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
+		FCE401321AC0C9E800DBB19A /* MapViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapViewController.h; sourceTree = "<group>"; };
+		FCE401331AC0C9E800DBB19A /* MapViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapViewController.m; sourceTree = "<group>"; };
 		FCE401361AC0C9E800DBB19A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		FCE401381AC0C9E800DBB19A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		FCE4013B1AC0C9E800DBB19A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -106,8 +106,8 @@
 				FC799E441AC5D89A00F8BD70 /* Airvolution.entitlements */,
 				FCE4012F1AC0C9E800DBB19A /* AppDelegate.h */,
 				FCE401301AC0C9E800DBB19A /* AppDelegate.m */,
-				FCE401321AC0C9E800DBB19A /* MainViewController.h */,
-				FCE401331AC0C9E800DBB19A /* MainViewController.m */,
+				FCE401321AC0C9E800DBB19A /* MapViewController.h */,
+				FCE401331AC0C9E800DBB19A /* MapViewController.m */,
 				FC799E471AC5E9CA00F8BD70 /* SetLocationView.h */,
 				FC799E481AC5E9CA00F8BD70 /* SetLocationView.m */,
 				FC8B18F41AC4B7E000051693 /* LocationController.h */,
@@ -257,7 +257,7 @@
 				FC8B18F61AC4B7E000051693 /* LocationController.m in Sources */,
 				FC799E411AC5D6F800F8BD70 /* Location.m in Sources */,
 				FC799E491AC5E9CA00F8BD70 /* SetLocationView.m in Sources */,
-				FCE401341AC0C9E800DBB19A /* MainViewController.m in Sources */,
+				FCE401341AC0C9E800DBB19A /* MapViewController.m in Sources */,
 				FCE401311AC0C9E800DBB19A /* AppDelegate.m in Sources */,
 				FCE4012E1AC0C9E800DBB19A /* main.m in Sources */,
 			);
