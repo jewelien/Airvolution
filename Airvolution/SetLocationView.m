@@ -20,7 +20,8 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor lightGrayColor];
+        self.backgroundColor = [UIColor grayColor];
+        
         self.nameField = [[UITextField alloc] initWithFrame:CGRectMake(30, 60, 250, 50)];
         //self.setLocationView.frame = CGRectMake((self.view.frame.size.width/2) - 150, 100, 300, 200) ;
         self.nameField.delegate = self;
@@ -36,7 +37,7 @@
         [self addSubview:saveButton];
         [saveButton addTarget:self action:@selector(saveButtonPressed) forControlEvents:UIControlEventTouchUpInside];
         
-        UIButton *cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(50, 200, 200, 50)];
+        UIButton *cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(50, 175, 200, 50)];
         [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
         [cancelButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [self addSubview:cancelButton];

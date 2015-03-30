@@ -18,4 +18,7 @@
 
 - (void)saveLocationWithName:(NSString *)name location:(CLLocation *)location;
 
+- (void)loadLocationsFromCloudKit;
+
+
 @end

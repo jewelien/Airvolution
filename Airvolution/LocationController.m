@@ -8,6 +8,7 @@
 
 #import "LocationController.h"
 #import <CloudKit/CloudKit.h>
+#import "MapViewController.h"
 
 @implementation LocationController
 
@@ -41,31 +42,28 @@
     
 }
 
-- (NSArray *)locations {
-//    CKContainer *defaultContainer = [CKContainer defaultContainer];
-    NSMutableArray *array = [[NSMutableArray alloc] init];
-    CKQuery *query = [[CKQuery alloc] initWithRecordType:locationRecordKey predicate:[NSPredicate predicateWithFormat:@"TRUEPREDICATE"]];
-//    CKQueryOperation *operation = [[CKQueryOperation alloc] initWithQuery:query];
-//    operation.desiredKeys = @[@"%@, %@", nameKey, locationKey];
-//    [[LocationController publicDatabase]addOperation:operation];
+- (void)loadLocationsFromCloudKit
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"TRUEPREDICATE"];
+    CKQuery *query = [[CKQuery alloc] initWithRecordType:locationRecordKey predicate:predicate];
     [[LocationController publicDatabase] performQuery:query inZoneWithID:nil completionHandler:^(NSArray *results, NSError *error) {
-        
         if (error) {
             NSLog(@"fetch locations failed");
         } else {
             NSLog(@"fetched locations successfully");
+            NSMutableArray *array = [[NSMutableArray alloc] init];
             for (CKRecord *record in results) {
-                //            NSLog(@"%@, %@", [record objectForKey:nameKey], [record objectForKey:locationKey]);
-                [array addObject:[record objectForKey:nameKey]];
-                [array addObject:[record objectForKey:locationKey]];
+                NSMutableDictionary *dictionary = [NSMutableDictionary new];
+                [dictionary setObject:[record objectForKey:nameKey] forKey:nameKey];
+                [dictionary setObject:[record objectForKey:locationKey] forKey:locationKey];
+                    [array addObject:dictionary];
             }
+            self.locations = array;
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"locationsFetched" object:nil];
         }
     }];
-    return array;
+
+
 }
-
-
-
-
 
 @end
