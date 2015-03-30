@@ -36,8 +36,7 @@
     [self setTitle:@"Airvolution"];
     
     NSLog(@"%@", [LocationController sharedInstance].locations);
-//    [[LocationController sharedInstance]locations];
-
+    
     
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
