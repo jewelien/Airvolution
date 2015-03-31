@@ -44,6 +44,7 @@
     if ([self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
         [self.locationManager requestWhenInUseAuthorization];
     }
+    
     [self.locationManager startUpdatingLocation];
     
     
@@ -54,18 +55,29 @@
     self.mapView.userTrackingMode = MKUserTrackingModeFollow;
     
     
-    self.dropPinButton = [[UIButton alloc]initWithFrame:CGRectMake(0, 505, 320, 65)];
-//    self.dropPinButton = [[UIButton alloc]initWithFrame:CGRectMake(225, 400, 75, 75)];
-//    self.dropPinButton.layer.cornerRadius = 35;
-//    self.dropPinButton.layer.borderWidth = 2;
-    [self.dropPinButton setTitle:@"Pin" forState:UIControlStateNormal];
-    self.dropPinButton.backgroundColor = [UIColor grayColor];
+//    self.dropPinButton = [[UIButton alloc]initWithFrame:CGRectMake(0, 505, 320, 65)];
+    self.dropPinButton = [[UIButton alloc] initWithFrame:CGRectMake(235, 400, 65, 65)];
+    [self.dropPinButton setImage:[UIImage imageNamed:@"location"] forState:UIControlStateNormal];
     [self.view addSubview:self.dropPinButton];
     [self.dropPinButton addTarget:self action:@selector(addPin) forControlEvents:UIControlEventTouchUpInside];
     
+    UIButton *currentLocationButton = [[UIButton alloc] initWithFrame:CGRectMake(235, 470, 65, 65)];
+    currentLocationButton.layer.cornerRadius = 35;
+    currentLocationButton.layer.borderWidth = 2;
+    currentLocationButton.layer.borderColor = [[UIColor colorWithRed:150/255.0 green:150/255.0 blue:150/255.0 alpha:1] CGColor];
+    currentLocationButton.backgroundColor = [UIColor clearColor];
+    [currentLocationButton setImage:[UIImage imageNamed:@"nearMeBlue"] forState:UIControlStateNormal];
+    [self.view addSubview:currentLocationButton];
+    [currentLocationButton addTarget:self action:@selector(currentLocationButtonPressed) forControlEvents:UIControlEventTouchUpInside];
+    
+    
     self.setLocationView = [[SetLocationView alloc] initWithFrame:CGRectMake(self.view.frame.size.width, 0, 300, self.view.frame.size.height)];
     [self.view addSubview:self.setLocationView];
+    
+}
 
+- (void)currentLocationButtonPressed{
+    self.mapView.userTrackingMode = MKUserTrackingModeFollow;
 }
 
 -(void)registerForNotifications{
@@ -73,10 +85,10 @@
 }
 
 - (void)updateMapWithLocationsAfterNotification:(NSNotification *)notification {
-     [self annotationsForLocations:[LocationController sharedInstance].locations];
+     [self pinsForSavedLocations:[LocationController sharedInstance].locations];
 }
      
-- (void)annotationsForLocations:(NSArray *)array {
+- (void)pinsForSavedLocations:(NSArray *)array {
     NSMutableArray *newArray = [NSMutableArray new];
     for (NSDictionary *dictionary in array) {
         MKPointAnnotation *savedAnnotation = [[MKPointAnnotation alloc] init];
@@ -93,6 +105,7 @@
 }
 
 
+
 - (void)addPin{
     MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
     annotation.coordinate = self.mapView.centerCoordinate;
@@ -105,8 +118,6 @@
             [self.mapView removeAnnotation:annotation];
         }
     }
-    
-
     
     [self.mapView addAnnotation:annotation];
 //    [annotation release];
@@ -122,10 +133,8 @@
     MKPinAnnotationView *pinView;
     
     if ([[annotation title] isEqualToString:@"..."]) {
-        
-         pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"pin"];
-        
         if (pinView == nil) {
+            pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"pin"];
             pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
             pinView.draggable = YES;
             pinView.canShowCallout = YES;
@@ -139,6 +148,7 @@
             pinView.annotation = annotation;
         }
     } else {
+        pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"savedPin"];
         pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"savedPin"];
         pinView.pinColor = MKPinAnnotationColorGreen;
         pinView.canShowCallout = YES;
@@ -154,7 +164,7 @@
         NSLog(@"set button clicked");
         [UIView animateWithDuration:0.5 animations:^{
             self.setLocationView.locationFromAnnotation = self.location;
-            self.setLocationView.frame = CGRectMake((self.view.frame.size.width/2) - 150, 125, 300, 250) ;
+            self.setLocationView.frame = CGRectMake((self.view.frame.size.width/2) - 150, 125, 300, 225) ;
 //            self.setLocationView.frame = self.view.bounds;
         }];
     }

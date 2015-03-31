@@ -12,7 +12,7 @@
 
 static NSString * const locationRecordKey = @"location";
 static NSString * const nameKey = @"name";
-static NSString * const locationKey = @"location";
+static NSString * const locationKey = @"coordinates";
 static NSString * const locationIdentifierKey = @"identifier";
 
 

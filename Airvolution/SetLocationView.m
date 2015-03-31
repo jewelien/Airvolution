@@ -22,7 +22,7 @@
     if (self) {
         self.backgroundColor = [UIColor grayColor];
         
-        self.nameField = [[UITextField alloc] initWithFrame:CGRectMake(30, 60, 250, 50)];
+        self.nameField = [[UITextField alloc] initWithFrame:CGRectMake(30, 30, 250, 50)];
         //self.setLocationView.frame = CGRectMake((self.view.frame.size.width/2) - 150, 100, 300, 200) ;
         self.nameField.delegate = self;
         [self.nameField setPlaceholder:@"location name"];
@@ -31,13 +31,13 @@
                 self.nameField.backgroundColor = [UIColor whiteColor];
         [self addSubview:self.nameField];
         
-        UIButton *saveButton = [[UIButton alloc] initWithFrame:CGRectMake(50, 120, 200, 50)];
+        UIButton *saveButton = [[UIButton alloc] initWithFrame:CGRectMake(50, 100, 200, 50)];
         [saveButton setTitle:@"Share" forState:UIControlStateNormal];
         [saveButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [self addSubview:saveButton];
         [saveButton addTarget:self action:@selector(saveButtonPressed) forControlEvents:UIControlEventTouchUpInside];
         
-        UIButton *cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(50, 175, 200, 50)];
+        UIButton *cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(50, 155, 200, 50)];
         [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
         [cancelButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [self addSubview:cancelButton];
