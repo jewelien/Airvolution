@@ -49,6 +49,7 @@
 }
 
 - (void)saveButtonPressed {
+    [self.nameField resignFirstResponder];
     NSLog(@"save button pressed %@", self.locationFromAnnotation);
     NSLog(@"save button pressed %@", self.nameField.text);
     if ([self.nameField.text isEqualToString:@""]) {
@@ -58,15 +59,15 @@
         self.frame = CGRectMake(self.superview.frame.size.width, 0, 300, self.superview.frame.size.height);
         self.nameField.text = @"";
     }
-    
 }
 
 - (void)cancelButtonPressed {
+    [self.nameField resignFirstResponder];
     self.frame = CGRectMake(self.superview.frame.size.width, 0, 300, self.superview.frame.size.height);
     self.nameField.text = @"";
 }
 
--(BOOL)textFieldShouldReturn:(UITextField *)textField {
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [textField resignFirstResponder];
     return YES;
 }

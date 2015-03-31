@@ -10,19 +10,23 @@
 #import "SetLocationView.h"
 #import "LocationController.h"
 
-@interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate>
+@interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate>
 
 
 @property (nonatomic) MKMapView *mapView;
 @property (nonatomic) CLLocationManager *locationManager;
 
 @property (nonatomic, strong) UIButton *dropPinButton;
-@property (nonatomic) CLLocation *location;
-
 @property (nonatomic, strong) UIButton *setButton;
+@property (nonatomic, strong) UISearchBar *searchBar;
+
+@property (nonatomic) CLLocation *location;
 @property (nonatomic, strong) SetLocationView *setLocationView;
 
-
+@property (nonatomic, strong) MKPointAnnotation *droppedPinAnnotation;
+@property (nonatomic, strong) NSMutableArray *placemarks;
+@property (nonatomic, strong) NSMutableArray *savedLocations;
+@property (nonatomic, strong) NSArray *selectedPinAddress;
 
 @end
 
@@ -34,28 +38,21 @@
     // Do any additional setup after loading the view, typically from a nib.
     
     [self setTitle:@"Airvolution"];
-    [[LocationController sharedInstance]loadLocationsFromCloudKit];
     [self registerForNotifications];
 
     
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
-    
     if ([self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
         [self.locationManager requestWhenInUseAuthorization];
     }
-    
     [self.locationManager startUpdatingLocation];
-    
-    
     self.mapView = [[MKMapView alloc] initWithFrame:self.view.bounds];
     self.mapView.delegate = self;
     [self.view addSubview:self.mapView];
     self.mapView.showsUserLocation = YES;
     self.mapView.userTrackingMode = MKUserTrackingModeFollow;
     
-    
-//    self.dropPinButton = [[UIButton alloc]initWithFrame:CGRectMake(0, 505, 320, 65)];
     self.dropPinButton = [[UIButton alloc] initWithFrame:CGRectMake(235, 400, 65, 65)];
     [self.dropPinButton setImage:[UIImage imageNamed:@"location"] forState:UIControlStateNormal];
     [self.view addSubview:self.dropPinButton];
@@ -70,61 +67,147 @@
     [self.view addSubview:currentLocationButton];
     [currentLocationButton addTarget:self action:@selector(currentLocationButtonPressed) forControlEvents:UIControlEventTouchUpInside];
     
+    UIButton *clearPinsButton = [[UIButton alloc] initWithFrame:CGRectMake(235, 350, 65, 65)];
+    [clearPinsButton setImage:[UIImage imageNamed:@"clear"] forState:UIControlStateNormal];
+    [clearPinsButton addTarget:self action:@selector(clearPins) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:clearPinsButton];
+    
+    self.searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(20, 70, 285, 30)];
+    self.searchBar.searchBarStyle = UISearchBarStyleMinimal;
+    self.searchBar.delegate = self;
+    [self.searchBar setShowsCancelButton:YES];
+    
+    [self.view addSubview:self.searchBar];
     
     self.setLocationView = [[SetLocationView alloc] initWithFrame:CGRectMake(self.view.frame.size.width, 0, 300, self.view.frame.size.height)];
     [self.view addSubview:self.setLocationView];
     
 }
 
-- (void)currentLocationButtonPressed{
-    self.mapView.userTrackingMode = MKUserTrackingModeFollow;
+#pragma mapSearch
+
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+{
+    [searchBar resignFirstResponder];
+    // Create and initialize a search request object.
+    MKLocalSearchRequest *request = [[MKLocalSearchRequest alloc] init];
+    request.naturalLanguageQuery = self.searchBar.text;
+    request.region = self.mapView.region;
+    
+    // Create and initialize a search object.
+    MKLocalSearch *search = [[MKLocalSearch alloc] initWithRequest:request];
+    
+    // Start the search and display the results as annotations on the map.
+    [search startWithCompletionHandler:^(MKLocalSearchResponse *response, NSError *error)
+     {
+         self.placemarks = [NSMutableArray array];
+         for (MKMapItem *item in response.mapItems) {
+             [self.placemarks addObject:item.placemark];
+         }
+//         [self.mapView removeAnnotations:[self.mapView annotations]];
+         [self.mapView showAnnotations:self.placemarks animated:NO];
+     }];
 }
 
--(void)registerForNotifications{
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateMapWithLocationsAfterNotification:) name:@"locationsFetched" object:nil];
+-(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
+{
+    [searchBar resignFirstResponder];
 }
 
-- (void)updateMapWithLocationsAfterNotification:(NSNotification *)notification {
-     [self pinsForSavedLocations:[LocationController sharedInstance].locations];
+
+#pragma notification observer
+-(void)registerForNotifications
+{
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateMapWithSavedLocations) name:@"locationsFetched" object:nil];
 }
-     
-- (void)pinsForSavedLocations:(NSArray *)array {
-    NSMutableArray *newArray = [NSMutableArray new];
-    for (NSDictionary *dictionary in array) {
+
+- (void)updateMapWithSavedLocations
+{
+    self.savedLocations = [NSMutableArray new];
+    for (NSDictionary *dictionary in [LocationController sharedInstance].locations) {
         MKPointAnnotation *savedAnnotation = [[MKPointAnnotation alloc] init];
         CLLocation *location = dictionary[locationKey];
         savedAnnotation.coordinate = CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude);
         savedAnnotation.title = dictionary[nameKey];
-        [newArray addObject:savedAnnotation];
+        
+        [self.savedLocations addObject:savedAnnotation];
     }
-    [self.mapView addAnnotations:newArray];
+    [self.mapView addAnnotations:self.savedLocations];
 }
 
--(void)deRegisterForNotifcations {
+-(void)deRegisterForNotifcations
+{
     [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
+#pragma geocode location
+
+-(void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view
+{
+    MKPointAnnotation *selectedAnnotation = view.annotation;
+    
+    if ( [selectedAnnotation isKindOfClass:[MKPlacemark class]] ) {
+        return;
+    } else {
+        CLLocation *selectedLocation = [[CLLocation alloc] initWithLatitude:selectedAnnotation.coordinate.latitude longitude:selectedAnnotation.coordinate.longitude];
+        [self reverseGeocode:selectedLocation forAnnotation:selectedAnnotation];
+    }
+    
+}
+
+- (void)reverseGeocode:(CLLocation *)location forAnnotation:(MKPointAnnotation *)annotation
+{
+    CLGeocoder *geocoder = [[CLGeocoder alloc] init];
+    [geocoder reverseGeocodeLocation:location completionHandler:^(NSArray *placemarks, NSError *error) {
+        NSLog(@"Finding address");
+        if (error) {
+            NSLog(@"Error %@", error.description);
+        } else {
+            CLPlacemark *placemark = [placemarks lastObject];
+            self.selectedPinAddress = [placemark.addressDictionary valueForKey:@"FormattedAddressLines"];
+            NSLog(@"%@", self.selectedPinAddress);
+            annotation.subtitle = [NSString stringWithFormat:@"%@", self.selectedPinAddress[0]];
+        }
+    }];
+
+}
 
 
-- (void)addPin{
-    MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
-    annotation.coordinate = self.mapView.centerCoordinate;
-    annotation.title = @"...";
-    self.location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
+#pragma buttons
+- (void)currentLocationButtonPressed
+{
+    self.mapView.userTrackingMode = MKUserTrackingModeFollow;
+}
+
+- (void)clearPins
+{
+    [self.mapView removeAnnotation:self.droppedPinAnnotation];
+    [self.mapView removeAnnotations:self.placemarks];
+//    [self.mapView addAnnotations:self.savedLocations];
+}
+
+#pragma annotations
+- (void)addPin
+{
+    self.droppedPinAnnotation = [[MKPointAnnotation alloc] init];
+    self.droppedPinAnnotation.coordinate = self.mapView.centerCoordinate;
+    self.droppedPinAnnotation.title = @"location name";
+    self.location = [[CLLocation alloc] initWithLatitude:self.droppedPinAnnotation.coordinate.latitude longitude:self.droppedPinAnnotation.coordinate.longitude];
 //    NSLog(@"DROPPED %@", self.location);
     
     for (id annotation in self.mapView.annotations) {
-        if ([[annotation title] isEqualToString:@"..."]) {
+        if ([[annotation title] isEqualToString:@"location name"]) {
             [self.mapView removeAnnotation:annotation];
         }
     }
     
-    [self.mapView addAnnotation:annotation];
+    [self.mapView addAnnotation:self.droppedPinAnnotation];
 //    [annotation release];
 }
 
 
--(MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
+-(MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation
+{
     
     if ([annotation isKindOfClass:[MKUserLocation class]]) {
         return nil;
@@ -132,10 +215,14 @@
     
     MKPinAnnotationView *pinView;
     
-    if ([[annotation title] isEqualToString:@"..."]) {
+    if ([annotation isKindOfClass:[MKPlacemark class] ]) {
+        pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"placemarksPin"];
+        pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"placemarksPin"];
+        pinView.pinColor = MKPinAnnotationColorPurple;
+    } else if ([[annotation title] isEqualToString:@"location name"]) {
         if (pinView == nil) {
-            pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"pin"];
-            pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
+            pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"droppedPin"];
+            pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"droppedPin"];
             pinView.draggable = YES;
             pinView.canShowCallout = YES;
             pinView.animatesDrop = YES;
@@ -158,8 +245,8 @@
 }
 
 
--(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control {
-
+-(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
+{
     if (view.rightCalloutAccessoryView) {
         NSLog(@"set button clicked");
         [UIView animateWithDuration:0.5 animations:^{
@@ -169,9 +256,11 @@
         }];
     }
     
+    
 }
 
--(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view didChangeDragState:(MKAnnotationViewDragState)newState fromOldState:(MKAnnotationViewDragState)oldState {
+-(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view didChangeDragState:(MKAnnotationViewDragState)newState fromOldState:(MKAnnotationViewDragState)oldState
+{
     
     if (newState == MKAnnotationViewDragStateEnding) {
         CLLocationCoordinate2D droppedAt = view.annotation.coordinate;

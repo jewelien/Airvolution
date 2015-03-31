@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "MapViewController.h"
+#import "LocationController.h"
 
 @interface AppDelegate ()
 
@@ -19,6 +20,8 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:[MapViewController new]];
+    [[LocationController sharedInstance]loadLocationsFromCloudKit];
+
     return YES;
 }
 

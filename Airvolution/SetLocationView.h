@@ -12,7 +12,6 @@
 
 @interface SetLocationView : UIView
 
-@property (nonatomic, strong) Location *location;
 @property (nonatomic) CLLocation *locationFromAnnotation;
 
 @end
