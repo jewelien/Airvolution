@@ -9,8 +9,13 @@
 #import "AppDelegate.h"
 #import "MapViewController.h"
 #import "LocationController.h"
+#import "ProfileViewController.h"
+#import "LeaderboardViewController.h"
+
 
 @interface AppDelegate ()
+
+@property (nonatomic, strong) UITabBarController *tabBarController;
 
 @end
 
@@ -19,9 +24,40 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:[MapViewController new]];
-    [[LocationController sharedInstance]loadLocationsFromCloudKit];
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 
+    [[LocationController sharedInstance]loadLocationsFromCloudKit];
+    
+    MapViewController *mapViewController = [MapViewController new];
+    UIImage *mapImage = [UIImage imageNamed:@"globe"];
+    UITabBarItem *mapTabBar = [[UITabBarItem alloc] initWithTitle:@"Map" image:mapImage selectedImage:nil];
+    mapViewController.tabBarItem = mapTabBar;
+    
+    ProfileViewController *profileViewController = [ProfileViewController new];
+    UIImage *profileImage = [UIImage imageNamed:@"profileBlue"];
+    UITabBarItem *profileTabBar = [[UITabBarItem alloc] initWithTitle:@"Profile" image:profileImage selectedImage:nil];
+    profileViewController.tabBarItem = profileTabBar;
+    
+    LeaderboardViewController *leaderboardViewController = [LeaderboardViewController new];
+    UIImage *leaderboardImage = [UIImage imageNamed:@"people"];
+    UITabBarItem *leaderboardTabBar = [[UITabBarItem alloc] initWithTitle:@"Leaderboard" image:leaderboardImage selectedImage:nil];
+    leaderboardViewController.tabBarItem = leaderboardTabBar;
+    
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:mapViewController];
+    NSArray *controllers = [NSArray arrayWithObjects:profileViewController, navigationController, leaderboardViewController, nil];
+    
+    self.tabBarController = [[UITabBarController alloc] init];
+    self.tabBarController.viewControllers = controllers;
+    
+    self.window.backgroundColor = [UIColor whiteColor];
+    self.window.rootViewController = self.tabBarController;
+//    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:[MapViewController new]];
+    
+    [self.window makeKeyAndVisible];
+    
+    UITabBarController *tabBar = (UITabBarController *)self.window.rootViewController;
+    tabBar.selectedIndex = 1;
+    
     return YES;
 }
 
