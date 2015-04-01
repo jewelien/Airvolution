@@ -167,6 +167,10 @@
             self.selectedPinAddress = [placemark.addressDictionary valueForKey:@"FormattedAddressLines"];
             NSLog(@"%@", self.selectedPinAddress);
             annotation.subtitle = [NSString stringWithFormat:@"%@", self.selectedPinAddress[0]];
+            
+//            MKPinAnnotationView *view = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"savedPin"];
+//            view.rightCalloutAccessoryView = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+////            need to set this only for savedPinLocations
         }
     }];
 
