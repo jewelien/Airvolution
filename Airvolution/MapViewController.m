@@ -12,7 +12,6 @@
 
 @interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate>
 
-@property (nonatomic) MKMapView *mapView;
 @property (nonatomic) CLLocationManager *locationManager;
 
 @property (nonatomic, strong) UIButton *dropPinButton;
@@ -23,7 +22,6 @@
 
 @property (nonatomic, strong) MKPointAnnotation *droppedPinAnnotation;
 @property (nonatomic, strong) NSMutableArray *placemarks;
-@property (nonatomic, strong) NSMutableArray *savedLocations;
 @property (nonatomic, strong) NSArray *selectedPinAddress;
 
 @end
@@ -63,11 +61,6 @@ static NSString * const droppedPinTitle = @"cancel or add";
     dropPinPress.minimumPressDuration = 1.0;
     [self.mapView addGestureRecognizer:dropPinPress];
     
-    UIButton *clearPinsButton = [[UIButton alloc] initWithFrame:CGRectMake(260, 455, 45, 40)];
-//    clearPinsButton.backgroundColor = [UIColor grayColor];
-    [clearPinsButton setImage:[UIImage imageNamed:@"clear"] forState:UIControlStateNormal];
-    [clearPinsButton addTarget:self action:@selector(clearPins) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:clearPinsButton];
     
     MKUserTrackingBarButtonItem *barButtonItem = [[MKUserTrackingBarButtonItem alloc] initWithMapView:self.mapView];
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
@@ -86,7 +79,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 {
     [UIView animateWithDuration:1.0 animations:^{
         self.searchBar.frame = CGRectMake(20, 70, 285, 30);
-        self.searchBar.searchBarStyle = UISearchBarStyleDefault;
+        self.searchBar.searchBarStyle = UISearchBarStyleProminent;
         //    self.searchBar.barTintColor = [UIColor whiteColor];
         self.searchBar.delegate = self;
         self.searchBar.showsCancelButton = YES;
@@ -130,6 +123,10 @@ static NSString * const droppedPinTitle = @"cancel or add";
 -(void)registerForNotifications
 {
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateMapWithSavedLocations) name:@"locationsFetched" object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitFailedAlert) name:@"CloudKitSaveFail" object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitSuccess) name:@"savedToCloudKit" object:nil];
 }
 
 - (void)updateMapWithSavedLocations
@@ -143,7 +140,25 @@ static NSString * const droppedPinTitle = @"cancel or add";
         
         [self.savedLocations addObject:savedAnnotation];
     }
+    NSLog(@"%@", self.savedLocations);
     [self.mapView addAnnotations:self.savedLocations];
+}
+
+
+- (void)savedToCloudKitFailedAlert {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"error" message:@"please enter a location name" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:nil];
+    [alert addAction:action];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+- (void)savedToCloudKitSuccess {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Success" message:@"Thank you for your sharing! This location has now been saved." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:nil];
+    [alert addAction:action];
+    [self presentViewController:alert animated:YES completion:nil];
+
 }
 
 -(void)deRegisterForNotifcations

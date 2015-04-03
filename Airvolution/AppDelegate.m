@@ -11,6 +11,7 @@
 #import "LocationController.h"
 #import "ProfileViewController.h"
 #import "LeaderboardViewController.h"
+#import "UserController.h"
 
 
 @interface AppDelegate ()
@@ -27,6 +28,7 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 
     [[LocationController sharedInstance]loadLocationsFromCloudKit];
+    [[UserController sharedInstance] fetchUserRecordID];
     
     MapViewController *mapViewController = [MapViewController new];
     UIImage *mapImage = [UIImage imageNamed:@"globe"];

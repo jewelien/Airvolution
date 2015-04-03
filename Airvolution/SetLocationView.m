@@ -53,6 +53,7 @@
     NSLog(@"save button pressed %@", self.locationFromAnnotation);
     NSLog(@"save button pressed %@", self.nameField.text);
     if ([self.nameField.text isEqualToString:@""]) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"CloudKitSaveFail" object:nil];
         NSLog(@"please enter a location name");
     } else {
         [[LocationController sharedInstance] saveLocationWithName:self.nameField.text location:self.locationFromAnnotation];

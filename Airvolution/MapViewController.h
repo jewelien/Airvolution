@@ -11,6 +11,9 @@
 
 @interface MapViewController : UIViewController
 
+@property (nonatomic) MKMapView *mapView;
+@property (nonatomic, strong) NSMutableArray *savedLocations;
+
 
 
 @end

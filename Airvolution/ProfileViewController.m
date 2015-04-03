@@ -7,8 +7,13 @@
 //
 
 #import "ProfileViewController.h"
+#import "ProfileTableViewDatasource.h"
+
 
 @interface ProfileViewController ()
+
+@property (nonatomic, strong) UITableView *tableView;
+@property (nonatomic, strong) ProfileTableViewDatasource *dataSource;
 
 @end
 
@@ -17,6 +22,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
+    self.dataSource = [ProfileTableViewDatasource new];
+    self.tableView.dataSource = self.dataSource;
+    [self.view addSubview:self.tableView];
 
 
 }
