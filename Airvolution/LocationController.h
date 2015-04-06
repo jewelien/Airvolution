@@ -9,16 +9,22 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 #import "Location.h"
+#import "MapViewController.h"
+#import <CloudKit/CloudKit.h>
+
 
 @interface LocationController : NSObject
 
 @property (nonatomic,strong) NSArray *locations;
 
+
+
 + (LocationController *)sharedInstance;
-
 - (void)saveLocationWithName:(NSString *)name location:(CLLocation *)location;
-
 - (void)loadLocationsFromCloudKit;
+
+
+
 
 
 @end

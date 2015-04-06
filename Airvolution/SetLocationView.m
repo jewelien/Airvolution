@@ -20,7 +20,7 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor grayColor];
+        self.backgroundColor = [UIColor whiteColor];
         
         self.nameField = [[UITextField alloc] initWithFrame:CGRectMake(30, 30, 250, 50)];
         //self.setLocationView.frame = CGRectMake((self.view.frame.size.width/2) - 150, 100, 300, 200) ;
@@ -53,6 +53,7 @@
     NSLog(@"save button pressed %@", self.locationFromAnnotation);
     NSLog(@"save button pressed %@", self.nameField.text);
     if ([self.nameField.text isEqualToString:@""]) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"CloudKitSaveFail" object:nil];
         NSLog(@"please enter a location name");
     } else {
         [[LocationController sharedInstance] saveLocationWithName:self.nameField.text location:self.locationFromAnnotation];

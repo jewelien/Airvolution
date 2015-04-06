@@ -7,8 +7,6 @@
 //
 
 #import "LocationController.h"
-#import <CloudKit/CloudKit.h>
-#import "MapViewController.h"
 
 @implementation LocationController
 
@@ -35,12 +33,15 @@
     [[LocationController publicDatabase] saveRecord:cloudKitLocation completionHandler:^(CKRecord *record, NSError *error) {
         if (!error) {
             NSLog(@"Location saved to CloudKit");
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"savedToCloudKit" object:nil];
+            
         } else {
             NSLog(@"NOT saved to CloudKit");
         }
     }];
     
 }
+
 
 - (void)loadLocationsFromCloudKit
 {
@@ -58,12 +59,13 @@
                 [dictionary setObject:[record objectForKey:locationKey] forKey:locationKey];
                     [array addObject:dictionary];
             }
+//            NSLog(@"records results : %@", results);
             self.locations = array;
             [[NSNotificationCenter defaultCenter] postNotificationName:@"locationsFetched" object:nil];
         }
     }];
 
-
 }
+
 
 @end

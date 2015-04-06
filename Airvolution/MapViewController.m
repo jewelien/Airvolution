@@ -12,12 +12,9 @@
 
 @interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate>
 
-
-@property (nonatomic) MKMapView *mapView;
 @property (nonatomic) CLLocationManager *locationManager;
 
 @property (nonatomic, strong) UIButton *dropPinButton;
-@property (nonatomic, strong) UIButton *setButton;
 @property (nonatomic, strong) UISearchBar *searchBar;
 
 @property (nonatomic) CLLocation *location;
@@ -25,10 +22,12 @@
 
 @property (nonatomic, strong) MKPointAnnotation *droppedPinAnnotation;
 @property (nonatomic, strong) NSMutableArray *placemarks;
-@property (nonatomic, strong) NSMutableArray *savedLocations;
 @property (nonatomic, strong) NSArray *selectedPinAddress;
 
 @end
+
+static NSString * const droppedPinTitle = @"cancel or add";
+
 
 @implementation MapViewController
 
@@ -36,10 +35,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    
+//    self.view.backgroundColor = [UIColor lightGrayColor];
     [self setTitle:@"Airvolution"];
     [self registerForNotifications];
-
     
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
@@ -47,44 +45,69 @@
         [self.locationManager requestWhenInUseAuthorization];
     }
     [self.locationManager startUpdatingLocation];
-    self.mapView = [[MKMapView alloc] initWithFrame:self.view.bounds];
+    self.mapView = [[MKMapView alloc] initWithFrame:CGRectMake(0, 105, self.view.frame.size.width, self.view.frame.size.height - 105)];
     self.mapView.delegate = self;
     [self.view addSubview:self.mapView];
     self.mapView.showsUserLocation = YES;
     self.mapView.userTrackingMode = MKUserTrackingModeFollow;
     
-    self.dropPinButton = [[UIButton alloc] initWithFrame:CGRectMake(235, 400, 65, 65)];
+//    self.dropPinButton = [[UIButton alloc] initWithFrame:CGRectMake(260, 400, 45, 55)];
+////    self.dropPinButton.backgroundColor = [UIColor grayColor];
+//    [self.dropPinButton setImage:[UIImage imageNamed:@"location"] forState:UIControlStateNormal];
+//    [self.view addSubview:self.dropPinButton];
+//    [self.dropPinButton addTarget:self action:@selector(dropPinAtCurrentLocation) forControlEvents:UIControlEventTouchUpInside];
+
+    
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
+    self.dropPinButton = [[UIButton alloc] initWithFrame:view.frame];
     [self.dropPinButton setImage:[UIImage imageNamed:@"location"] forState:UIControlStateNormal];
-    [self.view addSubview:self.dropPinButton];
-    [self.dropPinButton addTarget:self action:@selector(addPin) forControlEvents:UIControlEventTouchUpInside];
+    [self.dropPinButton addTarget:self action:@selector(dropPinAtCurrentLocation) forControlEvents:UIControlEventTouchUpInside];
+    [view addSubview:self.dropPinButton];
+    UIBarButtonItem *pinDrop = [[UIBarButtonItem alloc] initWithCustomView:view];
+    [self.navigationItem setRightBarButtonItem:pinDrop];
     
-    UIButton *currentLocationButton = [[UIButton alloc] initWithFrame:CGRectMake(235, 470, 65, 65)];
-    currentLocationButton.layer.cornerRadius = 35;
-    currentLocationButton.layer.borderWidth = 2;
-    currentLocationButton.layer.borderColor = [[UIColor colorWithRed:150/255.0 green:150/255.0 blue:150/255.0 alpha:1] CGColor];
-    currentLocationButton.backgroundColor = [UIColor clearColor];
-    [currentLocationButton setImage:[UIImage imageNamed:@"nearMeBlue"] forState:UIControlStateNormal];
-    [self.view addSubview:currentLocationButton];
-    [currentLocationButton addTarget:self action:@selector(currentLocationButtonPressed) forControlEvents:UIControlEventTouchUpInside];
     
-    UIButton *clearPinsButton = [[UIButton alloc] initWithFrame:CGRectMake(235, 350, 65, 65)];
-    [clearPinsButton setImage:[UIImage imageNamed:@"clear"] forState:UIControlStateNormal];
-    [clearPinsButton addTarget:self action:@selector(clearPins) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:clearPinsButton];
+    UILongPressGestureRecognizer *dropPinPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(addPinWithGestureRecognizer:)];
+    dropPinPress.minimumPressDuration = 1.0;
+    [self.mapView addGestureRecognizer:dropPinPress];
     
-    self.searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(20, 70, 285, 30)];
-    self.searchBar.searchBarStyle = UISearchBarStyleMinimal;
-    self.searchBar.delegate = self;
-    [self.searchBar setShowsCancelButton:YES];
     
-    [self.view addSubview:self.searchBar];
+    MKUserTrackingBarButtonItem *barButtonItem = [[MKUserTrackingBarButtonItem alloc] initWithMapView:self.mapView];
+    [self.navigationItem setLeftBarButtonItem:barButtonItem];
     
+    
+    self.searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(20, -30, 285, 30)];
+    [self showSearchBar];
+//    UIBarButtonItem *searchButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(showSearchBar)];
+//    [self.navigationItem setLeftBarButtonItem:searchButton];
+
     self.setLocationView = [[SetLocationView alloc] initWithFrame:CGRectMake(self.view.frame.size.width, 0, 300, self.view.frame.size.height)];
     [self.view addSubview:self.setLocationView];
-    
 }
 
 #pragma mapSearch
+
+- (void)showSearchBar
+{
+    [UIView animateWithDuration:1.0 animations:^{
+        self.searchBar.frame = CGRectMake(20, 70, 285, 30);
+        self.searchBar.searchBarStyle = UISearchBarStyleMinimal;
+//        self.searchBar.backgroundColor = [UIColor blackColor];
+//            self.searchBar.barTintColor = [UIColor whiteColor];
+        self.searchBar.delegate = self;
+        self.searchBar.showsCancelButton = YES;
+        [self.view addSubview:self.searchBar];
+    }];
+}
+
+-(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
+    [searchBar resignFirstResponder];
+    [self.mapView removeAnnotations:self.placemarks];
+//    [UIView animateWithDuration:1.0 animations:^{
+//        self.searchBar.frame = CGRectMake(20, -30, 285, 30);
+//        self.searchBar.text = @"";
+//    }];
+}
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
 {
@@ -109,16 +132,14 @@
      }];
 }
 
--(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
-{
-    [searchBar resignFirstResponder];
-}
-
-
 #pragma notification observer
 -(void)registerForNotifications
 {
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateMapWithSavedLocations) name:@"locationsFetched" object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitFailedAlert) name:@"CloudKitSaveFail" object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitSuccess) name:@"savedToCloudKit" object:nil];
 }
 
 - (void)updateMapWithSavedLocations
@@ -132,7 +153,26 @@
         
         [self.savedLocations addObject:savedAnnotation];
     }
+    NSLog(@"%@", self.savedLocations);
     [self.mapView addAnnotations:self.savedLocations];
+}
+
+
+- (void)savedToCloudKitFailedAlert {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"error" message:@"please enter a location name" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:nil];
+    [alert addAction:action];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+- (void)savedToCloudKitSuccess {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Success" message:@"Thank you for your sharing! This location has now been saved." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:nil];
+    [alert addAction:action];
+    [self presentViewController:alert animated:YES completion:nil];
+//    [self.mapView removeAnnotation:self.droppedPinAnnotation];
+
 }
 
 -(void)deRegisterForNotifcations
@@ -176,37 +216,42 @@
 
 }
 
-
-#pragma buttons
-- (void)currentLocationButtonPressed
-{
-    self.mapView.userTrackingMode = MKUserTrackingModeFollow;
-}
-
-- (void)clearPins
-{
-    [self.mapView removeAnnotation:self.droppedPinAnnotation];
-    [self.mapView removeAnnotations:self.placemarks];
-//    [self.mapView addAnnotations:self.savedLocations];
-}
-
 #pragma annotations
-- (void)addPin
-{
+- (void)dropPinAtCurrentLocation {
+    
     self.droppedPinAnnotation = [[MKPointAnnotation alloc] init];
-    self.droppedPinAnnotation.coordinate = self.mapView.centerCoordinate;
-    self.droppedPinAnnotation.title = @"location name";
+    self.droppedPinAnnotation.coordinate = self.mapView.userLocation.coordinate;
+    self.droppedPinAnnotation.title = droppedPinTitle;
     self.location = [[CLLocation alloc] initWithLatitude:self.droppedPinAnnotation.coordinate.latitude longitude:self.droppedPinAnnotation.coordinate.longitude];
-//    NSLog(@"DROPPED %@", self.location);
+    NSLog(@"DROPPED %@", self.location);
     
     for (id annotation in self.mapView.annotations) {
-        if ([[annotation title] isEqualToString:@"location name"]) {
+        if ([[annotation title] isEqualToString:droppedPinTitle]) {
+            [self.mapView removeAnnotation:annotation];
+        }
+    }
+    self.mapView.userTrackingMode = MKUserTrackingModeFollow;
+    [self.mapView addAnnotation:self.droppedPinAnnotation];
+}
+
+- (void)addPinWithGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
+{
+    CGPoint touchPoint = [gestureRecognizer locationInView:self.mapView];
+    CLLocationCoordinate2D touchMapCoordinate = [self.mapView convertPoint:touchPoint toCoordinateFromView:self.mapView];
+    
+    self.droppedPinAnnotation = [[MKPointAnnotation alloc] init];
+    self.droppedPinAnnotation.coordinate = touchMapCoordinate;
+    self.droppedPinAnnotation.title = droppedPinTitle;
+    self.location = [[CLLocation alloc] initWithLatitude:self.droppedPinAnnotation.coordinate.latitude longitude:self.droppedPinAnnotation.coordinate.longitude];
+    NSLog(@"DROPPED %@", self.location);
+    
+    for (id annotation in self.mapView.annotations) {
+        if ([[annotation title] isEqualToString:droppedPinTitle]) {
             [self.mapView removeAnnotation:annotation];
         }
     }
     
     [self.mapView addAnnotation:self.droppedPinAnnotation];
-//    [annotation release];
 }
 
 
@@ -223,18 +268,25 @@
         pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"placemarksPin"];
         pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"placemarksPin"];
         pinView.pinColor = MKPinAnnotationColorPurple;
-    } else if ([[annotation title] isEqualToString:@"location name"]) {
+        pinView.canShowCallout = YES;
+    } else if ([[annotation title] isEqualToString:droppedPinTitle]) {
         if (pinView == nil) {
             pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"droppedPin"];
             pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"droppedPin"];
             pinView.draggable = YES;
             pinView.canShowCallout = YES;
-            pinView.animatesDrop = YES;
+//            pinView.animatesDrop = YES;
             
-            self.setButton = [[UIButton alloc] initWithFrame:CGRectMake(10, 10, 50, 25)];
-            [self.setButton setTitle:@"set" forState:UIControlStateNormal];
-            [self.setButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-            pinView.rightCalloutAccessoryView = self.setButton;
+            UIButton *addLocationButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
+            addLocationButton.tag = 2;
+            pinView.rightCalloutAccessoryView = addLocationButton;
+            
+            UIImage *removePinImage = [UIImage imageNamed:@"remove"];
+            UIButton *removePinButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, removePinImage.size.width, removePinImage.size.width)];
+            [removePinButton setImage:removePinImage forState:UIControlStateNormal];
+            removePinButton.tag = 1;
+            pinView.leftCalloutAccessoryView = removePinButton;
+            
         }     else {
             pinView.annotation = annotation;
         }
@@ -248,33 +300,31 @@
     return pinView;
 }
 
-
--(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
-{
-    if (view.rightCalloutAccessoryView) {
-        NSLog(@"set button clicked");
-        [UIView animateWithDuration:0.5 animations:^{
-            self.setLocationView.locationFromAnnotation = self.location;
-            self.setLocationView.frame = CGRectMake((self.view.frame.size.width/2) - 150, 125, 300, 225) ;
-//            self.setLocationView.frame = self.view.bounds;
-        }];
-    }
-    
-    
-}
-
 -(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view didChangeDragState:(MKAnnotationViewDragState)newState fromOldState:(MKAnnotationViewDragState)oldState
 {
     
     if (newState == MKAnnotationViewDragStateEnding) {
         CLLocationCoordinate2D droppedAt = view.annotation.coordinate;
         self.location = [[CLLocation alloc] initWithLatitude:droppedAt.latitude longitude:droppedAt.longitude];
-//        NSLog(@"DRAGGED %@", self.location );
+        //        NSLog(@"DRAGGED %@", self.location );
         
     }
 }
 
 
+-(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
+{
+    if ([control tag] == 2) {
+        NSLog(@"add button clicked");
+        [UIView animateWithDuration:0.5 animations:^{
+            self.setLocationView.locationFromAnnotation = self.location;
+            self.setLocationView.frame = CGRectMake((self.view.frame.size.width/2) - 150, 125, 300, 225) ;
+//            self.setLocationView.frame = self.view.bounds;
+        }];
+    } else if ([control tag] == 1) {
+        [self.mapView removeAnnotation:self.droppedPinAnnotation];
+    }
+}
 
 
 - (void)didReceiveMemoryWarning {
