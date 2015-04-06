@@ -16,6 +16,8 @@
 @property (nonatomic, strong) NSArray *usersSharedLocations;
 
 + (UserController *)sharedInstance;
+
 - (void)fetchUserRecordID;
+
 
 @end

@@ -12,6 +12,7 @@
 #import "ProfileViewController.h"
 #import "LeaderboardViewController.h"
 #import "UserController.h"
+#import <MapKit/MapKit.h>
 
 
 @interface AppDelegate ()
@@ -34,6 +35,7 @@
     UIImage *mapImage = [UIImage imageNamed:@"globe"];
     UITabBarItem *mapTabBar = [[UITabBarItem alloc] initWithTitle:@"Map" image:mapImage selectedImage:nil];
     mapViewController.tabBarItem = mapTabBar;
+    
     
     ProfileViewController *profileViewController = [ProfileViewController new];
     UIImage *profileImage = [UIImage imageNamed:@"profileBlue"];

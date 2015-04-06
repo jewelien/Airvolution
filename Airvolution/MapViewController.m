@@ -35,7 +35,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    
+//    self.view.backgroundColor = [UIColor lightGrayColor];
     [self setTitle:@"Airvolution"];
     [self registerForNotifications];
     
@@ -45,7 +45,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
         [self.locationManager requestWhenInUseAuthorization];
     }
     [self.locationManager startUpdatingLocation];
-    self.mapView = [[MKMapView alloc] initWithFrame:self.view.bounds];
+    self.mapView = [[MKMapView alloc] initWithFrame:CGRectMake(0, 105, self.view.frame.size.width, self.view.frame.size.height - 105)];
     self.mapView.delegate = self;
     [self.view addSubview:self.mapView];
     self.mapView.showsUserLocation = YES;
@@ -55,8 +55,18 @@ static NSString * const droppedPinTitle = @"cancel or add";
 ////    self.dropPinButton.backgroundColor = [UIColor grayColor];
 //    [self.dropPinButton setImage:[UIImage imageNamed:@"location"] forState:UIControlStateNormal];
 //    [self.view addSubview:self.dropPinButton];
-//    [self.dropPinButton addTarget:self action:@selector(addPin) forControlEvents:UIControlEventTouchUpInside];
+//    [self.dropPinButton addTarget:self action:@selector(dropPinAtCurrentLocation) forControlEvents:UIControlEventTouchUpInside];
 
+    
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
+    self.dropPinButton = [[UIButton alloc] initWithFrame:view.frame];
+    [self.dropPinButton setImage:[UIImage imageNamed:@"location"] forState:UIControlStateNormal];
+    [self.dropPinButton addTarget:self action:@selector(dropPinAtCurrentLocation) forControlEvents:UIControlEventTouchUpInside];
+    [view addSubview:self.dropPinButton];
+    UIBarButtonItem *pinDrop = [[UIBarButtonItem alloc] initWithCustomView:view];
+    [self.navigationItem setRightBarButtonItem:pinDrop];
+    
+    
     UILongPressGestureRecognizer *dropPinPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(addPinWithGestureRecognizer:)];
     dropPinPress.minimumPressDuration = 1.0;
     [self.mapView addGestureRecognizer:dropPinPress];
@@ -65,9 +75,11 @@ static NSString * const droppedPinTitle = @"cancel or add";
     MKUserTrackingBarButtonItem *barButtonItem = [[MKUserTrackingBarButtonItem alloc] initWithMapView:self.mapView];
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
     
-    UIBarButtonItem *searchButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(showSearchBar)];
-    [self.navigationItem setRightBarButtonItem:searchButton];
+    
     self.searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(20, -30, 285, 30)];
+    [self showSearchBar];
+//    UIBarButtonItem *searchButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(showSearchBar)];
+//    [self.navigationItem setLeftBarButtonItem:searchButton];
 
     self.setLocationView = [[SetLocationView alloc] initWithFrame:CGRectMake(self.view.frame.size.width, 0, 300, self.view.frame.size.height)];
     [self.view addSubview:self.setLocationView];
@@ -79,8 +91,9 @@ static NSString * const droppedPinTitle = @"cancel or add";
 {
     [UIView animateWithDuration:1.0 animations:^{
         self.searchBar.frame = CGRectMake(20, 70, 285, 30);
-        self.searchBar.searchBarStyle = UISearchBarStyleProminent;
-        //    self.searchBar.barTintColor = [UIColor whiteColor];
+        self.searchBar.searchBarStyle = UISearchBarStyleMinimal;
+//        self.searchBar.backgroundColor = [UIColor blackColor];
+//            self.searchBar.barTintColor = [UIColor whiteColor];
         self.searchBar.delegate = self;
         self.searchBar.showsCancelButton = YES;
         [self.view addSubview:self.searchBar];
@@ -90,10 +103,10 @@ static NSString * const droppedPinTitle = @"cancel or add";
 -(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
     [searchBar resignFirstResponder];
     [self.mapView removeAnnotations:self.placemarks];
-    [UIView animateWithDuration:1.0 animations:^{
-        self.searchBar.frame = CGRectMake(20, -30, 285, 30);
-        self.searchBar.text = @"";
-    }];
+//    [UIView animateWithDuration:1.0 animations:^{
+//        self.searchBar.frame = CGRectMake(20, -30, 285, 30);
+//        self.searchBar.text = @"";
+//    }];
 }
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
@@ -158,6 +171,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:nil];
     [alert addAction:action];
     [self presentViewController:alert animated:YES completion:nil];
+//    [self.mapView removeAnnotation:self.droppedPinAnnotation];
 
 }
 
@@ -203,6 +217,23 @@ static NSString * const droppedPinTitle = @"cancel or add";
 }
 
 #pragma annotations
+- (void)dropPinAtCurrentLocation {
+    
+    self.droppedPinAnnotation = [[MKPointAnnotation alloc] init];
+    self.droppedPinAnnotation.coordinate = self.mapView.userLocation.coordinate;
+    self.droppedPinAnnotation.title = droppedPinTitle;
+    self.location = [[CLLocation alloc] initWithLatitude:self.droppedPinAnnotation.coordinate.latitude longitude:self.droppedPinAnnotation.coordinate.longitude];
+    NSLog(@"DROPPED %@", self.location);
+    
+    for (id annotation in self.mapView.annotations) {
+        if ([[annotation title] isEqualToString:droppedPinTitle]) {
+            [self.mapView removeAnnotation:annotation];
+        }
+    }
+    self.mapView.userTrackingMode = MKUserTrackingModeFollow;
+    [self.mapView addAnnotation:self.droppedPinAnnotation];
+}
+
 - (void)addPinWithGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
 {
     CGPoint touchPoint = [gestureRecognizer locationInView:self.mapView];
@@ -237,6 +268,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
         pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"placemarksPin"];
         pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"placemarksPin"];
         pinView.pinColor = MKPinAnnotationColorPurple;
+        pinView.canShowCallout = YES;
     } else if ([[annotation title] isEqualToString:droppedPinTitle]) {
         if (pinView == nil) {
             pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"droppedPin"];

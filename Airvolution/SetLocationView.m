@@ -20,7 +20,7 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor grayColor];
+        self.backgroundColor = [UIColor whiteColor];
         
         self.nameField = [[UITextField alloc] initWithFrame:CGRectMake(30, 30, 250, 50)];
         //self.setLocationView.frame = CGRectMake((self.view.frame.size.width/2) - 150, 100, 300, 200) ;
