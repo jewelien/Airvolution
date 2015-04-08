@@ -21,6 +21,7 @@
         self.cityStateZip = dictionary[cityStateZipKey];
         self.country = dictionary[countryKey];
         [self formatNSDate:dictionary[creationDateKey]];
+        [self retrieveUserRecordNamefromUserRecordID:dictionary[userKey]];
     }
     return self;
 }
@@ -31,5 +32,8 @@
     self.creationDate = [dateFormatter stringFromDate:date];
 }
 
+-(void)retrieveUserRecordNamefromUserRecordID:(CKRecordID *)recordID {
+    self.userRecordName = recordID.recordName;
+}
 
 @end

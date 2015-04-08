@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
+#import <CloudKit/CloudKit.h>
 
 
 static NSString * const locationRecordKey = @"location";
@@ -19,6 +20,8 @@ static NSString * const cityStateZipKey = @"cityStateZip";
 static NSString * const countryKey = @"country";
 static NSString * const creationDateKey = @"creationDate";
 
+static NSString * const userKey = @"creatorUserRecordID";
+
 @interface Location : NSObject
 
 @property (nonatomic, strong) NSString *locationName;
@@ -27,6 +30,8 @@ static NSString * const creationDateKey = @"creationDate";
 @property (nonatomic, strong) NSString *cityStateZip;
 @property (nonatomic, strong) NSString *country;
 @property (nonatomic, strong) NSString *creationDate;
+
+@property (nonatomic, strong) NSString *userRecordName;
 
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary;

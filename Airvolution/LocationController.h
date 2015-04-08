@@ -21,8 +21,7 @@
 
 + (LocationController *)sharedInstance;
 - (void)saveLocationWithName:(NSString *)name location:(CLLocation *)location addressArray:(NSArray *)address;
-- (void)loadLocationsFromCloudKit;
-
+- (void)loadLocationsFromCloudKitWithCompletion:(void (^)(NSArray *array))completion;
 
 
 

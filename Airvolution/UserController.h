@@ -20,7 +20,7 @@
 
 + (UserController *)sharedInstance;
 
-- (void)fetchUserRecordID;
 
-
+- (void)fetchUserRecordIDWithCompletion:(void (^)(NSString *userRecordName))completion;
+-(void)fetchUsersSavedLocationsFromArray:(NSArray *)allLocationsArray;
 @end

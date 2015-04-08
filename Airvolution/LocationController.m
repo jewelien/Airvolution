@@ -51,7 +51,7 @@
 }
 
 
-- (void)loadLocationsFromCloudKit
+- (void)loadLocationsFromCloudKitWithCompletion:(void (^)(NSArray *array))completion
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"TRUEPREDICATE"];
     CKQuery *query = [[CKQuery alloc] initWithRecordType:locationRecordKey predicate:predicate];
@@ -66,12 +66,17 @@
                 [tempArray addObject:location];
             }
             self.locations = tempArray;
-
+            completion(self.locations);
             [[NSNotificationCenter defaultCenter] postNotificationName:@"locationsFetched" object:nil];
         }
     }];
 
 }
 
-
 @end
+
+
+
+
+
+

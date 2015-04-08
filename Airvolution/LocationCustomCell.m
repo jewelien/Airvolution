@@ -14,7 +14,7 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         
-        self.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 10, self.contentView.frame.size.width / 2 + 15, 15)];
+        self.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 10, self.contentView.frame.size.width / 2 + 15, 20)];
 //        self.nameLabel.backgroundColor = [UIColor grayColor];
         [self.contentView addSubview:self.nameLabel];
         
