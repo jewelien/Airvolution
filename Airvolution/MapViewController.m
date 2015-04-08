@@ -166,7 +166,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 }
 
 - (void)savedToCloudKitSuccess {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"You're Awesome!" message:@"Location saved. Thank you!" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Thanks!" message:@"Location saved. Thank you!" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:nil];
     [alert addAction:action];
     [self presentViewController:alert animated:YES completion:nil];

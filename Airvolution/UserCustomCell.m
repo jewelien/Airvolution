@@ -6,31 +6,28 @@
 //  Copyright (c) 2015 Julien Guanzon. All rights reserved.
 //
 
-#import "ProfileCustomCell.h"
+#import "UserCustomCell.h"
 
-@implementation ProfileCustomCell
+@implementation UserCustomCell
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         
-        UILabel *label;
-        UIImageView *imageView;
-        
+        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 10, 60, 60)];
         imageView.image = [UIImage imageNamed:@"compass"];
-        imageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 10, 60, 60)];
         imageView.backgroundColor = [UIColor lightGrayColor];
         [self.contentView addSubview:imageView];
         
-        label = [[UILabel alloc] initWithFrame:CGRectMake(100, 15, 200, 20)];
+        self.usernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(100, 15, 200, 20)];
 //                    label.backgroundColor = [UIColor orangeColor];
-        label.text = [NSString stringWithFormat:@"Username: julienh12"];
-        [self.contentView addSubview:label];
+        self.usernameLabel.text = [NSString stringWithFormat:@"Username: julienh12"];
+        [self.contentView addSubview:self.usernameLabel];
         
-        label = [[UILabel alloc] initWithFrame:CGRectMake(100, 40, 100, 20)];
+        self.pointsLabel = [[UILabel alloc] initWithFrame:CGRectMake(100, 40, 100, 20)];
 //                    label.backgroundColor = [UIColor orangeColor];
-        label.text = [NSString stringWithFormat:@"Points: 0"];
-        [self.contentView addSubview:label];
+        self.pointsLabel.text = [NSString stringWithFormat:@"Points: 0"];
+        [self.contentView addSubview:self.pointsLabel];
         
     }
     return self;

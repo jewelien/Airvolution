@@ -27,7 +27,6 @@
     [[CKContainer defaultContainer] fetchUserRecordIDWithCompletionHandler:^(CKRecordID *recordID, NSError *error) {
         self.userRecordID = recordID;
         self.userRecordName = recordID.recordName;
-        
         [self fetchUsersSavedLocations:recordID];
     }];
 
@@ -43,7 +42,6 @@
     
     CKDatabase *publicDatabase = [[CKContainer defaultContainer] publicCloudDatabase];
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"creatorUserRecordID == %@", ID];
-
 
     CKQuery *query = [[CKQuery alloc] initWithRecordType:@"Location" predicate:predicate];
     [publicDatabase performQuery:query inZoneWithID:nil completionHandler:^(NSArray *results, NSError *error) {

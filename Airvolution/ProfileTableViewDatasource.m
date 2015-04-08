@@ -10,16 +10,20 @@
 #import "UserController.h"
 #import "User.h"
 #import "Location.h"
-#import "ProfileCustomCell.h"
+#import "UserCustomCell.h"
+#import "LocationCustomCell.h"
 
 static NSString *const CellKey = @"cell";
+static NSString *const LocationCellKey = @"locationCell";
 static NSString *const UserInfoCellKey = @"userInfoCell";
 
 @implementation ProfileTableViewDatasource
 
 - (void)registerTableView:(UITableView *)tableView {
     [tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:CellKey];
-    [tableView registerClass:[ProfileCustomCell class] forCellReuseIdentifier:UserInfoCellKey];
+    [tableView registerClass:[LocationCustomCell class] forCellReuseIdentifier:LocationCellKey];
+    [tableView registerClass:[UserCustomCell class] forCellReuseIdentifier:UserInfoCellKey];
+    tableView.delegate = self;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -60,27 +64,43 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
     return numberOfRows;
 }
 
-
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellKey];
-    ProfileCustomCell *userCell = [tableView dequeueReusableCellWithIdentifier:UserInfoCellKey];
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     
+    tableView.rowHeight = 0;
     
     switch (indexPath.section) {
         case 0:
             tableView.rowHeight = 80;
+            break;
+        default: tableView.rowHeight = 50;
+            break;
+    }
+    
+    return tableView.rowHeight;
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellKey];
+    LocationCustomCell *locationCell = [tableView dequeueReusableCellWithIdentifier:LocationCellKey];
+    UserCustomCell *userCell = [tableView dequeueReusableCellWithIdentifier:UserInfoCellKey];
+    
+    
+    switch (indexPath.section) {
+        case 0:
             tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
             cell = userCell;
             break;
         default:
-            tableView.rowHeight = 50;
-            if (cell) {
-                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier:CellKey];
-            }
+            cell = locationCell;
             if ([UserController sharedInstance].usersSharedLocations.count > indexPath.row) {
                 Location *location = [UserController sharedInstance].usersSharedLocations[indexPath.row];
-                cell.textLabel.text = location.locationName;
-                cell.detailTextLabel.text = location.street;
+                locationCell.nameLabel.text = location.locationName;
+                locationCell.dateLabel.text = [NSString stringWithFormat:@"Date added: %@",location.creationDate];
+                locationCell.addressLabel.text = [NSString stringWithFormat:@"%@, %@", location.street, location.cityStateZip];
             }
             break;
     }
@@ -88,4 +108,6 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
     
     return cell;
 }
+
+
 @end
