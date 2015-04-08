@@ -8,7 +8,11 @@
 
 #import "User.h"
 
+
 @implementation User
 
+-(void)initWithDictionary:(NSDictionary *)dictionary {
+
+}
 
 @end

@@ -18,9 +18,9 @@
 @property (nonatomic, strong) UISearchBar *searchBar;
 
 @property (nonatomic) CLLocation *location;
-@property (nonatomic, strong) SetLocationView *setLocationView;
-
 @property (nonatomic, strong) MKPointAnnotation *droppedPinAnnotation;
+
+@property (nonatomic, strong) SetLocationView *setLocationView;
 @property (nonatomic, strong) NSMutableArray *placemarks;
 @property (nonatomic, strong) NSArray *selectedPinAddress;
 
@@ -38,6 +38,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 //    self.view.backgroundColor = [UIColor lightGrayColor];
     [self setTitle:@"Airvolution"];
     [self registerForNotifications];
+    
     
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
@@ -144,17 +145,15 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 - (void)updateMapWithSavedLocations
 {
-    self.savedLocations = [NSMutableArray new];
-    for (NSDictionary *dictionary in [LocationController sharedInstance].locations) {
+    NSMutableArray *locationsArray = [NSMutableArray new];
+    for (Location *location in [LocationController sharedInstance].locations) {
         MKPointAnnotation *savedAnnotation = [[MKPointAnnotation alloc] init];
-        CLLocation *location = dictionary[locationKey];
-        savedAnnotation.coordinate = CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude);
-        savedAnnotation.title = dictionary[nameKey];
+        savedAnnotation.coordinate = CLLocationCoordinate2DMake(location.location.coordinate.latitude, location.location.coordinate.longitude);
+        savedAnnotation.title = location.locationName;
         
-        [self.savedLocations addObject:savedAnnotation];
+        [locationsArray addObject:savedAnnotation];
     }
-    NSLog(@"%@", self.savedLocations);
-    [self.mapView addAnnotations:self.savedLocations];
+    [self.mapView addAnnotations:locationsArray];
 }
 
 
@@ -167,7 +166,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 }
 
 - (void)savedToCloudKitSuccess {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Success" message:@"Thank you for your sharing! This location has now been saved." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"You're Awesome!" message:@"Location saved. Thank you!" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:nil];
     [alert addAction:action];
     [self presentViewController:alert animated:YES completion:nil];
@@ -205,7 +204,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
         } else {
             CLPlacemark *placemark = [placemarks lastObject];
             self.selectedPinAddress = [placemark.addressDictionary valueForKey:@"FormattedAddressLines"];
-            NSLog(@"%@", self.selectedPinAddress);
+//            NSLog(@"selectedPinAddress array %@", placemark);
             annotation.subtitle = [NSString stringWithFormat:@"%@", self.selectedPinAddress[0]];
             
 //            MKPinAnnotationView *view = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"savedPin"];
@@ -257,7 +256,6 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 -(MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation
 {
-    
     if ([annotation isKindOfClass:[MKUserLocation class]]) {
         return nil;
     }
@@ -267,7 +265,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     if ([annotation isKindOfClass:[MKPlacemark class] ]) {
         pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"placemarksPin"];
         pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"placemarksPin"];
-        pinView.pinColor = MKPinAnnotationColorPurple;
+        pinView.pinColor = MKPinAnnotationColorGreen;
         pinView.canShowCallout = YES;
     } else if ([[annotation title] isEqualToString:droppedPinTitle]) {
         if (pinView == nil) {
@@ -293,7 +291,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     } else {
         pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"savedPin"];
         pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"savedPin"];
-        pinView.pinColor = MKPinAnnotationColorGreen;
+        pinView.pinColor = MKPinAnnotationColorPurple;
         pinView.canShowCallout = YES;
     }
     
@@ -318,7 +316,9 @@ static NSString * const droppedPinTitle = @"cancel or add";
         NSLog(@"add button clicked");
         [UIView animateWithDuration:0.5 animations:^{
             self.setLocationView.locationFromAnnotation = self.location;
-            self.setLocationView.frame = CGRectMake((self.view.frame.size.width/2) - 150, 125, 300, 225) ;
+            self.setLocationView.address = self.selectedPinAddress;
+            NSLog(@"self.location %@ ... self.selectedPinAddress %@", self.location, self.selectedPinAddress);
+            self.setLocationView.frame = CGRectMake((self.view.frame.size.width/2) - 150, 125, 300, 225);
 //            self.setLocationView.frame = self.view.bounds;
         }];
     } else if ([control tag] == 1) {

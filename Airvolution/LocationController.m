@@ -7,6 +7,7 @@
 //
 
 #import "LocationController.h"
+#import "UserController.h"
 
 @implementation LocationController
 
@@ -24,15 +25,22 @@
     return database;
 }
 
-- (void)saveLocationWithName:(NSString *)name location:(CLLocation *)location {
+- (void)saveLocationWithName:(NSString *)name location:(CLLocation *)location addressArray:(NSArray *)address {
+    
+    
     CKRecord *cloudKitLocation = [[CKRecord alloc] initWithRecordType:locationRecordKey];
     cloudKitLocation[locationIdentifierKey] = [[NSUUID UUID] UUIDString];
     cloudKitLocation[nameKey] = name;
     cloudKitLocation[locationKey] = location;
+    cloudKitLocation[streetKey] = address[0];
+    cloudKitLocation[cityStateZipKey] = address[1];
+    cloudKitLocation[countryKey] = address[2];
+    
     
     [[LocationController publicDatabase] saveRecord:cloudKitLocation completionHandler:^(CKRecord *record, NSError *error) {
         if (!error) {
             NSLog(@"Location saved to CloudKit");
+            NSLog(@"record saved: %@", record);
             [[NSNotificationCenter defaultCenter] postNotificationName:@"savedToCloudKit" object:nil];
             
         } else {
@@ -52,15 +60,13 @@
             NSLog(@"fetch locations failed");
         } else {
             NSLog(@"fetched locations successfully");
-            NSMutableArray *array = [[NSMutableArray alloc] init];
-            for (CKRecord *record in results) {
-                NSMutableDictionary *dictionary = [NSMutableDictionary new];
-                [dictionary setObject:[record objectForKey:nameKey] forKey:nameKey];
-                [dictionary setObject:[record objectForKey:locationKey] forKey:locationKey];
-                    [array addObject:dictionary];
+            NSMutableArray *tempArray = [[NSMutableArray alloc] init];
+            for (NSDictionary *dictionary in results) {
+                Location *location = [[Location alloc] initWithDictionary:dictionary];
+                [tempArray addObject:location];
             }
-//            NSLog(@"records results : %@", results);
-            self.locations = array;
+            self.locations = tempArray;
+
             [[NSNotificationCenter defaultCenter] postNotificationName:@"locationsFetched" object:nil];
         }
     }];

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FC0BCBD41AD48F9200EAF9BF /* ProfileCustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FC0BCBD31AD48F9200EAF9BF /* ProfileCustomCell.m */; };
 		FC1F21CD1AC342AB00A8DCD8 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */; };
 		FC1F21CF1AC3563300A8DCD8 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC1F21CE1AC3563300A8DCD8 /* CoreLocation.framework */; };
 		FC58E8FF1ACDE33B00CF6A0C /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = FC58E8FE1ACDE33B00CF6A0C /* User.m */; };
@@ -37,6 +38,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		FC0BCBD21AD48F9200EAF9BF /* ProfileCustomCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileCustomCell.h; sourceTree = "<group>"; };
+		FC0BCBD31AD48F9200EAF9BF /* ProfileCustomCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileCustomCell.m; sourceTree = "<group>"; };
 		FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		FC1F21CE1AC3563300A8DCD8 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		FC58E8FD1ACDE33B00CF6A0C /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
@@ -125,6 +128,8 @@
 				FC799E481AC5E9CA00F8BD70 /* SetLocationView.m */,
 				FCA0ECA21ACC662A006E1B8B /* ProfileViewController.h */,
 				FCA0ECA31ACC662A006E1B8B /* ProfileViewController.m */,
+				FC0BCBD21AD48F9200EAF9BF /* ProfileCustomCell.h */,
+				FC0BCBD31AD48F9200EAF9BF /* ProfileCustomCell.m */,
 				FCBB5AA91ACDF5D20059AC3C /* ProfileTableViewDatasource.h */,
 				FCBB5AAA1ACDF5D20059AC3C /* ProfileTableViewDatasource.m */,
 				FCA0ECA51ACC663B006E1B8B /* LeaderboardViewController.h */,
@@ -281,6 +286,7 @@
 				FC58E8FF1ACDE33B00CF6A0C /* User.m in Sources */,
 				FCBB5AAB1ACDF5D20059AC3C /* ProfileTableViewDatasource.m in Sources */,
 				FCA0ECA71ACC663B006E1B8B /* LeaderboardViewController.m in Sources */,
+				FC0BCBD41AD48F9200EAF9BF /* ProfileCustomCell.m in Sources */,
 				FC799E491AC5E9CA00F8BD70 /* SetLocationView.m in Sources */,
 				FCE401341AC0C9E800DBB19A /* MapViewController.m in Sources */,
 				FCA0ECA41ACC662A006E1B8B /* ProfileViewController.m in Sources */,

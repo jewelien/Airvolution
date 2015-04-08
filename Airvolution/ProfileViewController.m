@@ -22,12 +22,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    self.title = @"Profile";
+    
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
     self.dataSource = [ProfileTableViewDatasource new];
+    [self.dataSource registerTableView:self.tableView];
     self.tableView.dataSource = self.dataSource;
     [self.view addSubview:self.tableView];
-
-
+    
 }
 
 - (void)didReceiveMemoryWarning {

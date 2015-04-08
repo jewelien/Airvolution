@@ -7,8 +7,12 @@
 //
 
 #import "UserController.h"
+#import "LocationController.h"
+#import "Location.h"
 
 @implementation UserController
+
+
 
 + (UserController *)sharedInstance {
     static UserController *sharedInstance = nil;
@@ -21,34 +25,46 @@
 
 - (void)fetchUserRecordID {
     [[CKContainer defaultContainer] fetchUserRecordIDWithCompletionHandler:^(CKRecordID *recordID, NSError *error) {
-//        NSLog(@"record ID %@ ", recordID);
+        self.userRecordID = recordID;
+        self.userRecordName = recordID.recordName;
+        
         [self fetchUsersSavedLocations:recordID];
     }];
 
 }
 
 -(void)fetchUsersSavedLocations:(CKRecordID *)ID {
-    NSLog(@"%@", ID);
-//    
-////    CKReference* recordToMatch = [[CKReference alloc] initWithRecordID:ID action:CKReferenceActionNone];
-//    NSPredicate* predicate = [NSPredicate predicateWithFormat:@"createdBy == _cd5f8486186028ea08f86b6597489619"];
-//    
-////    CKFetchRecordsOperation *fetchOperation = [[CKFetchRecordsOperation alloc] initWithRecordIDs:@[ID]];
-////    CKFetchRecordsOperation *fetchOperation2 = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
-//    
-//    CKQuery *query = [[CKQuery alloc] initWithRecordType:@"Users" predicate:predicate];
     
-//    CKDatabase *database = [[CKContainer defaultContainer] publicCloudDatabase];  ///working on this
+//    for (NSDictionary *dictionary in [LocationController sharedInstance].locations) {
+//        NSLog(@"%@", dictionary);
+//        
+//        
+//    }
     
-//    [database performQuery:query inZoneWithID:nil completionHandler:^(NSArray *results, NSError *error) {
-//        NSLog(@"%@", results);
-//    }];
-//
-    
-//    [database fetchRecordWithID:ID completionHandler:^(CKRecord *record, NSError *error) {  //working on this
-//        NSLog(@"%@", record);
-//    }];
-    
+    CKDatabase *publicDatabase = [[CKContainer defaultContainer] publicCloudDatabase];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"creatorUserRecordID == %@", ID];
+
+
+    CKQuery *query = [[CKQuery alloc] initWithRecordType:@"Location" predicate:predicate];
+    [publicDatabase performQuery:query inZoneWithID:nil completionHandler:^(NSArray *results, NSError *error) {
+        if (error) {
+            NSLog(@"fetch user's saved locations failed");
+        } else {
+            NSLog(@"fetched user's saved locations successfully");
+            NSMutableArray *tempArray = [[NSMutableArray alloc] init];
+            for (NSDictionary *dictionary in results) {
+                Location *location = [[Location alloc] initWithDictionary:dictionary];
+                [tempArray addObject:location];
+            }
+            NSLog(@"user's saved locations results : %@", tempArray);
+            self.usersSharedLocations = tempArray;
+//            [[NSNotificationCenter defaultCenter] postNotificationName:@"locationsFetched" object:nil];
+        }
+    }];
+
 }
+
+
+
 
 @end

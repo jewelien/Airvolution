@@ -12,8 +12,10 @@
 @interface User : NSObject
 
 @property (nonatomic, strong) NSString *username;
+@property (nonatomic, assign) NSInteger points;
+@property (nonatomic, strong) CKAsset *image;
 @property (nonatomic, strong) CKRecordID *userRecordID;
 
-
+-(void)initWithDictionary:(NSDictionary *)dictionary;
 
 @end

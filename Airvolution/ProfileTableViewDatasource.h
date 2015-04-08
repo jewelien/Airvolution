@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-@interface ProfileTableViewDatasource : NSObject <UITableViewDataSource>
+@interface ProfileTableViewDatasource : NSObject <UITableViewDataSource, UITableViewDelegate>
+
+- (void)registerTableView:(UITableView *)tableView;
 
 @end

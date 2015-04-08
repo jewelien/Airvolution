@@ -8,9 +8,12 @@
 
 #import "LeaderboardViewController.h"
 
-@interface LeaderboardViewController ()
+@interface LeaderboardViewController () <UITableViewDataSource>
 
+@property (nonatomic, strong) UITableView *tableView;
 @end
+
+static NSString * const cellKey = @"cell";
 
 @implementation LeaderboardViewController
 
@@ -20,6 +23,20 @@
     
     self.title = @"Leadeboard";
     
+    self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
+    [self.view addSubview:self.tableView];
+    
+}
+
+//- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+//    
+//}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellKey];
+    
+    
+    return cell;
 }
 
 - (void)didReceiveMemoryWarning {
