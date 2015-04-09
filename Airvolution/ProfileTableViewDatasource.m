@@ -97,7 +97,7 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
             if ([UserController sharedInstance].allUsers.count > indexPath.row) {
                 User *user = [UserController sharedInstance].allUsers[indexPath.row];
                 userCell.usernameLabel.text = user.username;
-//                userCell.pointsLabel.text = [NSString stringWithFormat:@"points: %@", user.points];
+                userCell.pointsLabel.text = [NSString stringWithFormat:@"points: %@", user.points];
             }
             break;
         default:

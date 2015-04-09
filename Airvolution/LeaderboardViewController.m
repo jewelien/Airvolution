@@ -7,6 +7,7 @@
 //
 
 #import "LeaderboardViewController.h"
+#import "UserController.h"
 
 @interface LeaderboardViewController () <UITableViewDataSource>
 
@@ -24,18 +25,28 @@ static NSString * const cellKey = @"cell";
     self.title = @"Leadeboard";
     
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
+    self.tableView.dataSource = self;
+    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:cellKey];
     [self.view addSubview:self.tableView];
+    
     
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 5;
+    return [UserController sharedInstance].allUsers.count;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellKey];
     
+    if (cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier:NSStringFromClass([UITableViewCell class])];
+    }
     
+    User *user = [UserController sharedInstance].allUsers[indexPath.row];
+    cell.textLabel.text = user.username;
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"Points: %@", user.points];
+    cell.textLabel.lineBreakMode = NSLineBreakByCharWrapping;
     return cell;
 }
 

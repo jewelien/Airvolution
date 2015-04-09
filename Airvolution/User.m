@@ -16,8 +16,7 @@
     self = [super init];
     if (self) {
     self.username = dictionary[UsernameKey];
-    NSString *string = dictionary[PointsKey];
-    self.points = string;
+    self.points = dictionary[PointsKey];
     }
     NSLog(@"POINTS %@", self.points);
     NSLog(@"dictionary points key %@", dictionary[PointsKey]);

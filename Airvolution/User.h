@@ -17,7 +17,7 @@ static NSString *const PointsKey = @"points";
 @interface User : NSObject
 
 @property (nonatomic, strong) NSString *username;
-@property (nonatomic, assign) NSString *points;
+@property (nonatomic, strong) NSString *points;
 @property (nonatomic, strong) CKAsset *image;
 @property (nonatomic, strong) CKRecordID *userRecordID;
 
