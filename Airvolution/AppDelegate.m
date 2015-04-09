@@ -28,7 +28,7 @@
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-
+    
     [[UserController sharedInstance]fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
         [[LocationController sharedInstance]loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
             [[UserController sharedInstance]fetchUsersSavedLocationsFromArray:array];

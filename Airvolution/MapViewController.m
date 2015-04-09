@@ -82,8 +82,8 @@ static NSString * const droppedPinTitle = @"cancel or add";
 //    UIBarButtonItem *searchButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(showSearchBar)];
 //    [self.navigationItem setLeftBarButtonItem:searchButton];
 
-    self.setLocationView = [[SetLocationView alloc] initWithFrame:CGRectMake(self.view.frame.size.width, 0, 300, self.view.frame.size.height)];
-    [self.view addSubview:self.setLocationView];
+//    self.setLocationView = [[SetLocationView alloc] initWithFrame:CGRectMake(self.view.frame.size.width, 0, 300, self.view.frame.size.height)];
+//    [self.view addSubview:self.setLocationView];
 }
 
 #pragma mapSearch
@@ -158,7 +158,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 
 - (void)savedToCloudKitFailedAlert {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"error" message:@"please enter a location name" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"error" message:@"Please log in to your iCloud in your iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:nil];
     [alert addAction:action];
     
@@ -314,13 +314,37 @@ static NSString * const droppedPinTitle = @"cancel or add";
 {
     if ([control tag] == 2) {
         NSLog(@"add button clicked");
-        [UIView animateWithDuration:0.5 animations:^{
-            self.setLocationView.locationFromAnnotation = self.location;
-            self.setLocationView.address = self.selectedPinAddress;
-            NSLog(@"self.location %@ ... self.selectedPinAddress %@", self.location, self.selectedPinAddress);
-            self.setLocationView.frame = CGRectMake((self.view.frame.size.width/2) - 150, 125, 300, 225);
-//            self.setLocationView.frame = self.view.bounds;
+        
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Enter Location" message:nil preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+            textField.placeholder = @"location name";
         }];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [self removeFromParentViewController];
+        }];
+        [alertController addAction:cancelAction];
+        
+        UIAlertAction *saveAction = [UIAlertAction actionWithTitle:@"save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            UITextField *textField = alertController.textFields[0];
+            if ([textField.text isEqualToString:@""]) {
+                NSLog(@"no text");
+            } else {
+            [[LocationController sharedInstance]saveLocationWithName:textField.text location:self.location addressArray:self.selectedPinAddress];
+            }
+        }];
+        [alertController addAction:saveAction];
+        
+        [self presentViewController:alertController animated:YES completion:nil];
+//        [UIView animateWithDuration:0.5 animations:^{
+//            self.setLocationView.locationFromAnnotation = self.location;
+//            self.setLocationView.address = self.selectedPinAddress;
+//            NSLog(@"self.location %@ ... self.selectedPinAddress %@", self.location, self.selectedPinAddress);
+//            self.setLocationView.frame = CGRectMake((self.view.frame.size.width/2) - 150, 125, 300, 225);
+////            self.setLocationView.frame = self.view.bounds;
+//        }];
+        
     } else if ([control tag] == 1) {
         [self.mapView removeAnnotation:self.droppedPinAnnotation];
     }

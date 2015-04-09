@@ -9,13 +9,18 @@
 #import <Foundation/Foundation.h>
 #import <CloudKit/CloudKit.h>
 
+static NSString *const UserRecordTypeKey = @"User";
+static NSString *const UserIdentifierKey = @"identifier";
+static NSString *const UsernameKey = @"username";
+static NSString *const PointsKey = @"points";
+
 @interface User : NSObject
 
 @property (nonatomic, strong) NSString *username;
-@property (nonatomic, assign) NSInteger points;
+@property (nonatomic, assign) NSString *points;
 @property (nonatomic, strong) CKAsset *image;
 @property (nonatomic, strong) CKRecordID *userRecordID;
 
--(void)initWithDictionary:(NSDictionary *)dictionary;
+-(instancetype)initWithDictionary:(NSDictionary *)dictionary;
 
 @end

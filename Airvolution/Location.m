@@ -32,7 +32,7 @@
     self.creationDate = [dateFormatter stringFromDate:date];
 }
 
--(void)retrieveUserRecordNamefromUserRecordID:(CKRecordID *)recordID {
+- (void)retrieveUserRecordNamefromUserRecordID:(CKRecordID *)recordID {
     self.userRecordName = recordID.recordName;
 }
 

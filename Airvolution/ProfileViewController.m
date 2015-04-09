@@ -12,7 +12,6 @@
 
 @interface ProfileViewController ()
 
-@property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) ProfileTableViewDatasource *dataSource;
 
 @end
@@ -31,6 +30,7 @@
     [self.view addSubview:self.tableView];
     
 }
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

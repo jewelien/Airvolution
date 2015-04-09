@@ -41,15 +41,18 @@
         if (!error) {
             NSLog(@"Location saved to CloudKit");
             NSLog(@"record saved: %@", record);
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"savedToCloudKit" object:nil];
+            [self loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
+                [[UserController sharedInstance]fetchUsersSavedLocationsFromArray:array];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"savedToCloudKit" object:nil];
+            }];
             
         } else {
             NSLog(@"NOT saved to CloudKit");
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"CloudKitSaveFail" object:nil];
         }
     }];
     
 }
-
 
 - (void)loadLocationsFromCloudKitWithCompletion:(void (^)(NSArray *array))completion
 {
@@ -66,8 +69,8 @@
                 [tempArray addObject:location];
             }
             self.locations = tempArray;
-            completion(self.locations);
             [[NSNotificationCenter defaultCenter] postNotificationName:@"locationsFetched" object:nil];
+            completion(self.locations);
         }
     }];
 

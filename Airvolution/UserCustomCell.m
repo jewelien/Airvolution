@@ -21,12 +21,12 @@
         
         self.usernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(100, 15, 200, 20)];
 //                    label.backgroundColor = [UIColor orangeColor];
-        self.usernameLabel.text = [NSString stringWithFormat:@"Username: julienh12"];
+//        self.usernameLabel.text = [NSString stringWithFormat:@"Username: julienh12"];
         [self.contentView addSubview:self.usernameLabel];
         
         self.pointsLabel = [[UILabel alloc] initWithFrame:CGRectMake(100, 40, 100, 20)];
 //                    label.backgroundColor = [UIColor orangeColor];
-        self.pointsLabel.text = [NSString stringWithFormat:@"Points: 0"];
+//        self.pointsLabel.text = [NSString stringWithFormat:@"Points: 0"];
         [self.contentView addSubview:self.pointsLabel];
         
     }

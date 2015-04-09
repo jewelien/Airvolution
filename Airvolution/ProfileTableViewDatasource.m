@@ -86,20 +86,26 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellKey];
     LocationCustomCell *locationCell = [tableView dequeueReusableCellWithIdentifier:LocationCellKey];
-    UserCustomCell *userCell = [tableView dequeueReusableCellWithIdentifier:UserInfoCellKey];
+//    UserCustomCell *userCell = [tableView dequeueReusableCellWithIdentifier:UserInfoCellKey];
+    UserCustomCell *userCell = [[UserCustomCell alloc] init];
     
     
     switch (indexPath.section) {
         case 0:
-            tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
+//            tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
             cell = userCell;
+            if ([UserController sharedInstance].allUsers.count > indexPath.row) {
+                User *user = [UserController sharedInstance].allUsers[indexPath.row];
+                userCell.usernameLabel.text = user.username;
+//                userCell.pointsLabel.text = [NSString stringWithFormat:@"points: %@", user.points];
+            }
             break;
         default:
             cell = locationCell;
             if ([UserController sharedInstance].usersSharedLocations.count > indexPath.row) {
                 Location *location = [UserController sharedInstance].usersSharedLocations[indexPath.row];
                 locationCell.nameLabel.text = location.locationName;
-                locationCell.dateLabel.text = [NSString stringWithFormat:@"Date added: %@",location.creationDate];
+                locationCell.dateLabel.text = [NSString stringWithFormat:@"added: %@",location.creationDate];
                 locationCell.addressLabel.text = [NSString stringWithFormat:@"%@, %@", location.street, location.cityStateZip];
             }
             break;

@@ -12,8 +12,9 @@
 
 @interface UserController : NSObject
 
-@property (nonatomic, strong) User *user;
+//@property (nonatomic, strong) User *user;
 
+@property (nonatomic, strong) NSArray *allUsers;
 @property (nonatomic, strong) NSArray *usersSharedLocations;
 @property (nonatomic, strong) CKRecordID *userRecordID;
 @property (nonatomic, strong) NSString *userRecordName;
