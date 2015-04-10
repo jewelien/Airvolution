@@ -22,7 +22,7 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 - (void)registerTableView:(UITableView *)tableView {
     [tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:CellKey];
     [tableView registerClass:[LocationCustomCell class] forCellReuseIdentifier:LocationCellKey];
-    [tableView registerClass:[UserCustomCell class] forCellReuseIdentifier:UserInfoCellKey];
+//    [tableView registerClass:[UserCustomCell class] forCellReuseIdentifier:UserInfoCellKey];
     tableView.delegate = self;
 }
 
@@ -86,19 +86,16 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellKey];
     LocationCustomCell *locationCell = [tableView dequeueReusableCellWithIdentifier:LocationCellKey];
-//    UserCustomCell *userCell = [tableView dequeueReusableCellWithIdentifier:UserInfoCellKey];
     UserCustomCell *userCell = [[UserCustomCell alloc] init];
-    
+    User *currentUser = [UserController sharedInstance].currentUser;
+
     
     switch (indexPath.section) {
         case 0:
 //            tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
             cell = userCell;
-            if ([UserController sharedInstance].allUsers.count > indexPath.row) {
-                User *user = [UserController sharedInstance].allUsers[indexPath.row];
-                userCell.usernameLabel.text = user.username;
-                userCell.pointsLabel.text = [NSString stringWithFormat:@"points: %@", user.points];
-            }
+            userCell.usernameLabel.text = currentUser.username;
+            userCell.pointsLabel.text = currentUser.points;
             break;
         default:
             cell = locationCell;

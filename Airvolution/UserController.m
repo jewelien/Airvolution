@@ -33,6 +33,8 @@
             self.userRecordName = recordID.recordName;
             NSLog(@"USER RECORD NAME Fetched %@", self.userRecordName);
             completion(self.userRecordName);
+        } else {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"CloudKitSaveFail" object:nil];
         }
         
     }];
@@ -41,14 +43,20 @@
 
 -(void)fetchUsersSavedLocationsFromArray:(NSArray *)allLocationsArray {
     NSMutableArray *tempArray = [NSMutableArray new];
+    NSLog(@"locations array %@", [LocationController sharedInstance].locations);
+    
     for (Location *location in [LocationController sharedInstance].locations) {
-        if ([location.userRecordName isEqualToString: self.userRecordName]) {
+        
+        if ([location.userRecordName isEqualToString: @"__defaultOwner__"]) {
             [tempArray addObject:location];
             NSLog(@"user's locations found");
         } else {
-            NSLog(@"no locations found for user");
+            NSLog(@"not user's location");
+            NSLog(@"location.userRecordName, %@",location.userRecordName);
+            NSLog(@"self.userRecordName %@", self.userRecordName);
         }
         self.usersSharedLocations = tempArray;
+        NSLog(@"self.usersSharedLocations, %@", self.usersSharedLocations);
     }
     [self retrieveAllUsers];
 }
@@ -70,7 +78,7 @@
         else {
             if (results.count == 0) {
                 NSLog(@"no users found when retrieving all users");
-                [self saveUsernametoCloudKitWithUserRecordName:self.userRecordName];
+//                [self saveUsernametoCloudKitWithUserRecordName:self.userRecordName];
             } else {
                 NSLog(@"successfully retrieved all users, total %ld", results.count);
                 for (NSDictionary *dictionary in results) {
@@ -79,10 +87,23 @@
                 }
                 self.allUsers = array;
                 NSLog(@"All Users %@", self.allUsers);
+                [self findCurrentUser];
                 [self checkUserInCloudkit];
             }
         }
     }];
+}
+- (void)findCurrentUser{
+    for (User *user in self.allUsers) {
+        if ([user.userRecordName isEqualToString:@"__defaultOwner__"]) {
+            NSLog(@"current user found in all users %@", user.userRecordName);
+            self.currentUser = user;
+        } else {
+            NSLog(@"current user not found in all users");
+            NSLog(@"user.userRecordName %@", user.userRecordName);
+        }
+    }
+    NSLog(@"self.currentUser == %@", self.currentUser);
 }
 
 - (void)checkUserInCloudkit {
@@ -98,9 +119,62 @@
         [self saveUsernametoCloudKitWithUserRecordName:self.userRecordName];
     } else {
         NSLog(@"user is in cloudkit");
+        NSLog(@"user Identifier %@", self.currentUser.userIdentifier);
+
+        [self checkUserUpdate];
     }
     
 }
+
+
+
+-(void)checkUserUpdate{
+    NSInteger integer = self.usersSharedLocations.count * 25 ;
+    NSString *pointsString = [@(integer)stringValue];
+    if (![self.currentUser.points isEqualToString:pointsString]) {
+        NSLog(@"Points do not match, %@ : %@", self.currentUser.points, pointsString);
+
+        NSLog(@"user Identifier %@", self.currentUser.userIdentifier);
+        
+        CKRecordID *recordID = [[CKRecordID alloc] initWithRecordName: self.currentUser.userIdentifier];
+        
+        [[UserController publicDatabase] deleteRecordWithID:recordID completionHandler:^(CKRecordID *recordID, NSError *error) {
+            if (error) {
+                NSLog(@"Record ID not deleted with error, %@", error);
+                NSLog(@"record iD not deleted %@", recordID);
+                
+            }else {
+                NSLog(@"deleted recordID %@", recordID);
+            }
+        }];
+        
+    } else {
+        NSLog(@"User points matches.");
+    }
+    
+//        CKRecord *cloudKitUser = [[CKRecord alloc] initWithRecordType:UserRecordTypeKey];
+//        cloudKitUser[UserIdentifierKey] = [[NSUUID UUID] UUIDString];
+//        cloudKitUser[UsernameKey] = self.userRecordName;
+//        cloudKitUser[PointsKey] = pointsString;
+//        
+//        CKModifyRecordsOperation *modifyOp = [[CKModifyRecordsOperation alloc]initWithRecordsToSave:@[cloudKitUser] recordIDsToDelete:nil];
+//        
+//        modifyOp.database = [UserController publicDatabase];
+//        modifyOp.modifyRecordsCompletionBlock = ^(NSArray *savedRecords, NSArray *deletedRecordIDs, NSError *error) {
+//            if (error) {
+//                NSLog(@"[%@] Error pushing local data: %@", self.class, error);
+//                NSLog(@"deletedRecordIDs %@", deletedRecordIDs);
+//                NSLog(@"saved records %@", savedRecords);
+//            } else {
+//                NSLog(@"deleted /saved successfully");
+//                NSLog(@"deletedRecordIDs %@", deletedRecordIDs);
+//                NSLog(@"saved records %@", savedRecords);
+//            }
+//        };
+//        [[UserController publicDatabase] addOperation:modifyOp];
+    
+}
+
 
 -(void)saveUsernametoCloudKitWithUserRecordName:(NSString *)userRecordName {
     CKRecord *cloudKitUser = [[CKRecord alloc] initWithRecordType:UserRecordTypeKey];
