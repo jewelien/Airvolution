@@ -62,7 +62,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
     self.dropPinButton = [[UIButton alloc] initWithFrame:view.frame];
     [self.dropPinButton setImage:[UIImage imageNamed:@"location"] forState:UIControlStateNormal];
-    [self.dropPinButton addTarget:self action:@selector(dropPinAtCurrentLocation) forControlEvents:UIControlEventTouchUpInside];
+    [self.dropPinButton addTarget:self action:@selector(dropPinAtCenterOfMap) forControlEvents:UIControlEventTouchUpInside];
     [view addSubview:self.dropPinButton];
     UIBarButtonItem *pinDrop = [[UIBarButtonItem alloc] initWithCustomView:view];
     [self.navigationItem setRightBarButtonItem:pinDrop];
@@ -216,10 +216,11 @@ static NSString * const droppedPinTitle = @"cancel or add";
 }
 
 #pragma annotations
-- (void)dropPinAtCurrentLocation {
+- (void)dropPinAtCenterOfMap {
     
     self.droppedPinAnnotation = [[MKPointAnnotation alloc] init];
-    self.droppedPinAnnotation.coordinate = self.mapView.userLocation.coordinate;
+//    self.droppedPinAnnotation.coordinate = self.mapView.userLocation.coordinate;
+    self.droppedPinAnnotation.coordinate = self.mapView.centerCoordinate;
     self.droppedPinAnnotation.title = droppedPinTitle;
     self.location = [[CLLocation alloc] initWithLatitude:self.droppedPinAnnotation.coordinate.latitude longitude:self.droppedPinAnnotation.coordinate.longitude];
     NSLog(@"DROPPED %@", self.location);
@@ -229,9 +230,24 @@ static NSString * const droppedPinTitle = @"cancel or add";
             [self.mapView removeAnnotation:annotation];
         }
     }
-    self.mapView.userTrackingMode = MKUserTrackingModeFollow;
     [self.mapView addAnnotation:self.droppedPinAnnotation];
 }
+//- (void)dropPinAtCurrentLocation {
+//    
+//    self.droppedPinAnnotation = [[MKPointAnnotation alloc] init];
+//    self.droppedPinAnnotation.coordinate = self.mapView.userLocation.coordinate;
+//    self.droppedPinAnnotation.title = droppedPinTitle;
+//    self.location = [[CLLocation alloc] initWithLatitude:self.droppedPinAnnotation.coordinate.latitude longitude:self.droppedPinAnnotation.coordinate.longitude];
+//    NSLog(@"DROPPED %@", self.location);
+//    
+//    for (id annotation in self.mapView.annotations) {
+//        if ([[annotation title] isEqualToString:droppedPinTitle]) {
+//            [self.mapView removeAnnotation:annotation];
+//        }
+//    }
+//    self.mapView.userTrackingMode = MKUserTrackingModeFollow;
+//    [self.mapView addAnnotation:self.droppedPinAnnotation];
+//}
 
 - (void)addPinWithGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
 {
