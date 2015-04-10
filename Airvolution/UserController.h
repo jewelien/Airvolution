@@ -12,12 +12,16 @@
 
 @interface UserController : NSObject
 
-@property (nonatomic, strong) User *user;
+//@property (nonatomic, strong) User *user;
+
+@property (nonatomic, strong) NSArray *allUsers;
 @property (nonatomic, strong) NSArray *usersSharedLocations;
+@property (nonatomic, strong) CKRecordID *userRecordID;
+@property (nonatomic, strong) NSString *userRecordName;
 
 + (UserController *)sharedInstance;
 
-- (void)fetchUserRecordID;
 
-
+- (void)fetchUserRecordIDWithCompletion:(void (^)(NSString *userRecordName))completion;
+-(void)fetchUsersSavedLocationsFromArray:(NSArray *)allLocationsArray;
 @end

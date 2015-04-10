@@ -8,7 +8,19 @@
 
 #import "User.h"
 
+
 @implementation User
 
+-(instancetype)initWithDictionary:(NSDictionary *)dictionary {
+    
+    self = [super init];
+    if (self) {
+    self.username = dictionary[UsernameKey];
+    self.points = dictionary[PointsKey];
+    }
+    NSLog(@"POINTS %@", self.points);
+    NSLog(@"dictionary points key %@", dictionary[PointsKey]);
+    return  self;
+}
 
 @end

@@ -11,18 +11,17 @@
 #import "Location.h"
 #import "MapViewController.h"
 #import <CloudKit/CloudKit.h>
-
+#import "User.h"
 
 @interface LocationController : NSObject
 
 @property (nonatomic,strong) NSArray *locations;
-
+@property (nonatomic, strong) User *user;
 
 
 + (LocationController *)sharedInstance;
-- (void)saveLocationWithName:(NSString *)name location:(CLLocation *)location;
-- (void)loadLocationsFromCloudKit;
-
+- (void)saveLocationWithName:(NSString *)name location:(CLLocation *)location addressArray:(NSArray *)address;
+- (void)loadLocationsFromCloudKitWithCompletion:(void (^)(NSArray *array))completion;
 
 
 

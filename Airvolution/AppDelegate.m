@@ -27,28 +27,34 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-
-    [[LocationController sharedInstance]loadLocationsFromCloudKit];
-    [[UserController sharedInstance] fetchUserRecordID];
+    
+    
+    [[UserController sharedInstance]fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
+        [[LocationController sharedInstance]loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
+            [[UserController sharedInstance]fetchUsersSavedLocationsFromArray:array];
+        }];
+    }];
     
     MapViewController *mapViewController = [MapViewController new];
     UIImage *mapImage = [UIImage imageNamed:@"globe"];
     UITabBarItem *mapTabBar = [[UITabBarItem alloc] initWithTitle:@"Map" image:mapImage selectedImage:nil];
     mapViewController.tabBarItem = mapTabBar;
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:mapViewController];
     
     
     ProfileViewController *profileViewController = [ProfileViewController new];
     UIImage *profileImage = [UIImage imageNamed:@"profileBlue"];
     UITabBarItem *profileTabBar = [[UITabBarItem alloc] initWithTitle:@"Profile" image:profileImage selectedImage:nil];
     profileViewController.tabBarItem = profileTabBar;
+    UINavigationController *profileNav = [[UINavigationController alloc] initWithRootViewController:profileViewController];
     
     LeaderboardViewController *leaderboardViewController = [LeaderboardViewController new];
     UIImage *leaderboardImage = [UIImage imageNamed:@"people"];
     UITabBarItem *leaderboardTabBar = [[UITabBarItem alloc] initWithTitle:@"Leaderboard" image:leaderboardImage selectedImage:nil];
     leaderboardViewController.tabBarItem = leaderboardTabBar;
+    UINavigationController *leaderboardNav = [[UINavigationController alloc] initWithRootViewController:leaderboardViewController];
     
-    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:mapViewController];
-    NSArray *controllers = [NSArray arrayWithObjects:profileViewController, navigationController, leaderboardViewController, nil];
+    NSArray *controllers = [NSArray arrayWithObjects:profileNav, navigationController, leaderboardNav, nil];
     
     self.tabBarController = [[UITabBarController alloc] init];
     self.tabBarController.viewControllers = controllers;

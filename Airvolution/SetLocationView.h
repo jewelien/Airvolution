@@ -12,6 +12,7 @@
 
 @interface SetLocationView : UIView
 
-@property (nonatomic) CLLocation *locationFromAnnotation;
+@property (nonatomic, strong) CLLocation *locationFromAnnotation;
+@property (nonatomic, strong) NSArray *address;
 
 @end

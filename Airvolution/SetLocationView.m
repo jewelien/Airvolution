@@ -56,9 +56,10 @@
         [[NSNotificationCenter defaultCenter] postNotificationName:@"CloudKitSaveFail" object:nil];
         NSLog(@"please enter a location name");
     } else {
-        [[LocationController sharedInstance] saveLocationWithName:self.nameField.text location:self.locationFromAnnotation];
+        [[LocationController sharedInstance] saveLocationWithName:self.nameField.text location:self.locationFromAnnotation addressArray:self.address];
         self.frame = CGRectMake(self.superview.frame.size.width, 0, 300, self.superview.frame.size.height);
         self.nameField.text = @"";
+        NSLog(@"SETLOCATIONVIEW %@", self.address);
     }
 }
 
