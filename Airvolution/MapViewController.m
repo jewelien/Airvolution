@@ -133,11 +133,22 @@ static NSString * const droppedPinTitle = @"cancel or add";
 #pragma notification observer
 -(void)registerForNotifications
 {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notLoggedIniCloudAlert) name:NotLoggedIniCloudNotificationKey object:nil];
+
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateMapWithSavedLocations) name:allLocationsFetchedNotificationKey object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitFailedAlert) name:newLocationSaveFailedNotificationKey object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitSuccess) name:newLocationSavedNotificationKey object:nil];
+    
+}
+
+- (void)notLoggedIniCloudAlert {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Required" message:@"Please log in to your iCloud account in iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:nil];
+    [alert addAction:action];
+    
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)updateMapWithSavedLocations
@@ -155,7 +166,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 
 - (void)savedToCloudKitFailedAlert {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"error" message:@"Please log in to your iCloud in your iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"error" message:@"Location failed to save. Please make sure you have a network connection and logged in to your iCloud account in your iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:nil];
     [alert addAction:action];
     
@@ -164,10 +175,12 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 - (void)savedToCloudKitSuccess {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Thanks!" message:@"Location saved. Thank you!" preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:nil];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [self.mapView removeAnnotation:self.droppedPinAnnotation];
+
+    }];
     [alert addAction:action];
     [self presentViewController:alert animated:YES completion:nil];
-//    [self.mapView removeAnnotation:self.droppedPinAnnotation];
     
 }
 

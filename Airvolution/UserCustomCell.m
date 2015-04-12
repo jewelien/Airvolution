@@ -14,10 +14,16 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         
-        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 10, 60, 60)];
-        imageView.image = [UIImage imageNamed:@"compass"];
-        imageView.backgroundColor = [UIColor lightGrayColor];
-        [self.contentView addSubview:imageView];
+//        UIImageView *imageView = [[UIImageView alloc] init];
+//        imageView.image = [UIImage imageNamed:@"compass"];
+        self.imageView.image = [UIImage imageNamed:@"compass"];
+        self.imageView.backgroundColor = [UIColor redColor];
+        [self.contentView addSubview:self.imageView];
+        
+//        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 10, 60, 60)];
+//        imageView.image = [UIImage imageNamed:@"compass"];
+//        imageView.backgroundColor = [UIColor lightGrayColor];
+//        [self.contentView addSubview:imageView];
         
         self.usernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(100, 15, 200, 20)];
 //                    label.backgroundColor = [UIColor orangeColor];

@@ -12,6 +12,7 @@
 
 static NSString * const UsersLocationsNotificationKey = @"users shared locations updated";
 static NSString * const UserPointsNotificationKey = @"user points updated";
+static NSString * const NotLoggedIniCloudNotificationKey = @"iCloud user not found";
 
 @interface UserController : NSObject
 

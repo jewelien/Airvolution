@@ -23,7 +23,7 @@ static NSString * const cellKey = @"cell";
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-    self.title = @"Leadeboard";
+    self.title = @"Leaderboard";
     
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
     self.tableView.dataSource = self;

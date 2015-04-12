@@ -37,7 +37,7 @@
             completion(self.currentUserRecordName);
         } else {
             NSLog(@"User not logged in to iCloud");
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"CloudKitSaveFail" object:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:NotLoggedIniCloudNotificationKey object:nil];
         }
         
     }];
