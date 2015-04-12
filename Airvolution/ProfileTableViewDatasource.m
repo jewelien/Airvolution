@@ -96,7 +96,7 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
             cell = userCell;
 //            userCell.usernameLabel.text = [[UserControll]];
             userCell.usernameLabel.text = currentUser.username;
-            userCell.pointsLabel.text = currentUser.points;
+            userCell.pointsLabel.text = [NSString stringWithFormat:@"Points: %@", currentUser.points];
             break;
         default:
             cell = locationCell;

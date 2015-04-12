@@ -20,6 +20,7 @@
         self.street = dictionary[streetKey];
         self.cityStateZip = dictionary[cityStateZipKey];
         self.country = dictionary[countryKey];
+        self.identifier = dictionary[identifierKey];
         [self formatNSDate:dictionary[creationDateKey]];
         [self retrieveUserRecordNamefromUserRecordID:dictionary[userKey]];
     }

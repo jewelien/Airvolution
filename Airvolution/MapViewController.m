@@ -8,6 +8,7 @@
 
 #import "MapViewController.h"
 #import "LocationController.h"
+#import "UserController.h"
 
 @interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate>
 
@@ -132,11 +133,11 @@ static NSString * const droppedPinTitle = @"cancel or add";
 #pragma notification observer
 -(void)registerForNotifications
 {
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateMapWithSavedLocations) name:@"locationsFetched" object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateMapWithSavedLocations) name:allLocationsFetchedNotificationKey object:nil];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitFailedAlert) name:@"CloudKitSaveFail" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitFailedAlert) name:newLocationSaveFailedNotificationKey object:nil];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitSuccess) name:@"savedToCloudKit" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitSuccess) name:newLocationSavedNotificationKey object:nil];
 }
 
 - (void)updateMapWithSavedLocations
@@ -167,7 +168,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [alert addAction:action];
     [self presentViewController:alert animated:YES completion:nil];
 //    [self.mapView removeAnnotation:self.droppedPinAnnotation];
-
+    
 }
 
 -(void)deRegisterForNotifcations

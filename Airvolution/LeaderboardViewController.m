@@ -8,6 +8,7 @@
 
 #import "LeaderboardViewController.h"
 #import "UserController.h"
+#import "UserController.h"
 
 @interface LeaderboardViewController () <UITableViewDataSource>
 
@@ -29,8 +30,20 @@ static NSString * const cellKey = @"cell";
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:cellKey];
     [self.view addSubview:self.tableView];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateLeaderboard) name:UserPointsNotificationKey object:nil];
     
 }
+
+- (void)updateLeaderboard {
+    [self.tableView reloadData];
+}
+
+-(void)deRegisterForNotifcations
+{
+    [[NSNotificationCenter defaultCenter]removeObserver:self];
+}
+
+
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return [UserController sharedInstance].allUsers.count;

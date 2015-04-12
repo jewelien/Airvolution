@@ -10,6 +10,9 @@
 #import <CloudKit/CloudKit.h>
 #import "User.h"
 
+static NSString * const UsersLocationsNotificationKey = @"users shared locations updated";
+static NSString * const UserPointsNotificationKey = @"user points updated";
+
 @interface UserController : NSObject
 
 //@property (nonatomic, strong) User *user;

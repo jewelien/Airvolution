@@ -57,6 +57,8 @@
     }
     self.usersSharedLocations = tempArray;
     NSLog(@"User has %ld locations", self.usersSharedLocations.count);
+    //update profile my shared locations
+    [[NSNotificationCenter defaultCenter] postNotificationName:UsersLocationsNotificationKey object:nil];
     [self checkUserinCloudKitUserList];
 }
 
@@ -87,7 +89,7 @@
             
             if (results.count == 0) {
                 NSLog(@"no users in user list");
-//                [self saveUserinCloudKitUserList];
+                [self saveUserinCloudKitUserList];
             } else {
                 
                 for (CKRecord *record in results) {
@@ -208,6 +210,8 @@
             [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
                 if (!error) {
                     NSLog(@"saved records %@", record);
+                    [self retrieveAllUsers];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:UserPointsNotificationKey object:nil];
                 }
             }];
 

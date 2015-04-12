@@ -12,7 +12,7 @@
 
 
 static NSString * const locationRecordKey = @"location";
-static NSString * const locationIdentifierKey = @"identifier";
+static NSString * const identifierKey = @"identifier";
 static NSString * const nameKey = @"name";
 static NSString * const locationKey = @"coordinates";
 static NSString * const streetKey = @"street";
@@ -30,6 +30,7 @@ static NSString * const userKey = @"creatorUserRecordID";
 @property (nonatomic, strong) NSString *cityStateZip;
 @property (nonatomic, strong) NSString *country;
 @property (nonatomic, strong) NSString *creationDate;
+@property (nonatomic, strong) NSString *identifier;
 
 @property (nonatomic, strong) NSString *userRecordName;
 

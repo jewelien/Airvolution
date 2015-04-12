@@ -25,11 +25,10 @@
     return database;
 }
 
-- (void)saveLocationWithName:(NSString *)name location:(CLLocation *)location addressArray:(NSArray *)address {
-    
-    
+- (void)saveLocationWithName:(NSString *)name location:(CLLocation *)location addressArray:(NSArray *)address
+{
     CKRecord *cloudKitLocation = [[CKRecord alloc] initWithRecordType:locationRecordKey];
-    cloudKitLocation[locationIdentifierKey] = [[NSUUID UUID] UUIDString];
+    cloudKitLocation[identifierKey] = [[NSUUID UUID] UUIDString];
     cloudKitLocation[nameKey] = name;
     cloudKitLocation[locationKey] = location;
     cloudKitLocation[streetKey] = address[0];
@@ -41,16 +40,31 @@
         if (!error) {
             NSLog(@"Location saved to CloudKit");
             NSLog(@"record saved: %@", record);
-            [self loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
-                [[UserController sharedInstance]fetchUsersSavedLocationsFromArray:array];
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"savedToCloudKit" object:nil];
-            }];
+//            NSLog(@"IDENTIFIER %@", cloudKitLocation[identifierKey]);
+            [self loadLocationsAfterSavingLocationIdentifier:cloudKitLocation[identifierKey]];
             
         } else {
             NSLog(@"NOT saved to CloudKit");
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"CloudKitSaveFail" object:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:newLocationSaveFailedNotificationKey object:nil];
         }
     }];
+    
+}
+
+- (void)loadLocationsAfterSavingLocationIdentifier:(NSString *)identifier {
+    NSMutableArray *locationsIdentifiers = [[NSMutableArray alloc] init];
+    for (Location *location in self.locations) {
+        [locationsIdentifiers addObject:location.identifier];
+    }
+    if (![locationsIdentifiers containsObject:identifier]) {
+        [self loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
+            [self loadLocationsAfterSavingLocationIdentifier:identifier];
+        }];
+    } else {
+        NSLog(@"new location fetched from cloudKit successfully");
+        [[NSNotificationCenter defaultCenter] postNotificationName:newLocationSavedNotificationKey object:nil];
+        [[UserController sharedInstance] fetchUsersSavedLocationsFromArray:self.locations];
+    }
     
 }
 
@@ -69,7 +83,7 @@
                 [tempArray addObject:location];
             }
             self.locations = tempArray;
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"locationsFetched" object:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:allLocationsFetchedNotificationKey object:nil];
             completion(self.locations);
         }
     }];

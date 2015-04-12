@@ -8,6 +8,7 @@
 
 #import "ProfileViewController.h"
 #import "ProfileTableViewDatasource.h"
+#import "UserController.h"
 
 
 @interface ProfileViewController ()
@@ -29,8 +30,18 @@
     self.tableView.dataSource = self.dataSource;
     [self.view addSubview:self.tableView];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfile) name:UsersLocationsNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfile) name:UserPointsNotificationKey object:nil];
 }
 
+- (void)updateProfile {
+    [self.tableView reloadData];
+}
+
+-(void)deRegisterForNotifcations
+{
+    [[NSNotificationCenter defaultCenter]removeObserver:self];
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
