@@ -14,7 +14,6 @@
 		FC58E8FF1ACDE33B00CF6A0C /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = FC58E8FE1ACDE33B00CF6A0C /* User.m */; };
 		FC799E411AC5D6F800F8BD70 /* Location.m in Sources */ = {isa = PBXBuildFile; fileRef = FC799E401AC5D6F800F8BD70 /* Location.m */; };
 		FC799E461AC5D89E00F8BD70 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC799E451AC5D89E00F8BD70 /* CloudKit.framework */; };
-		FC799E491AC5E9CA00F8BD70 /* SetLocationView.m in Sources */ = {isa = PBXBuildFile; fileRef = FC799E481AC5E9CA00F8BD70 /* SetLocationView.m */; };
 		FC8B18F61AC4B7E000051693 /* LocationController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8B18F51AC4B7E000051693 /* LocationController.m */; };
 		FCA0ECA41ACC662A006E1B8B /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCA0ECA31ACC662A006E1B8B /* ProfileViewController.m */; };
 		FCA0ECA71ACC663B006E1B8B /* LeaderboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */; };
@@ -51,8 +50,6 @@
 		FC799E401AC5D6F800F8BD70 /* Location.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Location.m; sourceTree = "<group>"; };
 		FC799E441AC5D89A00F8BD70 /* Airvolution.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Airvolution.entitlements; sourceTree = "<group>"; };
 		FC799E451AC5D89E00F8BD70 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
-		FC799E471AC5E9CA00F8BD70 /* SetLocationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetLocationView.h; sourceTree = "<group>"; };
-		FC799E481AC5E9CA00F8BD70 /* SetLocationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SetLocationView.m; sourceTree = "<group>"; };
 		FC8B18F41AC4B7E000051693 /* LocationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationController.h; sourceTree = "<group>"; };
 		FC8B18F51AC4B7E000051693 /* LocationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationController.m; sourceTree = "<group>"; };
 		FCA0ECA21ACC662A006E1B8B /* ProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileViewController.h; sourceTree = "<group>"; };
@@ -142,8 +139,6 @@
 				FCE401301AC0C9E800DBB19A /* AppDelegate.m */,
 				FCE401321AC0C9E800DBB19A /* MapViewController.h */,
 				FCE401331AC0C9E800DBB19A /* MapViewController.m */,
-				FC799E471AC5E9CA00F8BD70 /* SetLocationView.h */,
-				FC799E481AC5E9CA00F8BD70 /* SetLocationView.m */,
 				FCB55F711AD9ECD800FDEF0A /* Profile */,
 				FCA0ECA51ACC663B006E1B8B /* LeaderboardViewController.h */,
 				FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */,
@@ -301,7 +296,6 @@
 				FCBB5AAB1ACDF5D20059AC3C /* ProfileTableViewDatasource.m in Sources */,
 				FCA0ECA71ACC663B006E1B8B /* LeaderboardViewController.m in Sources */,
 				FC0BCBD41AD48F9200EAF9BF /* UserCustomCell.m in Sources */,
-				FC799E491AC5E9CA00F8BD70 /* SetLocationView.m in Sources */,
 				FCE401341AC0C9E800DBB19A /* MapViewController.m in Sources */,
 				FCA0ECA41ACC662A006E1B8B /* ProfileViewController.m in Sources */,
 				FCE401311AC0C9E800DBB19A /* AppDelegate.m in Sources */,

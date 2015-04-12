@@ -7,7 +7,6 @@
 //
 
 #import "MapViewController.h"
-#import "SetLocationView.h"
 #import "LocationController.h"
 
 @interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate>
@@ -20,7 +19,6 @@
 @property (nonatomic) CLLocation *location;
 @property (nonatomic, strong) MKPointAnnotation *droppedPinAnnotation;
 
-//@property (nonatomic, strong) SetLocationView *setLocationView;
 @property (nonatomic, strong) NSMutableArray *placemarks;
 @property (nonatomic, strong) NSArray *selectedPinAddress;
 
@@ -82,8 +80,6 @@ static NSString * const droppedPinTitle = @"cancel or add";
 //    UIBarButtonItem *searchButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(showSearchBar)];
 //    [self.navigationItem setLeftBarButtonItem:searchButton];
 
-//    self.setLocationView = [[SetLocationView alloc] initWithFrame:CGRectMake(self.view.frame.size.width, 0, 300, self.view.frame.size.height)];
-//    [self.view addSubview:self.setLocationView];
 }
 
 #pragma mapSearch
@@ -315,7 +311,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     if ([control tag] == 2) {
         NSLog(@"add button clicked");
         
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Enter Location" message:nil preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Enter Location" message:[NSString stringWithFormat:@"Address: %@, \n %@", self.selectedPinAddress[0], self.selectedPinAddress[1]]  preferredStyle:UIAlertControllerStyleAlert];
         
         [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
             textField.placeholder = @"location name";
@@ -329,7 +325,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
         UIAlertAction *saveAction = [UIAlertAction actionWithTitle:@"save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
             UITextField *textField = alertController.textFields[0];
             if ([textField.text isEqualToString:@""]) {
-                NSLog(@"no text");
+                NSLog(@"no text no save");
             } else {
             [[LocationController sharedInstance]saveLocationWithName:textField.text location:self.location addressArray:self.selectedPinAddress];
             }
@@ -337,13 +333,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
         [alertController addAction:saveAction];
         
         [self presentViewController:alertController animated:YES completion:nil];
-//        [UIView animateWithDuration:0.5 animations:^{
-//            self.setLocationView.locationFromAnnotation = self.location;
-//            self.setLocationView.address = self.selectedPinAddress;
-//            NSLog(@"self.location %@ ... self.selectedPinAddress %@", self.location, self.selectedPinAddress);
-//            self.setLocationView.frame = CGRectMake((self.view.frame.size.width/2) - 150, 125, 300, 225);
-////            self.setLocationView.frame = self.view.bounds;
-//        }];
+
         
     } else if ([control tag] == 1) {
         [self.mapView removeAnnotation:self.droppedPinAnnotation];
