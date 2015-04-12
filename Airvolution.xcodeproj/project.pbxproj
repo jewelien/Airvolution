@@ -98,6 +98,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		FCB55F711AD9ECD800FDEF0A /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				FCA0ECA21ACC662A006E1B8B /* ProfileViewController.h */,
+				FCA0ECA31ACC662A006E1B8B /* ProfileViewController.m */,
+				FCBB5AA91ACDF5D20059AC3C /* ProfileTableViewDatasource.h */,
+				FCBB5AAA1ACDF5D20059AC3C /* ProfileTableViewDatasource.m */,
+				FC0BCBD21AD48F9200EAF9BF /* UserCustomCell.h */,
+				FC0BCBD31AD48F9200EAF9BF /* UserCustomCell.m */,
+				FC0BCBD81AD59DA600EAF9BF /* LocationCustomCell.h */,
+				FC0BCBD91AD59DA600EAF9BF /* LocationCustomCell.m */,
+			);
+			name = Profile;
+			sourceTree = "<group>";
+		};
 		FCE4011F1AC0C9E800DBB19A = {
 			isa = PBXGroup;
 			children = (
@@ -129,14 +144,7 @@
 				FCE401331AC0C9E800DBB19A /* MapViewController.m */,
 				FC799E471AC5E9CA00F8BD70 /* SetLocationView.h */,
 				FC799E481AC5E9CA00F8BD70 /* SetLocationView.m */,
-				FCA0ECA21ACC662A006E1B8B /* ProfileViewController.h */,
-				FCA0ECA31ACC662A006E1B8B /* ProfileViewController.m */,
-				FCBB5AA91ACDF5D20059AC3C /* ProfileTableViewDatasource.h */,
-				FCBB5AAA1ACDF5D20059AC3C /* ProfileTableViewDatasource.m */,
-				FC0BCBD21AD48F9200EAF9BF /* UserCustomCell.h */,
-				FC0BCBD31AD48F9200EAF9BF /* UserCustomCell.m */,
-				FC0BCBD81AD59DA600EAF9BF /* LocationCustomCell.h */,
-				FC0BCBD91AD59DA600EAF9BF /* LocationCustomCell.m */,
+				FCB55F711AD9ECD800FDEF0A /* Profile */,
 				FCA0ECA51ACC663B006E1B8B /* LeaderboardViewController.h */,
 				FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */,
 				FC8B18F41AC4B7E000051693 /* LocationController.h */,

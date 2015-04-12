@@ -20,7 +20,7 @@
 @property (nonatomic) CLLocation *location;
 @property (nonatomic, strong) MKPointAnnotation *droppedPinAnnotation;
 
-@property (nonatomic, strong) SetLocationView *setLocationView;
+//@property (nonatomic, strong) SetLocationView *setLocationView;
 @property (nonatomic, strong) NSMutableArray *placemarks;
 @property (nonatomic, strong) NSArray *selectedPinAddress;
 
@@ -232,22 +232,6 @@ static NSString * const droppedPinTitle = @"cancel or add";
     }
     [self.mapView addAnnotation:self.droppedPinAnnotation];
 }
-//- (void)dropPinAtCurrentLocation {
-//    
-//    self.droppedPinAnnotation = [[MKPointAnnotation alloc] init];
-//    self.droppedPinAnnotation.coordinate = self.mapView.userLocation.coordinate;
-//    self.droppedPinAnnotation.title = droppedPinTitle;
-//    self.location = [[CLLocation alloc] initWithLatitude:self.droppedPinAnnotation.coordinate.latitude longitude:self.droppedPinAnnotation.coordinate.longitude];
-//    NSLog(@"DROPPED %@", self.location);
-//    
-//    for (id annotation in self.mapView.annotations) {
-//        if ([[annotation title] isEqualToString:droppedPinTitle]) {
-//            [self.mapView removeAnnotation:annotation];
-//        }
-//    }
-//    self.mapView.userTrackingMode = MKUserTrackingModeFollow;
-//    [self.mapView addAnnotation:self.droppedPinAnnotation];
-//}
 
 - (void)addPinWithGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
 {

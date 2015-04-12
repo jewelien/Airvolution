@@ -1,18 +1,18 @@
+////
+////  SetLocationView.h
+////  Airvolution
+////
+////  Created by Julien Guanzon on 3/27/15.
+////  Copyright (c) 2015 Julien Guanzon. All rights reserved.
+////
 //
-//  SetLocationView.h
-//  Airvolution
+//#import <UIKit/UIKit.h>
+//#import "Location.h"
+//#import <MapKit/MapKit.h>
 //
-//  Created by Julien Guanzon on 3/27/15.
-//  Copyright (c) 2015 Julien Guanzon. All rights reserved.
+//@interface SetLocationView : UIView
 //
-
-#import <UIKit/UIKit.h>
-#import "Location.h"
-#import <MapKit/MapKit.h>
-
-@interface SetLocationView : UIView
-
-@property (nonatomic, strong) CLLocation *locationFromAnnotation;
-@property (nonatomic, strong) NSArray *address;
-
-@end
+//@property (nonatomic, strong) CLLocation *locationFromAnnotation;
+//@property (nonatomic, strong) NSArray *address;
+//
+//@end

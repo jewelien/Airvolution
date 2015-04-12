@@ -26,14 +26,17 @@
 }
 
 - (void)fetchUserRecordIDWithCompletion:(void (^)(NSString *userRecordName))completion {
-    [[CKContainer defaultContainer] fetchUserRecordIDWithCompletionHandler:^(CKRecordID *recordID, NSError *error) {
-        
+
+    [[CKContainer containerWithIdentifier:@"iCloud.com.julienguanzon.Airvolution"] fetchUserRecordIDWithCompletionHandler:^(CKRecordID *recordID, NSError *error) {
+    
         if (recordID) {
-            self.userRecordID = recordID;
-            self.userRecordName = recordID.recordName;
-            NSLog(@"USER RECORD NAME Fetched %@", self.userRecordName);
-            completion(self.userRecordName);
+            self.currentUserRecordID = recordID;
+            self.currentUserRecordName = recordID.recordName;
+
+            NSLog(@"USER RECORD NAME Fetched %@", self.currentUserRecordName);
+            completion(self.currentUserRecordName);
         } else {
+            NSLog(@"User not logged in to iCloud");
             [[NSNotificationCenter defaultCenter] postNotificationName:@"CloudKitSaveFail" object:nil];
         }
         
@@ -43,177 +46,179 @@
 
 -(void)fetchUsersSavedLocationsFromArray:(NSArray *)allLocationsArray {
     NSMutableArray *tempArray = [NSMutableArray new];
-    NSLog(@"locations array %@", [LocationController sharedInstance].locations);
-    
     for (Location *location in [LocationController sharedInstance].locations) {
         
         if ([location.userRecordName isEqualToString: @"__defaultOwner__"]) {
             [tempArray addObject:location];
-            NSLog(@"user's locations found");
+//            NSLog(@"user's locations found");
         } else {
-            NSLog(@"not user's location");
-            NSLog(@"location.userRecordName, %@",location.userRecordName);
-            NSLog(@"self.userRecordName %@", self.userRecordName);
+//            NSLog(@"not user's location");
         }
-        self.usersSharedLocations = tempArray;
-        NSLog(@"self.usersSharedLocations, %@", self.usersSharedLocations);
     }
-    [self retrieveAllUsers];
+    self.usersSharedLocations = tempArray;
+    NSLog(@"User has %ld locations", self.usersSharedLocations.count);
+    [self checkUserinCloudKitUserList];
 }
+
 
 + (CKDatabase*)publicDatabase {
     CKDatabase *database = [[CKContainer defaultContainer] publicCloudDatabase];
     return database;
 }
 
-- (void)retrieveAllUsers {
-    NSLog(@"method called ");
-    NSMutableArray *array = [[NSMutableArray alloc] init];
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"TRUEPREDICATE"];
-    CKQuery *query = [[CKQuery alloc] initWithRecordType:UserRecordTypeKey predicate:predicate];
+-(void)checkUserinCloudKitUserList {
+    NSLog(@"checking if user is in CK UserList");
+    //return an array of all User's record names only to use when fetching "Users" in cloudkit.
+    //1. FETCH ALL USER RECORD NAMES FROM CLOUDKIT USER LIST --- STORE IN LOCAL ARRAY
+    //2. CHECK THIS ARRAY IF CURRENT USER RECORD NAME IS IN THE LIST.
+    //3. if YES - no need to do anything. continue to step 5.
+    //4. if NO. add user to cloudKit userList  -- do step 1, continue to step 5.
+    //5. Continue to fetch all users from users. using the userrecordnames local array.
+    
+    NSMutableArray *userListMutableArray = [[NSMutableArray alloc] init];
+
+    NSPredicate *predicate = [NSPredicate predicateWithValue:YES];
+    CKQuery *query = [[CKQuery alloc] initWithRecordType:UserListRecordTypeKey predicate:predicate];
+    
     [[UserController publicDatabase] performQuery:query inZoneWithID:nil completionHandler:^(NSArray *results, NSError *error) {
         if (error) {
-            NSLog(@"error retrieving all users with error %@", error);
-        }
-        else {
+            NSLog(@"fetch CloudKit UserList failed, error %@", error);
+        } else {
+            
             if (results.count == 0) {
-                NSLog(@"no users found when retrieving all users");
-//                [self saveUsernametoCloudKitWithUserRecordName:self.userRecordName];
+                NSLog(@"no users in user list");
+//                [self saveUserinCloudKitUserList];
             } else {
-                NSLog(@"successfully retrieved all users, total %ld", results.count);
-                for (NSDictionary *dictionary in results) {
-                    User *user = [[User alloc] initWithDictionary:dictionary];
-                    [array addObject:user];
+                
+                for (CKRecord *record in results) {
+                        [userListMutableArray addObject:record[RecordNameKey]];
                 }
-                self.allUsers = array;
-                NSLog(@"All Users %@", self.allUsers);
-                [self findCurrentUser];
-                [self checkUserInCloudkit];
+                if ([userListMutableArray containsObject:self.currentUserRecordName]) {
+                    NSLog(@"user is in cloudkit");
+                    self.allUsersRecordNames = userListMutableArray;
+                    NSLog(@"self.allUsersRecordNames %@", self.allUsersRecordNames);
+                    [self retrieveAllUsers];
+                } else {
+                    NSLog(@"user is not in cloudkit");
+                    [self saveUserinCloudKitUserList];
+                }
             }
         }
     }];
 }
+
+- (void)saveUserinCloudKitUserList {
+    CKRecord *cloudKitUserList = [[CKRecord alloc] initWithRecordType:UserListRecordTypeKey];
+    cloudKitUserList[RecordNameKey] = self.currentUserRecordName;
+    
+    [[UserController publicDatabase] saveRecord:cloudKitUserList completionHandler:^(CKRecord *record, NSError *error) {
+        if (!error) {
+            NSLog(@"record saved: %@", record);
+            [self checkUserInUserListAfterSave];
+        } else {
+            NSLog(@"NOT saved to CloudKit");
+        }
+    }];
+}
+
+-(void)checkUserInUserListAfterSave {
+    NSLog(@"checking user in CK UserList after save");
+    NSMutableArray *userListMutableArray = [[NSMutableArray alloc] init];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithValue:YES];
+    CKQuery *query = [[CKQuery alloc] initWithRecordType:UserListRecordTypeKey predicate:predicate];
+    
+    [[UserController publicDatabase] performQuery:query inZoneWithID:nil completionHandler:^(NSArray *results, NSError *error) {
+        if (error) {
+            NSLog(@"fetch CloudKit UserList failed, error %@", error);
+        } else {
+            for (CKRecord *record in results) {
+                [userListMutableArray addObject:record[RecordNameKey]];
+            }
+            if ([userListMutableArray containsObject:self.currentUserRecordName]) {
+                NSLog(@"user is in cloudkit");
+                self.allUsersRecordNames = userListMutableArray;
+                NSLog(@"self.allUsersRecordNames %@", self.allUsersRecordNames);
+                [self retrieveAllUsers];
+            } else {
+                NSLog(@"user is not yet in cloudkit");
+                [self checkUserInUserListAfterSave];
+            }
+        }
+    }];
+    
+}
+
+
+//- (void)retrieveAllUsersWithUsersRecordNames:(NSArray *)array {
+- (void)retrieveAllUsers {
+
+    NSMutableArray *recordIDs = [[NSMutableArray alloc] init];
+    for (NSString *recordName in self.allUsersRecordNames) {
+        CKRecordID *recordID = [[CKRecordID alloc] initWithRecordName:recordName];
+        [recordIDs addObject:recordID];
+    }
+    
+    NSLog(@"retrieving all users ");
+    CKFetchRecordsOperation *fetchOperation = [[CKFetchRecordsOperation alloc] initWithRecordIDs:recordIDs];
+    
+    NSMutableArray *allUsersTempArray = [[NSMutableArray alloc] init];
+    fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
+//        NSLog(@"%@", recordsByRecordID);
+        for (CKRecordID *recordID in recordsByRecordID) {
+            User *user = [[User alloc] initWithDictionary:recordsByRecordID[recordID]];
+            [allUsersTempArray addObject:user];
+        }
+        self.allUsers = allUsersTempArray;
+        NSLog(@"RETRIEVED ALL USERS %@", self.allUsers);
+        [self findCurrentUser];
+    };
+    
+    [[UserController publicDatabase] addOperation:fetchOperation];
+}
+
 - (void)findCurrentUser{
     for (User *user in self.allUsers) {
-        if ([user.userRecordName isEqualToString:@"__defaultOwner__"]) {
-            NSLog(@"current user found in all users %@", user.userRecordName);
+        if ([user.recordName isEqualToString:self.currentUserRecordName]) {
             self.currentUser = user;
+            [self checkUserUpdate];
         } else {
-            NSLog(@"current user not found in all users");
-            NSLog(@"user.userRecordName %@", user.userRecordName);
+            NSLog(@"looking for user in all Users array");
         }
     }
     NSLog(@"self.currentUser == %@", self.currentUser);
 }
 
-- (void)checkUserInCloudkit {
-    NSLog(@"checking User In Cloudkit");
-    NSMutableArray *usernameArray = [NSMutableArray new];
-    for (User *user in self.allUsers) {
-        [usernameArray addObject:user.username];
-    }
-    NSLog(@"usernameARRAY %@", usernameArray);
-
-    if (![usernameArray containsObject:self.userRecordName]) {
-        NSLog(@"current user not found in cloudkit, saving now");
-        [self saveUsernametoCloudKitWithUserRecordName:self.userRecordName];
-    } else {
-        NSLog(@"user is in cloudkit");
-        NSLog(@"user Identifier %@", self.currentUser.userIdentifier);
-
-        [self checkUserUpdate];
-    }
-    
-}
-
-
 
 -(void)checkUserUpdate{
+    
     NSInteger integer = self.usersSharedLocations.count * 25 ;
     NSString *pointsString = [@(integer)stringValue];
+    
     if (![self.currentUser.points isEqualToString:pointsString]) {
-        NSLog(@"Points do not match, %@ : %@", self.currentUser.points, pointsString);
+        CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
+        fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
+        
+            CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
+            
+            cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
+            cloudKitUser[UsernameKey] = self.currentUserRecordName;
+            cloudKitUser[PointsKey] = pointsString;
+            
+            [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
+                if (!error) {
+                    NSLog(@"saved records %@", record);
+                }
+            }];
 
-        NSLog(@"user Identifier %@", self.currentUser.userIdentifier);
-        
-        CKRecordID *recordID = [[CKRecordID alloc] initWithRecordName: self.currentUser.userIdentifier];
-        
-        [[UserController publicDatabase] deleteRecordWithID:recordID completionHandler:^(CKRecordID *recordID, NSError *error) {
-            if (error) {
-                NSLog(@"Record ID not deleted with error, %@", error);
-                NSLog(@"record iD not deleted %@", recordID);
-                
-            }else {
-                NSLog(@"deleted recordID %@", recordID);
-            }
-        }];
+        };
+
+        [[UserController publicDatabase] addOperation:fetchOperation];
         
     } else {
-        NSLog(@"User points matches.");
+        NSLog(@"points are matching no need to update");
     }
-    
-//        CKRecord *cloudKitUser = [[CKRecord alloc] initWithRecordType:UserRecordTypeKey];
-//        cloudKitUser[UserIdentifierKey] = [[NSUUID UUID] UUIDString];
-//        cloudKitUser[UsernameKey] = self.userRecordName;
-//        cloudKitUser[PointsKey] = pointsString;
-//        
-//        CKModifyRecordsOperation *modifyOp = [[CKModifyRecordsOperation alloc]initWithRecordsToSave:@[cloudKitUser] recordIDsToDelete:nil];
-//        
-//        modifyOp.database = [UserController publicDatabase];
-//        modifyOp.modifyRecordsCompletionBlock = ^(NSArray *savedRecords, NSArray *deletedRecordIDs, NSError *error) {
-//            if (error) {
-//                NSLog(@"[%@] Error pushing local data: %@", self.class, error);
-//                NSLog(@"deletedRecordIDs %@", deletedRecordIDs);
-//                NSLog(@"saved records %@", savedRecords);
-//            } else {
-//                NSLog(@"deleted /saved successfully");
-//                NSLog(@"deletedRecordIDs %@", deletedRecordIDs);
-//                NSLog(@"saved records %@", savedRecords);
-//            }
-//        };
-//        [[UserController publicDatabase] addOperation:modifyOp];
-    
 }
 
-
--(void)saveUsernametoCloudKitWithUserRecordName:(NSString *)userRecordName {
-    CKRecord *cloudKitUser = [[CKRecord alloc] initWithRecordType:UserRecordTypeKey];
-    cloudKitUser[UserIdentifierKey] = [[NSUUID UUID] UUIDString];
-    cloudKitUser[UsernameKey] = userRecordName;
-    NSInteger integer = self.usersSharedLocations.count * 25 ;
-    cloudKitUser[PointsKey] = [@(integer)stringValue];
-    
-    
-    [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
-        if (!error) {
-            NSLog(@"User saved to CloudKit, %@", record);
-        }
-        else {
-            NSLog(@"User not saved to CloudKit");
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"CloudKitSaveFail" object:nil];
-        }
-    }];
-}
-
-- (void)updateUser:(User *)user withRecordName:(NSString *)recordName {
-//    
-//    
-//    if (dictionary[UsernameKey] != self.user.username) {
-//        NSLog(@"username has changed");
-//    } else {
-//        NSLog(@"no changes to username");
-//    }
-//    
-//    NSInteger integer = self.usersSharedLocations.count * 25;
-//    NSString *pointsString = [@(integer)stringValue];
-//    NSLog(@"%@", pointsString);
-//    if (dictionary[PointsKey] !=  pointsString ) {
-//        NSLog(@"points changed");
-//    } else {
-//        NSLog(@"no changes to points");
-//    }
-//    
-    
-}
 
 @end

@@ -94,6 +94,7 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
         case 0:
 //            tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
             cell = userCell;
+//            userCell.usernameLabel.text = [[UserControll]];
             userCell.usernameLabel.text = currentUser.username;
             userCell.pointsLabel.text = currentUser.points;
             break;

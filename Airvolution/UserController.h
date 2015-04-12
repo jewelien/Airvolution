@@ -16,9 +16,10 @@
 
 @property (nonatomic, strong) NSArray *allUsers;
 @property (nonatomic, strong) NSArray *usersSharedLocations;
-@property (nonatomic, strong) CKRecordID *userRecordID;
-@property (nonatomic, strong) NSString *userRecordName;
+@property (nonatomic, strong) CKRecordID *currentUserRecordID; //User Record Type
+@property (nonatomic, strong) NSString *currentUserRecordName; //User Record Type
 @property (nonatomic, strong) User *currentUser;
+@property (nonatomic, strong) NSArray *allUsersRecordNames;
 
 + (UserController *)sharedInstance;
 

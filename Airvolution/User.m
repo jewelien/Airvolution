@@ -15,22 +15,27 @@
     
     self = [super init];
     if (self) {
-    self.username = dictionary[UsernameKey];
-    self.points = dictionary[PointsKey];
-    self.userRecordID = dictionary[creatorUserKey];
-    self.userIdentifier = dictionary[UserIdentifierKey];
-    [self retrieveUserRecordNamefromUserRecordID:dictionary[creatorUserKey]];
+        self.recordID = dictionary[RecordIDKey];
+        self.recordName = self.recordID.recordName;
+        self.identifier = dictionary[IdentifierKey];
+        self.points = dictionary[PointsKey];
+        self.username = dictionary[UsernameKey];
     }
-    
-    NSLog(@"POINTS %@", self.points);
+//    NSLog(@"%@, %@, %@, %@, %@", self.recordID, self.recordName, self.identifier, self.points, self.username);
     return  self;
 }
 
 
-- (void)retrieveUserRecordNamefromUserRecordID:(CKRecordID *)recordID {
-    self.userRecordName = recordID.recordName;
-    NSLog(@"self.userRecordName %@", self.userRecordName);
+/*
+ "<CKRecordID: 0x7fb62060a970; _c835c6d554eafe238933b65a1a9dd94d:(_defaultZone:__defaultOwner__)>" =
+ "<CKRecord: 0x7fb61ec82710;
+ recordType=Users,
+ recordID=_c835c6d554eafe238933b65a1a9dd94d:(_defaultZone:__defaultOwner__),
+ recordChangeTag=i7rxe5ce, values={\n
+ identifier = \"3E7837F6-C23C-44B2-89E8-5D9DF9AB061E\";\n
+ points = 50;\n
+ username = \"_c835c6d554eafe238933b65a1a9dd94d\";\n}>";
+ */
 
-}
 
 @end
