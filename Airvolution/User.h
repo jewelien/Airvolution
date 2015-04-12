@@ -17,6 +17,8 @@ static NSString *const IdentifierKey = @"identifier";
 static NSString *const PointsKey = @"points";
 static NSString *const UsernameKey = @"username";
 
+static NSString *const ImageKey = @"profileImage";
+
 @interface User : NSObject
 
 @property (nonatomic, strong) CKRecordID *recordID;

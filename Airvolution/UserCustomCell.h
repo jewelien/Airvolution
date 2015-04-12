@@ -12,6 +12,6 @@
 
 @property (nonatomic, strong) UILabel *usernameLabel;
 @property (nonatomic, strong) UILabel *pointsLabel;
-@property (nonatomic, strong) UIImage *image;
+@property (nonatomic, strong) UIImageView *imageView;
 
 @end

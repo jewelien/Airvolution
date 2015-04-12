@@ -53,13 +53,15 @@ static NSString * const cellKey = @"cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellKey];
     
     if (cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier:NSStringFromClass([UITableViewCell class])];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:NSStringFromClass([UITableViewCell class])];
     }
     
     User *user = [UserController sharedInstance].allUsers[indexPath.row];
     cell.textLabel.text = user.username;
     cell.detailTextLabel.text = [NSString stringWithFormat:@"Points: %@", user.points];
+//    cell.imageView.image = [UIImage imageNamed:@"compass"];
     cell.textLabel.lineBreakMode = NSLineBreakByCharWrapping;
+    
     return cell;
 }
 

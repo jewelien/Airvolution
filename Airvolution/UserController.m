@@ -183,7 +183,7 @@
     for (User *user in self.allUsers) {
         if ([user.recordName isEqualToString:self.currentUserRecordName]) {
             self.currentUser = user;
-            [self checkUserUpdate];
+            [self updateUser];
         } else {
             NSLog(@"looking for user in all Users array");
         }
@@ -192,19 +192,19 @@
 }
 
 
--(void)checkUserUpdate{
-    
+-(void)updateUser {
+    NSString *username = [self.currentUserRecordName substringFromIndex:[self.currentUserRecordName length] - 12];
     NSInteger integer = self.usersSharedLocations.count * 25 ;
     NSString *pointsString = [@(integer)stringValue];
     
-    if (![self.currentUser.points isEqualToString:pointsString]) {
+    if (![self.currentUser.points isEqualToString:pointsString] || ![self.currentUser.username isEqualToString:username]) {
         CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
         fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
         
             CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
             
             cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
-            cloudKitUser[UsernameKey] = self.currentUserRecordName;
+            cloudKitUser[UsernameKey] = username;
             cloudKitUser[PointsKey] = pointsString;
             
             [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
@@ -220,7 +220,7 @@
         [[UserController publicDatabase] addOperation:fetchOperation];
         
     } else {
-        NSLog(@"points are matching no need to update");
+        NSLog(@"points and username are matching no need to update");
     }
 }
 

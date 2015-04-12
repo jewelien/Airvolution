@@ -31,10 +31,10 @@
     cloudKitLocation[identifierKey] = [[NSUUID UUID] UUIDString];
     cloudKitLocation[nameKey] = name;
     cloudKitLocation[locationKey] = location;
-    cloudKitLocation[streetKey] = address[0];
-    cloudKitLocation[cityStateZipKey] = address[1];
-    cloudKitLocation[countryKey] = address[2];
-    
+        cloudKitLocation[streetKey] = address[0];
+        cloudKitLocation[cityStateZipKey] = address[1];
+        cloudKitLocation[countryKey] = address[2];
+
     
     [[LocationController publicDatabase] saveRecord:cloudKitLocation completionHandler:^(CKRecord *record, NSError *error) {
         if (!error) {

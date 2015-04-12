@@ -23,6 +23,10 @@
 @property (nonatomic, strong) NSMutableArray *placemarks;
 @property (nonatomic, strong) NSArray *selectedPinAddress;
 
+@property (nonatomic, strong) UIView *loadingView;
+@property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
+
+
 @end
 
 static NSString * const droppedPinTitle = @"cancel or add";
@@ -177,10 +181,11 @@ static NSString * const droppedPinTitle = @"cancel or add";
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Thanks!" message:@"Location saved. Thank you!" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [self.mapView removeAnnotation:self.droppedPinAnnotation];
-
+        [self.indicatorView stopAnimating];
     }];
     [alert addAction:action];
     [self presentViewController:alert animated:YES completion:nil];
+
     
 }
 
@@ -283,7 +288,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
             pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"droppedPin"];
             pinView.draggable = YES;
             pinView.canShowCallout = YES;
-//            pinView.animatesDrop = YES;
+            pinView.animatesDrop = YES;
             
             UIButton *addLocationButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
             addLocationButton.tag = 2;
@@ -341,6 +346,15 @@ static NSString * const droppedPinTitle = @"cancel or add";
             if ([textField.text isEqualToString:@""]) {
                 NSLog(@"no text no save");
             } else {
+                
+                self.indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+                self.indicatorView.frame = self.view.bounds;
+                self.indicatorView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
+                self.indicatorView.center = CGPointMake(160, 240);
+                [self.loadingView addSubview:self.indicatorView];
+                [self.indicatorView startAnimating];
+                [self.view addSubview:self.indicatorView];
+                
             [[LocationController sharedInstance]saveLocationWithName:textField.text location:self.location addressArray:self.selectedPinAddress];
             }
         }];
