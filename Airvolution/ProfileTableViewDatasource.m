@@ -113,5 +113,56 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
     return cell;
 }
 
+-(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
+    BOOL command;
+    switch (indexPath.section) {
+        case 1:
+            command = YES;
+            break;
+        default:
+            break; command = NO;
+    }
+    return command;
+//    return NO;
+}
+
+
+-(NSArray *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSArray *rowAction;
+    
+    UITableViewRowAction *editAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"edit" handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
+        NSLog(@"swiped");
+        [[NSNotificationCenter defaultCenter] postNotificationName:editProfileNotificationKey object:nil];
+    }];
+    editAction.backgroundColor = [UIColor orangeColor];
+    
+    
+    switch (indexPath.section) {
+        case 0:
+            rowAction = @[editAction];
+            break;
+        default:
+            break;
+    }
+    
+    return rowAction;
+}
+
+
+
+-(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+}
+
+
+-(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    return YES;
+}
+
+
+
+
+
 
 @end

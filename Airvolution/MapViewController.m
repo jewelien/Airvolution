@@ -41,6 +41,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 //    self.view.backgroundColor = [UIColor lightGrayColor];
     [self setTitle:@"Airvolution"];
     [self registerForNotifications];
+    self.view.backgroundColor = [UIColor colorWithWhite:0.96 alpha:5.0];
     
     
     self.locationManager = [[CLLocationManager alloc] init];
@@ -170,7 +171,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 
 - (void)savedToCloudKitFailedAlert {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"error" message:@"Location failed to save. Please make sure you have a network connection and logged in to your iCloud account in your iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Location failed to save. Please make sure you have a network connection and logged in to your iCloud account in your iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:nil];
     [alert addAction:action];
     
@@ -178,7 +179,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 }
 
 - (void)savedToCloudKitSuccess {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Thanks!" message:@"Location saved. Thank you!" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Success" message:@"Location saved. Thank you!" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [self.mapView removeAnnotation:self.droppedPinAnnotation];
         [self.indicatorView stopAnimating];

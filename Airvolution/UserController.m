@@ -12,6 +12,9 @@
 #import "ProfileViewController.h"
 #import "User.h"
 
+@interface UserController ()
+@end
+
 @implementation UserController
 
 
@@ -73,7 +76,7 @@
     //return an array of all User's record names only to use when fetching "Users" in cloudkit.
     //1. FETCH ALL USER RECORD NAMES FROM CLOUDKIT USER LIST --- STORE IN LOCAL ARRAY
     //2. CHECK THIS ARRAY IF CURRENT USER RECORD NAME IS IN THE LIST.
-    //3. if YES - no need to do anything. continue to step 5.
+    //3. if YES - continue to step 5.
     //4. if NO. add user to cloudKit userList  -- do step 1, continue to step 5.
     //5. Continue to fetch all users from users. using the userrecordnames local array.
     
@@ -177,13 +180,14 @@
     };
     
     [[UserController publicDatabase] addOperation:fetchOperation];
+    [[NSNotificationCenter defaultCenter] postNotificationName:UserProfileNotificationKey object:nil];
 }
 
 - (void)findCurrentUser{
     for (User *user in self.allUsers) {
         if ([user.recordName isEqualToString:self.currentUserRecordName]) {
             self.currentUser = user;
-            [self updateUser];
+            [self updateUserPoints];
         } else {
             NSLog(@"looking for user in all Users array");
         }
@@ -192,26 +196,48 @@
 }
 
 
--(void)updateUser {
+-(void)updateUserPoints {
     NSString *username = [self.currentUserRecordName substringFromIndex:[self.currentUserRecordName length] - 12];
     NSInteger integer = self.usersSharedLocations.count * 25 ;
     NSString *pointsString = [@(integer)stringValue];
     
-    if (![self.currentUser.points isEqualToString:pointsString] || ![self.currentUser.username isEqualToString:username]) {
+    if ([self.currentUser.username isEqualToString:@""]) {
+        CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
+        fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
+            
+            CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
+            
+            cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
+            cloudKitUser[UsernameKey] = username;
+            
+            [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
+                if (!error) {
+                    NSLog(@"saved default username %@", record);
+                    [self retrieveAllUsers];
+                }
+            }];
+            
+        };
+        
+        [[UserController publicDatabase] addOperation:fetchOperation];
+    }
+
+    
+//    if (![self.currentUser.points isEqualToString:pointsString] || [self.currentUser.username isEqualToString:@""]) {
+    if (![self.currentUser.points isEqualToString:pointsString]) {
+
         CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
         fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
         
             CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
             
             cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
-            cloudKitUser[UsernameKey] = username;
             cloudKitUser[PointsKey] = pointsString;
             
             [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
                 if (!error) {
-                    NSLog(@"saved records %@", record);
+                    NSLog(@"saved new points %@", record);
                     [self retrieveAllUsers];
-                    [[NSNotificationCenter defaultCenter] postNotificationName:UserPointsNotificationKey object:nil];
                 }
             }];
 
@@ -222,6 +248,28 @@
     } else {
         NSLog(@"points and username are matching no need to update");
     }
+}
+
+-(void)updateUsernameWith:(NSString *)newUsername {
+    CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
+    fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
+        
+        CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
+        
+        cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
+        cloudKitUser[UsernameKey] = newUsername;
+        
+        [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
+            if (!error) {
+                NSLog(@"saved new username %@", record);
+                [self retrieveAllUsers];
+                [[NSNotificationCenter defaultCenter] postNotificationName:UsernameSavedNotificationKey object:nil];
+            }
+        }];
+        
+    };
+    [[UserController publicDatabase] addOperation:fetchOperation];
+
 }
 
 

@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+static NSString * const editProfileNotificationKey = @"edit profile clicked";
+
 @interface ProfileTableViewDatasource : NSObject <UITableViewDataSource, UITableViewDelegate>
 
 - (void)registerTableView:(UITableView *)tableView;
