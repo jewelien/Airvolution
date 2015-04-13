@@ -53,14 +53,35 @@ static NSString * const cellKey = @"cell";
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellKey];
     
-    if (cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:NSStringFromClass([UITableViewCell class])];
-    }
+//    if (cell) {
+//        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:NSStringFromClass([UITableViewCell class])];
+//    }
     
     User *user = [UserController sharedInstance].allUsers[indexPath.row];
-    cell.textLabel.text = user.username;
-    cell.detailTextLabel.text = [NSString stringWithFormat:@"Points: %@", user.points];
-//    cell.imageView.image = [UIImage imageNamed:@"compass"];
+    
+    UIImageView *view = [[UIImageView alloc] initWithFrame:CGRectMake(35, 2, 40, 40)];
+    view.backgroundColor = [UIColor lightGrayColor];
+    view.image = user.profileImage;
+    [cell.contentView addSubview:view];
+    
+    UILabel *usernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(80, 10, 125, 20)];
+//    usernameLabel.backgroundColor = [UIColor orangeColor];
+    usernameLabel.textAlignment = NSTextAlignmentCenter;
+    usernameLabel.text = user.username;
+    [cell.contentView addSubview:usernameLabel];
+    
+    UILabel *pointsLabel = [[UILabel alloc] initWithFrame:CGRectMake(210, 10, 90, 20)];
+//    pointsLabel.backgroundColor = [UIColor grayColor];
+    
+    NSString *pointsString = [NSString stringWithFormat:@"Points: %@", user.points];
+//    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:pointsString];
+//    UIFont *fontSize = [UIFont systemFontOfSize:5.f];
+//    [attributedString addAttribute:NSFontAttributeName value:fontSize range:NSMakeRange(0, 6)];
+        pointsLabel.text = pointsString;
+    pointsLabel.font = [UIFont systemFontOfSize:12.0];
+    [cell.contentView addSubview:pointsLabel];
+    
+//    cell.imageView.image = user.profileImage;
     cell.textLabel.lineBreakMode = NSLineBreakByCharWrapping;
     
     return cell;
