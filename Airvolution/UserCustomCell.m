@@ -14,16 +14,18 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
 
-//        self.imageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 10, 60, 60)];
-        self.imageView.backgroundColor = [UIColor lightGrayColor];
-        [self.contentView addSubview:self.imageView];
         
-        self.usernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(95, 15, 200, 20)];
-//                    label.backgroundColor = [UIColor orangeColor];
+        self.viewForImage = [[UIImageView alloc] initWithFrame:CGRectMake(50, 10, 60, 60)];
+        self.viewForImage.backgroundColor = [UIColor lightGrayColor];
+        [self.contentView addSubview:self.viewForImage];
+        
+        
+        self.usernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(125, 15, 150, 20)];
+//                    self.usernameLabel.backgroundColor = [UIColor orangeColor];
         [self.contentView addSubview:self.usernameLabel];
         
-        self.pointsLabel = [[UILabel alloc] initWithFrame:CGRectMake(95, 40, 150, 20)];
-//                    label.backgroundColor = [UIColor orangeColor];
+        self.pointsLabel = [[UILabel alloc] initWithFrame:CGRectMake(125, 40, 150, 20)];
+//                    self.pointsLabel.backgroundColor = [UIColor orangeColor];
         [self.contentView addSubview:self.pointsLabel];
         
     }

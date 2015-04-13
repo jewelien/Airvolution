@@ -8,6 +8,9 @@
 
 #import "User.h"
 
+@interface User ()
+    @property (nonatomic, strong) CKAsset *image;
+@end
 
 @implementation User
 
@@ -20,10 +23,18 @@
         self.identifier = dictionary[IdentifierKey];
         self.points = dictionary[PointsKey];
         self.username = dictionary[UsernameKey];
+        
+        self.image = dictionary[ImageKey];
+        self.profileImage = [UIImage imageWithContentsOfFile:self.image.fileURL.path];
+        
     }
 //    NSLog(@"%@, %@, %@, %@, %@", self.recordID, self.recordName, self.identifier, self.points, self.username);
+    NSLog(@"profileimage %@", self.profileImage);
     return  self;
 }
+
+
+
 
 
 /*

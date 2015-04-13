@@ -155,7 +155,6 @@
 }
 
 
-//- (void)retrieveAllUsersWithUsersRecordNames:(NSArray *)array {
 - (void)retrieveAllUsers {
 
     NSMutableArray *recordIDs = [[NSMutableArray alloc] init];
@@ -180,8 +179,8 @@
     };
     
     [[UserController publicDatabase] addOperation:fetchOperation];
-    [[NSNotificationCenter defaultCenter] postNotificationName:UserProfileNotificationKey object:nil];
 }
+
 
 - (void)findCurrentUser{
     for (User *user in self.allUsers) {
@@ -246,8 +245,13 @@
         [[UserController publicDatabase] addOperation:fetchOperation];
         
     } else {
-        NSLog(@"points and username are matching no need to update");
+        NSLog(@"points matching no need to update");
+        [self pointsUpdated];
     }
+}
+
+- (void)pointsUpdated {
+    [[NSNotificationCenter defaultCenter] postNotificationName:UserPointsNotificationKey object:nil];
 }
 
 -(void)updateUsernameWith:(NSString *)newUsername {
@@ -270,6 +274,40 @@
     };
     [[UserController publicDatabase] addOperation:fetchOperation];
 
+}
+
+-(void)updateUserImageWithData:(NSData *)imageData
+{
+    NSURL *cachesDirectory =[[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
+    NSString *tempName = [[NSUUID UUID].UUIDString stringByAppendingString:@"jpeg"];
+    
+    NSURL *localURL = [cachesDirectory URLByAppendingPathComponent:tempName];
+    [imageData writeToURL:localURL atomically:YES];
+    NSLog(@"localURL %@", localURL);
+    
+    CKAsset *asset = [[CKAsset alloc] initWithFileURL:localURL];
+    NSLog(@"asset %@", asset);
+    
+    
+    CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
+    fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
+        
+        CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
+        
+        cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
+        cloudKitUser[ImageKey] = asset;
+        
+        [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
+            if (!error) {
+                NSLog(@"saved new profile image %@", record);
+                [self retrieveAllUsers];
+                [[NSNotificationCenter defaultCenter] postNotificationName:UserImageNotificationKey object:nil];
+            }
+        }];
+        
+    };
+    [[UserController publicDatabase] addOperation:fetchOperation];
+    
 }
 
 

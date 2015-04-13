@@ -11,9 +11,13 @@
 #import "User.h"
 
 static NSString * const UsersLocationsNotificationKey = @"users shared locations updated";
-static NSString * const UserProfileNotificationKey = @"user points updated";
 static NSString * const NotLoggedIniCloudNotificationKey = @"iCloud user not found";
+
+
+static NSString * const UserPointsNotificationKey = @"user points updated";
 static NSString * const UsernameSavedNotificationKey = @"new username saved";
+static NSString * const UserImageNotificationKey = @"profile image saved";
+
 
 @interface UserController : NSObject
 
@@ -33,4 +37,6 @@ static NSString * const UsernameSavedNotificationKey = @"new username saved";
 - (void)fetchUserRecordIDWithCompletion:(void (^)(NSString *userRecordName))completion;
 -(void)fetchUsersSavedLocationsFromArray:(NSArray *)allLocationsArray;
 -(void)updateUsernameWith:(NSString *)newUsername;
+-(void)updateUserImageWithData:(NSData *)imageData;
+
 @end

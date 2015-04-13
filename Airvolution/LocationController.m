@@ -62,8 +62,8 @@
         }];
     } else {
         NSLog(@"new location fetched from cloudKit successfully");
-        [[NSNotificationCenter defaultCenter] postNotificationName:newLocationSavedNotificationKey object:nil];
         [[UserController sharedInstance] fetchUsersSavedLocationsFromArray:self.locations];
+        [[NSNotificationCenter defaultCenter] postNotificationName:newLocationSavedNotificationKey object:nil];
     }
     
 }

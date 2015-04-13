@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Julien Guanzon. All rights reserved.
 //
 
+@import UIKit;
 #import <Foundation/Foundation.h>
 #import <CloudKit/CloudKit.h>
 
@@ -27,7 +28,8 @@ static NSString *const ImageKey = @"profileImage";
 @property (nonatomic, strong) NSString *points;
 @property (nonatomic, strong) NSString *username;
 
-//@property (nonatomic, strong) CKAsset *image;
+@property (nonatomic, strong) UIImage *profileImage;
+
 
 -(instancetype)initWithDictionary:(NSDictionary *)dictionary;
 

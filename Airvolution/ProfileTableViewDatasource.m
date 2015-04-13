@@ -97,6 +97,7 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 //            userCell.usernameLabel.text = [[UserControll]];
             userCell.usernameLabel.text = currentUser.username;
             userCell.pointsLabel.text = [NSString stringWithFormat:@"Points: %@", currentUser.points];
+            userCell.viewForImage.image = currentUser.profileImage;
             break;
         default:
             cell = locationCell;
