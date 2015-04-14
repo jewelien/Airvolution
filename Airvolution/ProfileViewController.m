@@ -9,6 +9,8 @@
 #import "ProfileViewController.h"
 #import "ProfileTableViewDatasource.h"
 #import "UserController.h"
+#import "Location.h"
+#import "LocationController.h"
 
 
 @interface ProfileViewController () <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
@@ -20,6 +22,7 @@
 @property (nonatomic, strong) NSData *imageData;
 //@property (nonatomic, strong) NSURL *selectedImageURL;
 @property (nonatomic, strong) UIActivityIndicatorView *savingImageView;
+@property (nonatomic, strong) UIActivityIndicatorView *deletingLocationView;
 
 
 @end
@@ -36,7 +39,13 @@
     [self.dataSource registerTableView:self.tableView];
     self.tableView.dataSource = self.dataSource;
     [self.view addSubview:self.tableView];
+
+    [self registerForNotifications];
     
+}
+
+- (void)registerForNotifications
+{    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfile) name:UsersLocationsNotificationKey object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfile) name:UserPointsNotificationKey object:nil];
@@ -46,6 +55,9 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(usernameSaveSuccessAlert) name:UsernameSavedNotificationKey object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(profileImageSaveSuccessAlert) name:UserImageNotificationKey object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deleteLocationCheckAlert:) name:deleteLocationNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(locationDeletedAlert) name:locationDeletedNotificationKey object:nil];
 }
 
 - (void)updateProfile {
@@ -74,7 +86,7 @@
     
 }
 
--(void)deRegisterForNotifcations
+-(void)dealloc
 {
     [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
@@ -96,7 +108,6 @@
     [editAlertController addAction:editImage];
 
     UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        NSLog(@"cancel");
         [editAlertController removeFromParentViewController];
     }];
     [editAlertController addAction:cancel];
@@ -115,7 +126,6 @@
     }];
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        NSLog(@"cancel");
         [usernameAlertController removeFromParentViewController];
     }];
     [usernameAlertController addAction:cancelAction];
@@ -170,6 +180,13 @@
         [self presentViewController:imagePicker animated:YES completion:nil];
     }];
     [imageDestinationAlertController addAction:fromCameraRoll];
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:nil style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        [imageDestinationAlertController removeFromParentViewController];
+    }];
+                                   
+    [imageDestinationAlertController addAction:cancelAction];
+    
     [self presentViewController:imageDestinationAlertController animated:YES completion:nil];
 }
 
@@ -239,7 +256,36 @@
     [[UserController sharedInstance] updateUserImageWithData:self.imageData];
 }
 
+-(void)deleteLocationCheckAlert:(NSNotification *)notification {
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Confirm Delete" message:@"Are you sure you want delete this location?" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [controller removeFromParentViewController];
+    }];
+    [controller addAction:cancelAction];
+    
+    UIAlertAction *deleteAction = [UIAlertAction actionWithTitle:@"delete" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+//        NSLog(@"location.recordID %@", notification.object);
+        self.deletingLocationView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+        self.deletingLocationView.frame = self.view.bounds;
+        [self.view addSubview:self.deletingLocationView];
+        [self.deletingLocationView startAnimating];
+        [[LocationController sharedInstance]deleteLocation:notification.object];
+    }];
+    [controller addAction:deleteAction];
+    [self presentViewController:controller animated:YES completion:nil];
+    
+}
 
+-(void)locationDeletedAlert {
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Deleted" message:@"The location you selected was deleted." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [self.tableView reloadData];
+        [self.deletingLocationView stopAnimating];
+        [controller removeFromParentViewController];
+    }];
+    [controller addAction:action];
+    [self presentViewController:controller animated:YES completion:nil];
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

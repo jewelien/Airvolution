@@ -19,6 +19,7 @@ static NSString * const streetKey = @"street";
 static NSString * const cityStateZipKey = @"cityStateZip";
 static NSString * const countryKey = @"country";
 static NSString * const creationDateKey = @"creationDate";
+static NSString * const recordIDKey = @"recordID";
 
 static NSString * const userKey = @"creatorUserRecordID";
 
@@ -33,6 +34,7 @@ static NSString * const userKey = @"creatorUserRecordID";
 @property (nonatomic, strong) NSString *identifier;
 
 @property (nonatomic, strong) NSString *userRecordName;
+@property (nonatomic, strong) CKRecordID *recordID;
 
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary;

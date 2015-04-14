@@ -16,6 +16,7 @@
 static NSString *const newLocationSavedNotificationKey = @"new location saved";
 static NSString *const newLocationSaveFailedNotificationKey = @"new location not saved";
 static NSString *const allLocationsFetchedNotificationKey = @"all locations fetched";
+static NSString *const locationDeletedNotificationKey = @"location deleted";
 
 
 @interface LocationController : NSObject
@@ -28,7 +29,7 @@ static NSString *const allLocationsFetchedNotificationKey = @"all locations fetc
 - (void)saveLocationWithName:(NSString *)name location:(CLLocation *)location addressArray:(NSArray *)address;
 - (void)loadLocationsFromCloudKitWithCompletion:(void (^)(NSArray *array))completion;
 
-
+- (void)deleteLocation:(Location *)location;
 
 
 @end

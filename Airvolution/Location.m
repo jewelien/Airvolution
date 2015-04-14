@@ -23,6 +23,7 @@
         self.identifier = dictionary[identifierKey];
         [self formatNSDate:dictionary[creationDateKey]];
         [self retrieveUserRecordNamefromUserRecordID:dictionary[userKey]];
+        self.recordID = dictionary[recordIDKey];
     }
     return self;
 }

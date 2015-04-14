@@ -12,6 +12,8 @@
 #import "Location.h"
 #import "UserCustomCell.h"
 #import "LocationCustomCell.h"
+#import "LocationController.h"
+#import "ProfileViewController.h"
 
 static NSString *const CellKey = @"cell";
 static NSString *const LocationCellKey = @"locationCell";
@@ -114,6 +116,8 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
     return cell;
 }
 
+
+
 -(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
     BOOL command;
     switch (indexPath.section) {
@@ -131,18 +135,21 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 -(NSArray *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
     NSArray *rowAction;
     
-    UITableViewRowAction *editAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"edit" handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-        NSLog(@"swiped");
+    UITableViewRowAction *editAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Edit" handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
         [[NSNotificationCenter defaultCenter] postNotificationName:editProfileNotificationKey object:nil];
     }];
     editAction.backgroundColor = [UIColor orangeColor];
     
+//    UITableViewRowAction *deleteAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"Delete" handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
+//        NSLog(@"swiped");
+////        [[NSNotificationCenter defaultCenter] postNotificationName:deleteLocationNotificationKey object:nil];
+//    }];
     
     switch (indexPath.section) {
         case 0:
             rowAction = @[editAction];
             break;
-        default:
+        default: //rowAction = @[deleteAction];
             break;
     }
     
@@ -153,8 +160,12 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
-}
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        NSLog(@"destructive");
+        Location *location = [UserController sharedInstance].usersSharedLocations[indexPath.row];
+        [[NSNotificationCenter defaultCenter] postNotificationName:deleteLocationNotificationKey object:location.recordID];
+    }
+} 
 
 
 -(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {

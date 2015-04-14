@@ -26,6 +26,8 @@
 @property (nonatomic, strong) UIView *loadingView;
 @property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
 
+@property (nonatomic, strong) NSArray *allLocations;
+
 
 @end
 
@@ -145,6 +147,8 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitFailedAlert) name:newLocationSaveFailedNotificationKey object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitSuccess) name:newLocationSavedNotificationKey object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeMapAnnotations) name:locationDeletedNotificationKey object:nil];
 
     
 }
@@ -157,6 +161,11 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [self presentViewController:alert animated:YES completion:nil];
 }
 
+-(void)removeMapAnnotations {
+    [self.mapView removeAnnotations:self.mapView.annotations];
+    [self updateMapWithSavedLocations];
+}
+
 - (void)updateMapWithSavedLocations
 {
     NSMutableArray *locationsArray = [NSMutableArray new];
@@ -167,6 +176,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
         
         [locationsArray addObject:savedAnnotation];
     }
+    self.allLocations = locationsArray;
     [self.mapView addAnnotations:locationsArray];
 }
 
@@ -191,7 +201,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     
 }
 
--(void)deRegisterForNotifcations
+-(void)dealloc
 {
     [[NSNotificationCenter defaultCenter]removeObserver:self];
 }

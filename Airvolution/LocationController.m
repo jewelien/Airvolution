@@ -90,6 +90,22 @@
 
 }
 
+- (void)deleteLocation:(CKRecordID *)recordID {
+    NSLog(@"identifier, %@", recordID);
+    [[LocationController publicDatabase] deleteRecordWithID:recordID completionHandler:^(CKRecordID *recordID, NSError *error) {
+        if (error) {
+            NSLog(@"location delete failed, error %@", error);
+        } else {
+            NSLog(@"record ID %@ deleted", recordID);
+            [self loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
+                [[UserController sharedInstance] fetchUsersSavedLocationsFromArray:array];
+                [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:nil];
+            }];
+        }
+    }];
+    
+}
+
 @end
 
 

@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 
 static NSString * const editProfileNotificationKey = @"edit profile clicked";
+static NSString * const deleteLocationNotificationKey = @"delete location clicked";
 
 @interface ProfileTableViewDatasource : NSObject <UITableViewDataSource, UITableViewDelegate>
 

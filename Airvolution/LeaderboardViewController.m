@@ -26,14 +26,14 @@ static NSString * const cellKey = @"cell";
     // Do any additional setup after loading the view.
     
     self.title = @"Leaderboard";
-
+    [self sortUsersByPoints];
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
     self.tableView.dataSource = self;
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:cellKey];
     [self.view addSubview:self.tableView];
-    [self sortUsersByPoints];
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateLeaderboard) name:UserPointsNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sortUsersByPoints) name:UserPointsNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sortUsersByPoints) name:AllUsersFetchNotificationKey object:nil];
     
 }
 
@@ -41,15 +41,18 @@ static NSString * const cellKey = @"cell";
     [self.tableView reloadData];
 }
 
--(void)deRegisterForNotifcations
+-(void)sortUsersByPoints {
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:PointsKey ascending:NO];
+    self.sortedUsers = [[UserController sharedInstance].allUsers sortedArrayUsingDescriptors:@[sortDescriptor]];
+    [self.tableView reloadData];
+}
+
+
+-(void)dealloc
 {
     [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
--(void)sortUsersByPoints {
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:PointsKey ascending:NO];
-    self.sortedUsers = [[UserController sharedInstance].allUsers sortedArrayUsingDescriptors:@[sortDescriptor]];
-}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return [UserController sharedInstance].allUsers.count;
@@ -63,8 +66,8 @@ static NSString * const cellKey = @"cell";
         [object removeFromSuperview];
     }
     
-    User *user = [UserController sharedInstance].allUsers[indexPath.row];
-//    User *user = self.sortedUsers[indexPath.row];
+//    User *user = [UserController sharedInstance].allUsers[indexPath.row];
+    User *user = self.sortedUsers[indexPath.row];
     
     UIImageView *view = [[UIImageView alloc] initWithFrame:CGRectMake(35, 2, 40, 40)];
     view.layer.cornerRadius = 15;

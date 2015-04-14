@@ -60,7 +60,7 @@
     }
     self.usersSharedLocations = tempArray;
     NSLog(@"User has %ld locations", self.usersSharedLocations.count);
-//    [[NSNotificationCenter defaultCenter] postNotificationName:UsersLocationsNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:UsersLocationsNotificationKey object:nil];
     [self checkUserinCloudKitUserList];
 }
 
@@ -173,6 +173,7 @@
             self.allUsers = allUsersTempArray;
             NSLog(@"RETRIEVED ALL USERS %@", self.allUsers);
             [self findCurrentUser];
+            [[NSNotificationCenter defaultCenter] postNotificationName:AllUsersFetchNotificationKey object:nil];
             completion(self.allUsers);
         } else {
             NSLog(@"error retrieving all users, %@", operationError);
