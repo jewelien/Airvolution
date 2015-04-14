@@ -17,6 +17,8 @@
         
         self.viewForImage = [[UIImageView alloc] initWithFrame:CGRectMake(50, 10, 60, 60)];
         self.viewForImage.backgroundColor = [UIColor lightGrayColor];
+        self.viewForImage.layer.cornerRadius = 10;
+        self.viewForImage.clipsToBounds = YES;
         [self.contentView addSubview:self.viewForImage];
         
         

@@ -13,6 +13,8 @@
 @interface LeaderboardViewController () <UITableViewDataSource>
 
 @property (nonatomic, strong) UITableView *tableView;
+@property (nonatomic, strong) NSArray *sortedUsers;
+
 @end
 
 static NSString * const cellKey = @"cell";
@@ -24,14 +26,14 @@ static NSString * const cellKey = @"cell";
     // Do any additional setup after loading the view.
     
     self.title = @"Leaderboard";
-    
+
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
     self.tableView.dataSource = self;
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:cellKey];
     [self.view addSubview:self.tableView];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateLeaderboard) name:UserPointsNotificationKey object:nil];
+    [self sortUsersByPoints];
 
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateLeaderboard) name:UserPointsNotificationKey object:nil];
     
 }
 
@@ -44,7 +46,10 @@ static NSString * const cellKey = @"cell";
     [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
-
+-(void)sortUsersByPoints {
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:PointsKey ascending:NO];
+    self.sortedUsers = [[UserController sharedInstance].allUsers sortedArrayUsingDescriptors:@[sortDescriptor]];
+}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return [UserController sharedInstance].allUsers.count;
@@ -52,14 +57,18 @@ static NSString * const cellKey = @"cell";
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellKey];
-    
-//    if (cell) {
-//        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:NSStringFromClass([UITableViewCell class])];
-//    }
+
+    for (id object in cell.contentView.subviews)
+    {
+        [object removeFromSuperview];
+    }
     
     User *user = [UserController sharedInstance].allUsers[indexPath.row];
+//    User *user = self.sortedUsers[indexPath.row];
     
     UIImageView *view = [[UIImageView alloc] initWithFrame:CGRectMake(35, 2, 40, 40)];
+    view.layer.cornerRadius = 15;
+    view.clipsToBounds = YES;
     view.backgroundColor = [UIColor lightGrayColor];
     view.image = user.profileImage;
     [cell.contentView addSubview:view];
@@ -72,17 +81,10 @@ static NSString * const cellKey = @"cell";
     
     UILabel *pointsLabel = [[UILabel alloc] initWithFrame:CGRectMake(210, 10, 90, 20)];
 //    pointsLabel.backgroundColor = [UIColor grayColor];
-    
-    NSString *pointsString = [NSString stringWithFormat:@"Points: %@", user.points];
-//    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:pointsString];
-//    UIFont *fontSize = [UIFont systemFontOfSize:5.f];
-//    [attributedString addAttribute:NSFontAttributeName value:fontSize range:NSMakeRange(0, 6)];
-        pointsLabel.text = pointsString;
-    pointsLabel.font = [UIFont systemFontOfSize:12.0];
     [cell.contentView addSubview:pointsLabel];
+    pointsLabel.text = [NSString stringWithFormat:@"Points: %@", user.points];
+    pointsLabel.font = [UIFont systemFontOfSize:13.0];
     
-//    cell.imageView.image = user.profileImage;
-    cell.textLabel.lineBreakMode = NSLineBreakByCharWrapping;
     
     return cell;
 }

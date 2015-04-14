@@ -41,10 +41,10 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfile) name:UserPointsNotificationKey object:nil];
     
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(presentEditAlertController) name:editProfileNotificationKey object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(usernameSaveSuccessAlert) name:UsernameSavedNotificationKey object:nil];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(profileImageSaveSuccessAlert) name:UserImageNotificationKey object:nil];
 }
 
@@ -55,6 +55,7 @@
 -(void)usernameSaveSuccessAlert {
     UIAlertController *usernamedSavedAlertController = [UIAlertController alertControllerWithTitle:@"Success" message:@"Username changed successfully." preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [self.tableView reloadData];
         [self.savingUsernameView stopAnimating];
         [usernamedSavedAlertController removeFromParentViewController];
     }];
@@ -65,6 +66,7 @@
 -(void)profileImageSaveSuccessAlert {
     UIAlertController *profileImageSavedAlertController = [UIAlertController alertControllerWithTitle:@"Success" message:@"Profile image changed successfully" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [self.tableView reloadData];
         [self.savingImageView stopAnimating];
     }];
     [profileImageSavedAlertController addAction:okAction];
