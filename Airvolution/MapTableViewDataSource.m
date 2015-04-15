@@ -35,20 +35,40 @@
     if (indexPath.row == 0) {
         cell = nameCell;
 //        nameCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
-        nameCell.backgroundColor = [UIColor lightGrayColor];
+//        nameCell.backgroundColor = [UIColor lightGrayColor];
         nameCell.textLabel.text = selectedLocation.locationName;
-        nameCell.textLabel.font = [UIFont systemFontOfSize:20];
+        nameCell.textLabel.font = [UIFont systemFontOfSize:25];
         nameCell.textLabel.textAlignment = NSTextAlignmentCenter;
-        nameCell.detailTextLabel.text = [NSString stringWithFormat:@"shared by: %@", selectedLocation.username];
+        nameCell.detailTextLabel.text = [NSString stringWithFormat:@"shared by: %@  on: %@", selectedLocation.username, selectedLocation.creationDate];
         nameCell.detailTextLabel.textAlignment = NSTextAlignmentRight;
+        nameCell.detailTextLabel.font = [UIFont italicSystemFontOfSize:10];
         NSLog(@"selectedlocation.username %@", selectedLocation.username);
 
     }
     if (indexPath.row == 1) {
 //        locationCell.textLabel.text = [LocationController sharedInstance].selectedLocation.street;
         cell = locationCell;
-        locationCell.textLabel.text = @"address";
         
+        UILabel *addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 5, locationCell.contentView.frame.size.width, 20)];
+        [locationCell.contentView addSubview:addressLabel];
+        addressLabel.text = @"address: ";
+        addressLabel.font = [UIFont systemFontOfSize:12];
+        addressLabel.textColor = [UIColor blueColor];
+        
+        UILabel *streetLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 25, locationCell.contentView.frame.size.width, 20)];
+        [locationCell.contentView addSubview:streetLabel];
+        streetLabel.text = selectedLocation.street;
+
+
+        UILabel *cityStateZipLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 45, locationCell.contentView.frame.size.width, 20)];
+        [locationCell.contentView addSubview:cityStateZipLabel];
+        cityStateZipLabel.text = [NSString stringWithFormat:@"%@ %@ %@", selectedLocation.city, selectedLocation.state, selectedLocation.zip];
+
+        UILabel *countryLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 65, locationCell.contentView.frame.size.width, 20)];
+        [locationCell.contentView addSubview:countryLabel];
+        countryLabel.text = selectedLocation.country;
+
+
     }
     
     if (indexPath.row == 2) {

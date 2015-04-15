@@ -60,7 +60,11 @@
     }
     self.usersSharedLocations = tempArray;
     NSLog(@"User has %ld locations", self.usersSharedLocations.count);
-    [[NSNotificationCenter defaultCenter] postNotificationName:UsersLocationsNotificationKey object:nil];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:UsersLocationsNotificationKey object:nil];
+    });
+    
     [self checkUserinCloudKitUserList];
 }
 
@@ -230,7 +234,6 @@
         
         [[UserController publicDatabase] addOperation:fetchOperation];
 
-
     } else {
         NSLog(@"User has a username");
     }
@@ -260,7 +263,7 @@
                     NSLog(@"saved new points %@", record);
                     [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                                                    [[NSNotificationCenter defaultCenter] postNotificationName:UserPointsNotificationKey object:nil];
+                            [[NSNotificationCenter defaultCenter] postNotificationName:UserPointsNotificationKey object:nil];
                         });
                         
                     }];
@@ -292,7 +295,10 @@
             if (!error) {
                 NSLog(@"saved new username %@", record);
                 [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:UsernameSavedNotificationKey object:nil];
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [[NSNotificationCenter defaultCenter] postNotificationName:UsernameSavedNotificationKey object:nil];
+                    });
 
                 }];
             }
@@ -327,8 +333,13 @@
         [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
             if (!error) {
                 NSLog(@"saved new profile image %@", record);
+                
                 [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:UserImageNotificationKey object:nil];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [[NSNotificationCenter defaultCenter] postNotificationName:UserImageNotificationKey object:nil];
+
+                    });
+                    
                 }];
             }
         }];

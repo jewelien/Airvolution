@@ -79,7 +79,9 @@
     } else {
         NSLog(@"new location fetched from cloudKit successfully");
         [[UserController sharedInstance] fetchUsersSavedLocationsFromArray:self.locations];
-        [[NSNotificationCenter defaultCenter] postNotificationName:newLocationSavedNotificationKey object:nil];
+        
+            [[NSNotificationCenter defaultCenter] postNotificationName:newLocationSavedNotificationKey object:nil];
+
     }
     
 }
@@ -99,7 +101,12 @@
                 [tempArray addObject:location];
             }
             self.locations = tempArray;
-            [[NSNotificationCenter defaultCenter] postNotificationName:allLocationsFetchedNotificationKey object:nil];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:allLocationsFetchedNotificationKey object:nil];
+
+            });
+            
             completion(self.locations);
         }
     }];
@@ -116,7 +123,11 @@
             [self loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
                 
                     [[UserController sharedInstance] fetchUsersSavedLocationsFromArray:array];
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
                     [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:nil];
+
+                });
 
             }];
         }

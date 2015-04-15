@@ -74,7 +74,7 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
         case 0:
             tableView.rowHeight = 80;
             break;
-        default: tableView.rowHeight = 50;
+        default: tableView.rowHeight = 60;
             break;
     }
     

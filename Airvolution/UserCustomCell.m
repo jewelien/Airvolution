@@ -22,11 +22,12 @@
         [self.contentView addSubview:self.viewForImage];
         
         
-        self.usernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(125, 15, 150, 20)];
+        self.usernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(125, 11, 150, 30)];
+        self.usernameLabel.font = [UIFont systemFontOfSize:25];
 //                    self.usernameLabel.backgroundColor = [UIColor orangeColor];
         [self.contentView addSubview:self.usernameLabel];
         
-        self.pointsLabel = [[UILabel alloc] initWithFrame:CGRectMake(125, 40, 150, 20)];
+        self.pointsLabel = [[UILabel alloc] initWithFrame:CGRectMake(125, 47, 150, 20)];
 //                    self.pointsLabel.backgroundColor = [UIColor orangeColor];
         [self.contentView addSubview:self.pointsLabel];
         

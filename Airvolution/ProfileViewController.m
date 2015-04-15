@@ -123,6 +123,7 @@
     UIAlertController *usernameAlertController = [UIAlertController alertControllerWithTitle:@"Username" message:nil preferredStyle:UIAlertControllerStyleAlert];
     [usernameAlertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.placeholder = @"new username";
+        textField.textAlignment = NSTextAlignmentCenter;
     }];
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
@@ -265,7 +266,7 @@
     
     UIAlertAction *deleteAction = [UIAlertAction actionWithTitle:@"delete" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
 //        NSLog(@"location.recordID %@", notification.object);
-        self.deletingLocationView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+        self.deletingLocationView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         self.deletingLocationView.frame = self.view.bounds;
         [self.view addSubview:self.deletingLocationView];
         [self.deletingLocationView startAnimating];

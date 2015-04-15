@@ -194,6 +194,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     }
     self.allLocations = locationsArray;
     [self.mapView addAnnotations:locationsArray];
+    [self.mapView reloadInputViews];
 }
 
 
@@ -378,6 +379,8 @@ static NSString * const droppedPinTitle = @"cancel or add";
         
         [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
             textField.placeholder = @"location name";
+            textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
+            textField.textAlignment = NSTextAlignmentCenter;
         }];
         
         UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
@@ -417,8 +420,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
         [self directionsButtonPressedWithAnnotation:self.selectedAnnotation];
         
     } else if ([control tag] == 4) {
-        //location info show animate in a view with tableview of  name, complete address, directions.
-//        MKPointAnnotation *annotation = view.annotation;
+        //more info
         [self locationMoreInfoPressedForAnnotaiton:self.selectedAnnotation];
     }
     
@@ -449,6 +451,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [MKMapItem openMapsWithItems:@[mapItem] launchOptions:[NSDictionary dictionaryWithObjectsAndKeys: [NSValue valueWithMKCoordinate:region.center], MKLaunchOptionsMapCenterKey, [NSValue valueWithMKCoordinateSpan:region.span], MKLaunchOptionsMapSpanKey, nil]];
 }
 
+
 -(void)locationMoreInfoPressedForAnnotaiton:(MKPointAnnotation *)annotation {
     CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
     [[LocationController sharedInstance] findLocationMatchingLocation:location];
@@ -458,13 +461,16 @@ static NSString * const droppedPinTitle = @"cancel or add";
     self.locationInfoBackgroundView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:.50];
     [self.view addSubview:self.locationInfoBackgroundView];
     
-    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, self.locationInfoBackgroundView.frame.size.width, 230)];
+    int backgroundViewWidth = self.locationInfoBackgroundView.frame.size.width;
+    int locationInfoViewWidth = backgroundViewWidth - 40;
+    
+    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake((backgroundViewWidth / 2) - locationInfoViewWidth/2 , 125,  locationInfoViewWidth, 260)];
 //    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, self.view.frame.size.width, 300)];
-//    locationInfoView.backgroundColor = [UIColor colorWithWhite:.50 alpha:.75];
+    locationInfoView.backgroundColor = [UIColor colorWithWhite:.50 alpha:.75];
     [self.locationInfoBackgroundView addSubview:locationInfoView];
     
 //    self.tableView = [[UITableView alloc] initWithFrame:locationInfoView.bounds style:UITableViewStyleGrouped];
-    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, locationInfoView.frame.size.width, locationInfoView.frame.size.height)];
+    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(10, 10, locationInfoView.frame.size.width-20, locationInfoView.frame.size.height-20)];
 
     [locationInfoView addSubview:self.tableView];
     self.tableView.scrollEnabled = NO;
@@ -496,6 +502,9 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     switch (indexPath.row) {
+        case 1:
+            [self.locationInfoBackgroundView removeFromSuperview];
+            break;
         case 2: //directions
             [self directionsButtonPressedWithAnnotation:self.selectedAnnotation];
             break;
@@ -507,6 +516,18 @@ static NSString * const droppedPinTitle = @"cancel or add";
     }
 }
 
+-(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
+    BOOL command;
+    switch (indexPath.row) {
+        case 0:
+            return NO;
+            break;
+            
+        default: return YES;
+            break;
+    }
+    return command;
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
