@@ -9,8 +9,9 @@
 #import "MapViewController.h"
 #import "LocationController.h"
 #import "UserController.h"
+#import "MapTableViewDataSource.h"
 
-@interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate>
+@interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate, UITableViewDelegate>
 
 @property (nonatomic) CLLocationManager *locationManager;
 
@@ -20,13 +21,24 @@
 @property (nonatomic) CLLocation *location;
 @property (nonatomic, strong) MKPointAnnotation *droppedPinAnnotation;
 
-@property (nonatomic, strong) NSMutableArray *placemarks;
+@property (nonatomic, strong) NSMutableArray *searchedAnnotations;
+
 @property (nonatomic, strong) NSArray *selectedPinAddress;
+@property (nonatomic, strong) NSString *selectedPinStreet;
+@property (nonatomic, strong) NSString *selectedPinCity;
+@property (nonatomic, strong) NSString *selectedPinState;
+@property (nonatomic, strong) NSString *selectedPinZip;
+@property (nonatomic, strong) NSString *selectedPinCountry;
 
 @property (nonatomic, strong) UIView *loadingView;
 @property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
 
 @property (nonatomic, strong) NSArray *allLocations;
+@property (nonatomic, strong) MKPointAnnotation *selectedAnnotation;
+
+@property (nonatomic, strong) UITableView *tableView;
+@property (nonatomic, strong) MapTableViewDataSource *datasource;
+@property (nonatomic, strong) UIView *locationInfoBackgroundView;
 
 
 @end
@@ -41,7 +53,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
 //    self.view.backgroundColor = [UIColor lightGrayColor];
-    [self setTitle:@"Airvolution"];
+    [self setTitle:@"airvolution"];
     [self registerForNotifications];
     self.view.backgroundColor = [UIColor colorWithWhite:0.96 alpha:5.0];
     
@@ -107,7 +119,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 -(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
     [searchBar resignFirstResponder];
-    [self.mapView removeAnnotations:self.placemarks];
+    [self.mapView removeAnnotations:self.searchedAnnotations];
 //    [UIView animateWithDuration:1.0 animations:^{
 //        self.searchBar.frame = CGRectMake(20, -30, 285, 30);
 //        self.searchBar.text = @"";
@@ -128,12 +140,16 @@ static NSString * const droppedPinTitle = @"cancel or add";
     // Start the search and display the results as annotations on the map.
     [search startWithCompletionHandler:^(MKLocalSearchResponse *response, NSError *error)
      {
-         self.placemarks = [NSMutableArray array];
+         self.searchedAnnotations = [NSMutableArray new];
+         
          for (MKMapItem *item in response.mapItems) {
-             [self.placemarks addObject:item.placemark];
+             MKPointAnnotation *searchedAnnotation = [[MKPointAnnotation alloc] init];
+             searchedAnnotation.coordinate = item.placemark.coordinate;
+             searchedAnnotation.title = item.name;
+             [self.searchedAnnotations addObject:searchedAnnotation];
          }
-//         [self.mapView removeAnnotations:[self.mapView annotations]];
-         [self.mapView showAnnotations:self.placemarks animated:NO];
+         
+         [self.mapView showAnnotations:self.searchedAnnotations animated:NO];
      }];
 }
 
@@ -231,12 +247,13 @@ static NSString * const droppedPinTitle = @"cancel or add";
         } else {
             CLPlacemark *placemark = [placemarks lastObject];
             self.selectedPinAddress = [placemark.addressDictionary valueForKey:@"FormattedAddressLines"];
-//            NSLog(@"selectedPinAddress array %@", placemark);
+            self.selectedPinStreet = [placemark.addressDictionary valueForKey:@"Street"];
+            self.selectedPinCity = [placemark.addressDictionary valueForKey:@"City"];
+            self.selectedPinState = [placemark.addressDictionary valueForKey:@"State"];
+            self.selectedPinZip  = [placemark.addressDictionary valueForKey:@"ZIP"];
+            self.selectedPinCountry  = [placemark.addressDictionary valueForKey:@"Country"];
+
             annotation.subtitle = [NSString stringWithFormat:@"%@", self.selectedPinAddress[0]];
-            
-//            MKPinAnnotationView *view = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"savedPin"];
-//            view.rightCalloutAccessoryView = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
-////            need to set this only for savedPinLocations
         }
     }];
 
@@ -286,10 +303,9 @@ static NSString * const droppedPinTitle = @"cancel or add";
     if ([annotation isKindOfClass:[MKUserLocation class]]) {
         return nil;
     }
-    
     MKPinAnnotationView *pinView;
-    
-    if ([annotation isKindOfClass:[MKPlacemark class] ]) {
+//    if ([annotation isKindOfClass:[MKPlacemark class] ]) {
+    if ([self.searchedAnnotations containsObject:annotation]) {
         pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"placemarksPin"];
         pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"placemarksPin"];
         pinView.pinColor = MKPinAnnotationColorGreen;
@@ -307,7 +323,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
             pinView.rightCalloutAccessoryView = addLocationButton;
             
             UIImage *removePinImage = [UIImage imageNamed:@"remove"];
-            UIButton *removePinButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, removePinImage.size.width, removePinImage.size.width)];
+            UIButton *removePinButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, removePinImage.size.width, removePinImage.size.height)];
             [removePinButton setImage:removePinImage forState:UIControlStateNormal];
             removePinButton.tag = 1;
             pinView.leftCalloutAccessoryView = removePinButton;
@@ -320,6 +336,19 @@ static NSString * const droppedPinTitle = @"cancel or add";
         pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"savedPin"];
         pinView.pinColor = MKPinAnnotationColorPurple;
         pinView.canShowCallout = YES;
+    
+        UIImage *directionsImage = [UIImage imageNamed:@"rightFilled"];
+        UIButton *directionsButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, directionsImage.size.width, directionsImage.size.height)];
+        [directionsButton setImage:directionsImage forState:UIControlStateNormal];
+        directionsButton.tag = 3;
+        pinView.leftCalloutAccessoryView = directionsButton;
+        
+//        UIImage *moreInfo = [UIImage imageNamed:@"right"];
+//        UIButton *moreInfoButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, moreInfo.size.width, moreInfo.size.height)];
+//        [moreInfoButton setImage:moreInfo forState:UIControlStateNormal];
+        UIButton *moreInfoButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+        moreInfoButton.tag = 4;
+        pinView.rightCalloutAccessoryView = moreInfoButton;
     }
     
     return pinView;
@@ -339,6 +368,9 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 -(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
 {
+    
+    self.selectedAnnotation = view.annotation;
+    
     if ([control tag] == 2) {
         NSLog(@"add button clicked");
         
@@ -367,7 +399,9 @@ static NSString * const droppedPinTitle = @"cancel or add";
                 [self.indicatorView startAnimating];
                 [self.view addSubview:self.indicatorView];
                 
-            [[LocationController sharedInstance]saveLocationWithName:textField.text location:self.location addressArray:self.selectedPinAddress];
+//            [[LocationController sharedInstance]saveLocationWithName:textField.text location:self.location addressArray:self.selectedPinAddress];
+                [[LocationController sharedInstance] saveLocationWithName:textField.text location:self.location streetAddress:self.selectedPinStreet city:self.selectedPinCity state:self.selectedPinState zip:self.selectedPinZip country:self.selectedPinCountry];
+                
             }
         }];
         [alertController addAction:saveAction];
@@ -377,6 +411,99 @@ static NSString * const droppedPinTitle = @"cancel or add";
         
     } else if ([control tag] == 1) {
         [self.mapView removeAnnotation:self.droppedPinAnnotation];
+        
+    } else if ([control tag] == 3) {
+        //directions
+        [self directionsButtonPressedWithAnnotation:self.selectedAnnotation];
+        
+    } else if ([control tag] == 4) {
+        //location info show animate in a view with tableview of  name, complete address, directions.
+//        MKPointAnnotation *annotation = view.annotation;
+        [self locationMoreInfoPressedForAnnotaiton:self.selectedAnnotation];
+    }
+    
+}
+
+-(void)directionsButtonPressedWithAnnotation:(MKPointAnnotation *)annotation {
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Directions" message:@"You will be taken to the maps app for directions." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [controller removeFromParentViewController];
+    }];
+    [controller addAction:cancelAction];
+    
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"Go" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [self goToMapsAppForDirectionsToAnnotation:annotation];
+    }];
+    [controller addAction: action];
+    
+    [self presentViewController:controller animated:YES completion:nil];
+}
+
+-(void)goToMapsAppForDirectionsToAnnotation:(MKPointAnnotation *)annotation {
+    CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
+    NSDictionary *dictionary = [[LocationController sharedInstance]addressDictionaryForLocationWithCLLocation:location];
+    MKPlacemark *placemark = [[MKPlacemark alloc] initWithCoordinate:annotation.coordinate addressDictionary:dictionary];
+    MKMapItem *mapItem = [[MKMapItem alloc] initWithPlacemark:placemark];
+    
+    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(location.coordinate, 10000, 10000);
+    [MKMapItem openMapsWithItems:@[mapItem] launchOptions:[NSDictionary dictionaryWithObjectsAndKeys: [NSValue valueWithMKCoordinate:region.center], MKLaunchOptionsMapCenterKey, [NSValue valueWithMKCoordinateSpan:region.span], MKLaunchOptionsMapSpanKey, nil]];
+}
+
+-(void)locationMoreInfoPressedForAnnotaiton:(MKPointAnnotation *)annotation {
+    CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
+    [[LocationController sharedInstance] findLocationMatchingLocation:location];
+
+    self.locationInfoBackgroundView = [[UIView alloc] initWithFrame:self.view.bounds];
+//    UIView *locationInfoBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, locationInfoBackgroundView.frame.size.width, 300)];
+    self.locationInfoBackgroundView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:.50];
+    [self.view addSubview:self.locationInfoBackgroundView];
+    
+    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, self.locationInfoBackgroundView.frame.size.width, 230)];
+//    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, self.view.frame.size.width, 300)];
+//    locationInfoView.backgroundColor = [UIColor colorWithWhite:.50 alpha:.75];
+    [self.locationInfoBackgroundView addSubview:locationInfoView];
+    
+//    self.tableView = [[UITableView alloc] initWithFrame:locationInfoView.bounds style:UITableViewStyleGrouped];
+    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, locationInfoView.frame.size.width, locationInfoView.frame.size.height)];
+
+    [locationInfoView addSubview:self.tableView];
+    self.tableView.scrollEnabled = NO;
+    self.datasource = [MapTableViewDataSource new];
+    self.tableView.dataSource = self.datasource;
+    [self.datasource registerTableView:self.tableView];
+    self.tableView.delegate = self;
+    
+}
+
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    float rowHeight;
+    switch (indexPath.row) {
+        case 0:
+            rowHeight = 60;
+            break;
+        case 1:
+            rowHeight = 90;
+            break;
+        default:
+            rowHeight = 40;
+            break;
+    }
+    return rowHeight;
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    switch (indexPath.row) {
+        case 2: //directions
+            [self directionsButtonPressedWithAnnotation:self.selectedAnnotation];
+            break;
+        case 3: //go back to map
+            [self.locationInfoBackgroundView removeFromSuperview];
+            break;
+        default:
+            break;
     }
 }
 

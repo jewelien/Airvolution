@@ -195,36 +195,55 @@
         }
     }
     NSLog(@"self.currentUser == %@", self.currentUser);
+    [self checkUsername];
 }
 
-
--(void)updateUserPoints {
-    NSString *username = [self.currentUserRecordName substringFromIndex:[self.currentUserRecordName length] - 12];
-    NSInteger integer = self.usersSharedLocations.count * 25 ;
-    NSString *pointsString = [@(integer)stringValue];
+-(void)checkUsername {
     
     if ([self.currentUser.username isEqualToString:@""]) {
+        
+        NSString *defaultUsername = [self.currentUserRecordName substringFromIndex:[self.currentUserRecordName length] - 12];
+        
         CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
         fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
             
             CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
             
             cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
-            cloudKitUser[UsernameKey] = username;
+            cloudKitUser[usernameKey] = defaultUsername;
             
             [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
                 if (!error) {
-                    NSLog(@"saved default username %@", record);
+                    NSLog(@"saved defaultUsername %@", record);
                     [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
-                        NSLog(@"default username created for user");
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [[NSNotificationCenter defaultCenter] postNotificationName:UserPointsNotificationKey object:nil];
+                        });
+                        
                     }];
+                } else {
+                    NSLog(@"error updating username %@", error);
                 }
             }];
             
         };
         
         [[UserController publicDatabase] addOperation:fetchOperation];
+
+
+    } else {
+        NSLog(@"User has a username");
     }
+
+    
+
+}
+
+
+-(void)updateUserPoints {
+//    NSString *username = [self.currentUserRecordName substringFromIndex:[self.currentUserRecordName length] - 12];
+    NSInteger integer = self.usersSharedLocations.count * 25 ;
+    NSString *pointsString = [@(integer)stringValue];
 
     if (![self.currentUser.points isEqualToString:pointsString]) {
 
@@ -240,7 +259,10 @@
                 if (!error) {
                     NSLog(@"saved new points %@", record);
                     [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
-                        [[NSNotificationCenter defaultCenter] postNotificationName:UserPointsNotificationKey object:nil];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                                                    [[NSNotificationCenter defaultCenter] postNotificationName:UserPointsNotificationKey object:nil];
+                        });
+                        
                     }];
                 } else {
                     NSLog(@"error updating points error %@", error);

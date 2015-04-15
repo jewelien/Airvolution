@@ -107,7 +107,8 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
                 Location *location = [UserController sharedInstance].usersSharedLocations[indexPath.row];
                 locationCell.nameLabel.text = location.locationName;
                 locationCell.dateLabel.text = [NSString stringWithFormat:@"added: %@",location.creationDate];
-                locationCell.addressLabel.text = [NSString stringWithFormat:@"%@, %@", location.street, location.cityStateZip];
+                locationCell.addressLabel.text = [NSString stringWithFormat:@"%@ %@ %@ %@", location.street, location.city, location.state, location.zip];
+//                locationCell.addressLabel.text = [NSString stringWithFormat:@"%@, %@", location.street, location.cityStateZip];
             }
             break;
     }

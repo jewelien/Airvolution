@@ -25,16 +25,32 @@
     return database;
 }
 
-- (void)saveLocationWithName:(NSString *)name location:(CLLocation *)location addressArray:(NSArray *)address
+
+-(void)saveLocationWithName:(NSString *)name
+                   location:(CLLocation *)location
+              streetAddress:(NSString *)street
+                       city:(NSString *)city
+                      state:(NSString *)state
+                        zip:(NSString *)zip
+                    country:(NSString *)country
 {
     CKRecord *cloudKitLocation = [[CKRecord alloc] initWithRecordType:locationRecordKey];
     cloudKitLocation[identifierKey] = [[NSUUID UUID] UUIDString];
     cloudKitLocation[nameKey] = name;
     cloudKitLocation[locationKey] = location;
-        cloudKitLocation[streetKey] = address[0];
-        cloudKitLocation[cityStateZipKey] = address[1];
-        cloudKitLocation[countryKey] = address[2];
-
+    cloudKitLocation[streetKey] = street;
+    cloudKitLocation[cityKey] = city;
+    cloudKitLocation[stateKey] = state;
+    cloudKitLocation[zipKey] = zip;
+    cloudKitLocation[countryKey] = country;
+    
+    if ([[UserController sharedInstance].currentUser.username isEqualToString:@""]) {
+        NSString *currentUserRecordName = [UserController sharedInstance].currentUserRecordName;
+        NSString *defaultUsername = [currentUserRecordName substringFromIndex:[currentUserRecordName length] - 12];
+        cloudKitLocation [UsernameKey] = defaultUsername;
+    } else {
+        cloudKitLocation [UsernameKey] = [UserController sharedInstance]. currentUser.username;
+    }
     
     [[LocationController publicDatabase] saveRecord:cloudKitLocation completionHandler:^(CKRecord *record, NSError *error) {
         if (!error) {
@@ -98,13 +114,43 @@
         } else {
             NSLog(@"record ID %@ deleted", recordID);
             [self loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
-                [[UserController sharedInstance] fetchUsersSavedLocationsFromArray:array];
-                [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:nil];
+                
+                    [[UserController sharedInstance] fetchUsersSavedLocationsFromArray:array];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:nil];
+
             }];
         }
     }];
-    
 }
+
+- (NSDictionary *)addressDictionaryForLocationWithCLLocation:(CLLocation *)location {
+    Location *selectedLocation = [self findLocationMatchingLocation:location];
+    NSDictionary *dictionary = @{
+             (__bridge NSString *)kABPersonAddressStreetKey : selectedLocation.street,
+             (__bridge NSString *)kABPersonAddressCityKey : selectedLocation.city,
+             (__bridge NSString *)kABPersonAddressStateKey : selectedLocation.state,
+             (__bridge NSString *)kABPersonAddressZIPKey : selectedLocation.zip,
+             (__bridge NSString *)kABPersonAddressCountryKey : selectedLocation.country,
+             };
+    return dictionary;
+}
+
+- (Location *)findLocationMatchingLocation:(CLLocation *)location {
+//    Location *matchingLocation;
+    for (Location *findLocation in self.locations) {
+        NSLog(@"findLocation.location.coordinate %f, %f", findLocation.location.coordinate.longitude, findLocation.location.coordinate.latitude);
+        if (findLocation.location.coordinate.latitude == location.coordinate.latitude
+            && findLocation.location.coordinate.longitude == location.coordinate.longitude) {
+            self.selectedLocation = findLocation;
+        }
+    }
+//    return matchingLocation;
+    return self.selectedLocation;
+}
+
+
+
+
 
 @end
 

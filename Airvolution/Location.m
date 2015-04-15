@@ -18,12 +18,16 @@
         self.locationName = dictionary[nameKey];
         self.location = dictionary[locationKey];
         self.street = dictionary[streetKey];
-        self.cityStateZip = dictionary[cityStateZipKey];
+        self.city = dictionary[cityKey];
+        self.state = dictionary[stateKey];
+        self.zip = dictionary[zipKey];
+//        self.cityStateZip = dictionary[cityStateZipKey];
         self.country = dictionary[countryKey];
         self.identifier = dictionary[identifierKey];
         [self formatNSDate:dictionary[creationDateKey]];
         [self retrieveUserRecordNamefromUserRecordID:dictionary[userKey]];
         self.recordID = dictionary[recordIDKey];
+        self.username = dictionary[usernameKey];
     }
     return self;
 }

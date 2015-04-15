@@ -181,7 +181,7 @@
     }];
     [imageDestinationAlertController addAction:fromCameraRoll];
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:nil style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [imageDestinationAlertController removeFromParentViewController];
     }];
                                    
