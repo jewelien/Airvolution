@@ -287,7 +287,6 @@
     fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
         
         CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
-        
         cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
         cloudKitUser[UsernameKey] = newUsername;
         
@@ -298,9 +297,12 @@
                     
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [[NSNotificationCenter defaultCenter] postNotificationName:UsernameSavedNotificationKey object:nil];
+                        //update user's locations with new username
                     });
-
                 }];
+                [[LocationController sharedInstance]updateUsersSharedLocationsUsernameIfChanged:newUsername];
+            } else {
+                NSLog(@"error saving new username");
             }
         }];
         

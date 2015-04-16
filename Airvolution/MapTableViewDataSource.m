@@ -42,7 +42,6 @@
         nameCell.detailTextLabel.text = [NSString stringWithFormat:@"shared by: %@  on: %@", selectedLocation.username, selectedLocation.creationDate];
         nameCell.detailTextLabel.textAlignment = NSTextAlignmentRight;
         nameCell.detailTextLabel.font = [UIFont italicSystemFontOfSize:10];
-        NSLog(@"selectedlocation.username %@", selectedLocation.username);
 
     }
     if (indexPath.row == 1) {

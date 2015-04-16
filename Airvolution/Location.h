@@ -27,6 +27,7 @@ static NSString * const recordIDKey = @"recordID";
 
 static NSString * const userKey = @"creatorUserRecordID";
 static NSString * const usernameKey = @"username";
+static NSString * const userRecordIDRefKey = @"userRecordID";
 
 
 

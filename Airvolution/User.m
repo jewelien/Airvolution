@@ -29,7 +29,6 @@
         
     }
 //    NSLog(@"%@, %@, %@, %@, %@", self.recordID, self.recordName, self.identifier, self.points, self.username);
-    NSLog(@"profileimage %@", self.profileImage);
     return  self;
 }
 

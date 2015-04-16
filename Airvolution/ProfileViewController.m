@@ -94,7 +94,7 @@
 
 #pragma mark EditButtonPressed
 - (void)presentEditAlertController {
-    UIAlertController *editAlertController = [UIAlertController alertControllerWithTitle:@"Edit" message:@"Select what you would like to change." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *editAlertController = [UIAlertController alertControllerWithTitle:@"Edit" message:@"What would you like to change?" preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction *editUsername = [UIAlertAction actionWithTitle:@"username" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [self editUsername];

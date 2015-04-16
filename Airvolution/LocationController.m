@@ -34,6 +34,9 @@
                         zip:(NSString *)zip
                     country:(NSString *)country
 {
+    
+    CKReference *userReference = [[CKReference alloc] initWithRecordID:[UserController sharedInstance].currentUserRecordID action:CKReferenceActionNone];
+    
     CKRecord *cloudKitLocation = [[CKRecord alloc] initWithRecordType:locationRecordKey];
     cloudKitLocation[identifierKey] = [[NSUUID UUID] UUIDString];
     cloudKitLocation[nameKey] = name;
@@ -43,13 +46,15 @@
     cloudKitLocation[stateKey] = state;
     cloudKitLocation[zipKey] = zip;
     cloudKitLocation[countryKey] = country;
+    cloudKitLocation[userRecordIDRefKey] = userReference;
+    
     
     if ([[UserController sharedInstance].currentUser.username isEqualToString:@""]) {
         NSString *currentUserRecordName = [UserController sharedInstance].currentUserRecordName;
         NSString *defaultUsername = [currentUserRecordName substringFromIndex:[currentUserRecordName length] - 12];
-        cloudKitLocation [UsernameKey] = defaultUsername;
+        cloudKitLocation [usernameKey] = defaultUsername;
     } else {
-        cloudKitLocation [UsernameKey] = [UserController sharedInstance]. currentUser.username;
+        cloudKitLocation [usernameKey] = [UserController sharedInstance]. currentUser.username;
     }
     
     [[LocationController publicDatabase] saveRecord:cloudKitLocation completionHandler:^(CKRecord *record, NSError *error) {
@@ -147,19 +152,44 @@
 }
 
 - (Location *)findLocationMatchingLocation:(CLLocation *)location {
-//    Location *matchingLocation;
     for (Location *findLocation in self.locations) {
-        NSLog(@"findLocation.location.coordinate %f, %f", findLocation.location.coordinate.longitude, findLocation.location.coordinate.latitude);
+//        NSLog(@"findLocation.location.coordinate %f, %f", findLocation.location.coordinate.longitude, findLocation.location.coordinate.latitude);
         if (findLocation.location.coordinate.latitude == location.coordinate.latitude
             && findLocation.location.coordinate.longitude == location.coordinate.longitude) {
             self.selectedLocation = findLocation;
         }
     }
-//    return matchingLocation;
     return self.selectedLocation;
 }
 
 
+-(void)updateUsersSharedLocationsUsernameIfChanged:(NSString *)newUsername {
+
+    NSMutableArray *usersLocationsRecordId = [[NSMutableArray alloc] init];
+    for (Location *location in [UserController sharedInstance].usersSharedLocations) {
+        [usersLocationsRecordId addObject:location.recordID];
+    }
+    
+    CKFetchRecordsOperation *fetchOperation = [[CKFetchRecordsOperation alloc] initWithRecordIDs:usersLocationsRecordId];
+    fetchOperation.perRecordCompletionBlock = ^(CKRecord *record, CKRecordID *recordID, NSError *error) {
+        
+        CKRecord *cloudKitLocation = record;
+        cloudKitLocation[usernameKey] = newUsername;
+        
+        [[LocationController publicDatabase] saveRecord:cloudKitLocation completionHandler:^(CKRecord *record, NSError *error) {
+            if (error) {
+                NSLog(@"error saving locations with new username, %@", error);
+            } else {
+                NSLog(@"successfully saved user's locations with new username, %@", record);
+            }
+        }];
+        
+        
+        
+    };
+    
+    [[LocationController publicDatabase] addOperation:fetchOperation];
+}
 
 
 
