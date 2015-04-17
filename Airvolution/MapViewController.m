@@ -10,6 +10,7 @@
 #import "LocationController.h"
 #import "UserController.h"
 #import "MapTableViewDataSource.h"
+#import "UIColor+Color.h"
 
 @interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate, UITableViewDelegate>
 
@@ -30,7 +31,6 @@
 @property (nonatomic, strong) NSString *selectedPinZip;
 @property (nonatomic, strong) NSString *selectedPinCountry;
 
-@property (nonatomic, strong) UIView *loadingView;
 @property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
 
 @property (nonatomic, strong) NSArray *allLocations;
@@ -52,10 +52,24 @@ static NSString * const droppedPinTitle = @"cancel or add";
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-//    self.view.backgroundColor = [UIColor lightGrayColor];
-    [self setTitle:@"airvolution"];
+    [self setTitle:@"AIRVOLUTION"];
+    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor],
+                                                                    };
+
+    
+//    UIImage *logoImage = [UIImage imageNamed:@"logo"];
+//    UIImageView *logoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 10, 20)];
+//    logoImageView.image = logoImage;
+//    self.navigationItem.titleView = [[UIImageView alloc] initWithImage:logoImage];
+//    self.navigationItem.titleView.frame = CGRectMake(0, 0, 0, 15);
+    
+    self.navigationController.navigationBar.barTintColor = [UIColor airvolutionRed];
+    self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+
+
     [self registerForNotifications];
-    self.view.backgroundColor = [UIColor colorWithWhite:0.96 alpha:5.0];
+//    self.view.backgroundColor = [UIColor colorWithWhite:0.96 alpha:5.0];
+    self.view.backgroundColor = [UIColor airvolutionRed];
     
     
     self.locationManager = [[CLLocationManager alloc] init];
@@ -79,7 +93,8 @@ static NSString * const droppedPinTitle = @"cancel or add";
     
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
     self.dropPinButton = [[UIButton alloc] initWithFrame:view.frame];
-    [self.dropPinButton setImage:[UIImage imageNamed:@"location"] forState:UIControlStateNormal];
+    [self.dropPinButton setImage:[UIImage imageNamed:@"marker"] forState:UIControlStateNormal];
+
     [self.dropPinButton addTarget:self action:@selector(dropPinAtCenterOfMap) forControlEvents:UIControlEventTouchUpInside];
     [view addSubview:self.dropPinButton];
     UIBarButtonItem *pinDrop = [[UIBarButtonItem alloc] initWithCustomView:view];
@@ -92,10 +107,13 @@ static NSString * const droppedPinTitle = @"cancel or add";
     
     
     MKUserTrackingBarButtonItem *barButtonItem = [[MKUserTrackingBarButtonItem alloc] initWithMapView:self.mapView];
+    UIImage *currentLocationImage = [UIImage imageNamed:@"nearMe"];
+    UIImageView *currentLocationView = [[UIImageView alloc] initWithImage:currentLocationImage];
+    [barButtonItem setCustomView:currentLocationView] ;
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
     
     
-    self.searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(20, -30, 285, 30)];
+//    self.searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(20, -30, 285, 30)];
     [self showSearchBar];
 //    UIBarButtonItem *searchButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(showSearchBar)];
 //    [self.navigationItem setLeftBarButtonItem:searchButton];
@@ -107,10 +125,12 @@ static NSString * const droppedPinTitle = @"cancel or add";
 - (void)showSearchBar
 {
     [UIView animateWithDuration:1.0 animations:^{
-        self.searchBar.frame = CGRectMake(20, 70, 285, 30);
+        self.searchBar = [[UISearchBar alloc] init];
+        int viewWidth = self.view.frame.size.width;
+        self.searchBar.frame = CGRectMake(10 , 70, viewWidth - 15, 30);
         self.searchBar.searchBarStyle = UISearchBarStyleMinimal;
-//        self.searchBar.backgroundColor = [UIColor blackColor];
-//            self.searchBar.barTintColor = [UIColor whiteColor];
+        self.searchBar.backgroundColor = [UIColor whiteColor];
+            self.searchBar.barTintColor = [UIColor lightGrayColor];
         self.searchBar.delegate = self;
         self.searchBar.showsCancelButton = YES;
         [self.view addSubview:self.searchBar];
@@ -157,16 +177,10 @@ static NSString * const droppedPinTitle = @"cancel or add";
 -(void)registerForNotifications
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notLoggedIniCloudAlert) name:NotLoggedIniCloudNotificationKey object:nil];
-
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateMapWithSavedLocations) name:allLocationsFetchedNotificationKey object:nil];
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateMapWithSavedLocations) name:allLocationsFetchedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitFailedAlert) name:newLocationSaveFailedNotificationKey object:nil];
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitSuccess) name:newLocationSavedNotificationKey object:nil];
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeMapAnnotations) name:locationDeletedNotificationKey object:nil];
-
-    
 }
 
 - (void)notLoggedIniCloudAlert {
@@ -318,6 +332,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
             pinView.draggable = YES;
             pinView.canShowCallout = YES;
             pinView.animatesDrop = YES;
+            pinView.pinColor = MKPinAnnotationColorPurple;
             
             UIButton *addLocationButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
             addLocationButton.tag = 2;
@@ -332,10 +347,9 @@ static NSString * const droppedPinTitle = @"cancel or add";
         }     else {
             pinView.annotation = annotation;
         }
-    } else {
+    } else { //pinview for saved/shared locations
         pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"savedPin"];
         pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"savedPin"];
-        pinView.pinColor = MKPinAnnotationColorPurple;
         pinView.canShowCallout = YES;
     
         UIImage *directionsImage = [UIImage imageNamed:@"rightFilled"];
@@ -397,12 +411,10 @@ static NSString * const droppedPinTitle = @"cancel or add";
                 self.indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
                 self.indicatorView.frame = self.view.bounds;
                 self.indicatorView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
-                self.indicatorView.center = CGPointMake(160, 240);
-                [self.loadingView addSubview:self.indicatorView];
+//                self.indicatorView.center = CGPointMake(160, 240);
                 [self.indicatorView startAnimating];
                 [self.view addSubview:self.indicatorView];
                 
-//            [[LocationController sharedInstance]saveLocationWithName:textField.text location:self.location addressArray:self.selectedPinAddress];
                 [[LocationController sharedInstance] saveLocationWithName:textField.text location:self.location streetAddress:self.selectedPinStreet city:self.selectedPinCity state:self.selectedPinState zip:self.selectedPinZip country:self.selectedPinCountry];
                 
             }
@@ -426,7 +438,8 @@ static NSString * const droppedPinTitle = @"cancel or add";
     
 }
 
--(void)directionsButtonPressedWithAnnotation:(MKPointAnnotation *)annotation {
+-(void)directionsButtonPressedWithAnnotation:(MKPointAnnotation *)annotation
+{
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Directions" message:@"You will be taken to the maps app for directions." preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [controller removeFromParentViewController];
@@ -441,7 +454,8 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [self presentViewController:controller animated:YES completion:nil];
 }
 
--(void)goToMapsAppForDirectionsToAnnotation:(MKPointAnnotation *)annotation {
+-(void)goToMapsAppForDirectionsToAnnotation:(MKPointAnnotation *)annotation
+{
     CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
     NSDictionary *dictionary = [[LocationController sharedInstance]addressDictionaryForLocationWithCLLocation:location];
     MKPlacemark *placemark = [[MKPlacemark alloc] initWithCoordinate:annotation.coordinate addressDictionary:dictionary];
@@ -452,13 +466,14 @@ static NSString * const droppedPinTitle = @"cancel or add";
 }
 
 
--(void)locationMoreInfoPressedForAnnotaiton:(MKPointAnnotation *)annotation {
+-(void)locationMoreInfoPressedForAnnotaiton:(MKPointAnnotation *)annotation
+{
     CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
     [[LocationController sharedInstance] findLocationMatchingLocation:location];
 
     self.locationInfoBackgroundView = [[UIView alloc] initWithFrame:self.view.bounds];
 //    UIView *locationInfoBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, locationInfoBackgroundView.frame.size.width, 300)];
-    self.locationInfoBackgroundView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:.50];
+    self.locationInfoBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
     [self.view addSubview:self.locationInfoBackgroundView];
     
     int backgroundViewWidth = self.locationInfoBackgroundView.frame.size.width;
@@ -482,7 +497,8 @@ static NSString * const droppedPinTitle = @"cancel or add";
 }
 
 
--(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     float rowHeight;
     switch (indexPath.row) {
         case 0:
@@ -498,7 +514,8 @@ static NSString * const droppedPinTitle = @"cancel or add";
     return rowHeight;
 }
 
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     switch (indexPath.row) {
@@ -516,7 +533,8 @@ static NSString * const droppedPinTitle = @"cancel or add";
     }
 }
 
--(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
+-(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath
+{
     BOOL command;
     switch (indexPath.row) {
         case 0:

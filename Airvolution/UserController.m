@@ -28,6 +28,8 @@
     return sharedInstance;
 }
 
+#pragma mark - Finding User's iCloud
+
 - (void)fetchUserRecordIDWithCompletion:(void (^)(NSString *userRecordName))completion {
 
     [[CKContainer containerWithIdentifier:@"iCloud.com.julienguanzon.Airvolution"] fetchUserRecordIDWithCompletionHandler:^(CKRecordID *recordID, NSError *error) {
@@ -46,6 +48,8 @@
     }];
 
 }
+
+#pragma mark - Finding User's shared locations from all locations array
 
 -(void)fetchUsersSavedLocationsFromArray:(NSArray *)allLocationsArray {
     NSMutableArray *tempArray = [NSMutableArray new];
@@ -142,7 +146,6 @@
             if ([userListMutableArray containsObject:self.currentUserRecordName]) {
                 NSLog(@"user is in cloudkit");
                 self.allUsersRecordNames = userListMutableArray;
-                NSLog(@"self.allUsersRecordNames %@", self.allUsersRecordNames);
                 [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
                     [self updateUserPoints];
                 }];
@@ -235,7 +238,7 @@
         [[UserController publicDatabase] addOperation:fetchOperation];
 
     } else {
-        NSLog(@"User has a username");
+//        NSLog(@"User has a username");
     }
 
     
@@ -282,7 +285,8 @@
 }
 
 
--(void)updateUsernameWith:(NSString *)newUsername {
+-(void)updateUsernameWith:(NSString *)newUsername
+{
     CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
     fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
         
@@ -297,7 +301,6 @@
                     
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [[NSNotificationCenter defaultCenter] postNotificationName:UsernameSavedNotificationKey object:nil];
-                        //update user's locations with new username
                     });
                 }];
                 [[LocationController sharedInstance]updateUsersSharedLocationsUsernameIfChanged:newUsername];

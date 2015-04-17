@@ -9,8 +9,9 @@
 #import "LeaderboardViewController.h"
 #import "UserController.h"
 #import "UserController.h"
+#import "UIColor+Color.h"
 
-@interface LeaderboardViewController () <UITableViewDataSource>
+@interface LeaderboardViewController () <UITableViewDataSource, UITableViewDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSArray *sortedUsers;
@@ -26,8 +27,12 @@ static NSString * const cellKey = @"cell";
     // Do any additional setup after loading the view.
     
     self.title = @"Leaderboard";
+    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor airvolutionRed]};
+
+    
     [self sortUsersByPoints];
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
+    self.tableView.delegate = self;
     self.tableView.dataSource = self;
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:cellKey];
     [self.view addSubview:self.tableView];
@@ -90,6 +95,11 @@ static NSString * const cellKey = @"cell";
     
     
     return cell;
+}
+
+
+-(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
+    return NO;
 }
 
 - (void)didReceiveMemoryWarning {

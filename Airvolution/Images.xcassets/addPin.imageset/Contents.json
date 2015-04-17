@@ -2,12 +2,12 @@
   "images" : [
     {
       "idiom" : "universal",
-      "scale" : "1x"
+      "scale" : "1x",
+      "filename" : "pin-add-2.pdf"
     },
     {
       "idiom" : "universal",
-      "scale" : "2x",
-      "filename" : "Map Marker-50.png"
+      "scale" : "2x"
     },
     {
       "idiom" : "universal",

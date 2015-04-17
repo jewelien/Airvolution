@@ -11,6 +11,7 @@
 #import "UserController.h"
 #import "Location.h"
 #import "LocationController.h"
+#import "UIColor+Color.h"
 
 
 @interface ProfileViewController () <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
@@ -33,6 +34,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.title = @"Profile";
+    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor airvolutionRed]};
 
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
     self.dataSource = [ProfileTableViewDatasource new];

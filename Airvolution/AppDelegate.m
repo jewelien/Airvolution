@@ -13,6 +13,7 @@
 #import "LeaderboardViewController.h"
 #import "UserController.h"
 #import <MapKit/MapKit.h>
+#import "UIColor+Color.h"
 
 
 @interface AppDelegate ()
@@ -28,19 +29,21 @@
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-    
+
     [[UserController sharedInstance]fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
         [[LocationController sharedInstance]loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
             [[UserController sharedInstance]fetchUsersSavedLocationsFromArray:array];
         }];
     }];
+
+    [[UITabBar appearance] setTintColor:[UIColor airvolutionRed]];
     
     MapViewController *mapViewController = [MapViewController new];
     UIImage *mapImage = [UIImage imageNamed:@"globe"];
     UITabBarItem *mapTabBar = [[UITabBarItem alloc] initWithTitle:@"Map" image:mapImage selectedImage:nil];
     mapViewController.tabBarItem = mapTabBar;
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:mapViewController];
-    
+//    navigationController.navigationBar.backgroundColor = [UIColor airvolutionRed];
     
     ProfileViewController *profileViewController = [ProfileViewController new];
     UIImage *profileImage = [UIImage imageNamed:@"profileBlue"];
