@@ -28,6 +28,7 @@
         [self retrieveUserRecordNamefromUserRecordID:dictionary[userKey]];
         self.recordID = dictionary[recordIDKey];
         self.username = dictionary[usernameKey];
+        self.locationNotes = dictionary[notesKey];
     }
     return self;
 }

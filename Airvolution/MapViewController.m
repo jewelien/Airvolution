@@ -120,7 +120,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 }
 
-#pragma mapSearch
+#pragma mark - mapSearch
 
 - (void)showSearchBar
 {
@@ -173,7 +173,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
      }];
 }
 
-#pragma notification observer
+#pragma mark - notification observers
 -(void)registerForNotifications
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notLoggedIniCloudAlert) name:NotLoggedIniCloudNotificationKey object:nil];
@@ -237,8 +237,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
-#pragma geocode location
-
+#pragma mark - geocode location
 -(void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view
 {
     MKPointAnnotation *selectedAnnotation = view.annotation;
@@ -274,7 +273,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 }
 
-#pragma annotations
+#pragma mark - drop Pin
 - (void)dropPinAtCenterOfMap {
     
     self.droppedPinAnnotation = [[MKPointAnnotation alloc] init];
@@ -312,7 +311,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [self.mapView addAnnotation:self.droppedPinAnnotation];
 }
 
-
+#pragma mark - annotation views
 -(MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation
 {
     if ([annotation isKindOfClass:[MKUserLocation class]]) {
@@ -387,42 +386,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     self.selectedAnnotation = view.annotation;
     
     if ([control tag] == 2) {
-        NSLog(@"add button clicked");
-        
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Enter Location" message:[NSString stringWithFormat:@"Address: %@, \n %@", self.selectedPinAddress[0], self.selectedPinAddress[1]]  preferredStyle:UIAlertControllerStyleAlert];
-        
-        [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-            textField.placeholder = @"location name";
-            textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
-            textField.textAlignment = NSTextAlignmentCenter;
-        }];
-        
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-            [self removeFromParentViewController];
-        }];
-        [alertController addAction:cancelAction];
-        
-        UIAlertAction *saveAction = [UIAlertAction actionWithTitle:@"save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-            UITextField *textField = alertController.textFields[0];
-            if ([textField.text isEqualToString:@""]) {
-                NSLog(@"no text no save");
-            } else {
-                
-                self.indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-                self.indicatorView.frame = self.view.bounds;
-                self.indicatorView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
-//                self.indicatorView.center = CGPointMake(160, 240);
-                [self.indicatorView startAnimating];
-                [self.view addSubview:self.indicatorView];
-                
-                [[LocationController sharedInstance] saveLocationWithName:textField.text location:self.location streetAddress:self.selectedPinStreet city:self.selectedPinCity state:self.selectedPinState zip:self.selectedPinZip country:self.selectedPinCountry];
-                
-            }
-        }];
-        [alertController addAction:saveAction];
-        
-        [self presentViewController:alertController animated:YES completion:nil];
-
+        [self addLocationButtonClicked];
         
     } else if ([control tag] == 1) {
         [self.mapView removeAnnotation:self.droppedPinAnnotation];
@@ -433,11 +397,64 @@ static NSString * const droppedPinTitle = @"cancel or add";
         
     } else if ([control tag] == 4) {
         //more info
-        [self locationMoreInfoPressedForAnnotaiton:self.selectedAnnotation];
+        [self locationMoreInfoPressedForAnnotation:self.selectedAnnotation];
     }
     
 }
 
+-(void) addLocationButtonClicked {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Enter Location" message:[NSString stringWithFormat:@"Address: %@, \n %@", self.selectedPinAddress[0], self.selectedPinAddress[1]]  preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = @"location name";
+        textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
+        textField.textAlignment = NSTextAlignmentCenter;
+    }];
+    
+    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = @"notes (optional)";
+        textField.textAlignment = NSTextAlignmentCenter;
+    }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [self removeFromParentViewController];
+    }];
+    [alertController addAction:cancelAction];
+    
+    UIAlertAction *saveAction = [UIAlertAction actionWithTitle:@"save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        UITextField *locationNameField = alertController.textFields[0];
+        UITextField *locationNotesField = alertController.textFields[1];
+        if ([locationNameField.text isEqualToString:@""]) {
+            NSLog(@"no text no save");
+        } else {
+            [self saveButtonPressedWithLocationName:locationNameField.text andLocationNotes:locationNotesField.text];
+        }
+    }];
+    [alertController addAction:saveAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
+
+-(void)saveButtonPressedWithLocationName:(NSString *)locationName andLocationNotes:(NSString *)notes {
+    self.indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    self.indicatorView.frame = self.view.bounds;
+    self.indicatorView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
+    //                self.indicatorView.center = CGPointMake(160, 240);
+    [self.indicatorView startAnimating];
+    [self.view addSubview:self.indicatorView];
+    
+    [[LocationController sharedInstance] saveLocationWithName:locationName
+                                                     location:self.location
+                                                streetAddress:self.selectedPinStreet
+                                                         city:self.selectedPinCity state:self.selectedPinState zip:self.selectedPinZip
+                                                      country:self.selectedPinCountry
+                                                        notes:notes];
+}
+
+
+
+#pragma mark - directions
 -(void)directionsButtonPressedWithAnnotation:(MKPointAnnotation *)annotation
 {
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Directions" message:@"You will be taken to the maps app for directions." preferredStyle:UIAlertControllerStyleAlert];
@@ -465,8 +482,8 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [MKMapItem openMapsWithItems:@[mapItem] launchOptions:[NSDictionary dictionaryWithObjectsAndKeys: [NSValue valueWithMKCoordinate:region.center], MKLaunchOptionsMapCenterKey, [NSValue valueWithMKCoordinateSpan:region.span], MKLaunchOptionsMapSpanKey, nil]];
 }
 
-
--(void)locationMoreInfoPressedForAnnotaiton:(MKPointAnnotation *)annotation
+#pragma mark - location info
+-(void)locationMoreInfoPressedForAnnotation:(MKPointAnnotation *)annotation
 {
     CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
     [[LocationController sharedInstance] findLocationMatchingLocation:location];
@@ -479,9 +496,10 @@ static NSString * const droppedPinTitle = @"cancel or add";
     int backgroundViewWidth = self.locationInfoBackgroundView.frame.size.width;
     int locationInfoViewWidth = backgroundViewWidth - 40;
     
-    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake((backgroundViewWidth / 2) - locationInfoViewWidth/2 , 125,  locationInfoViewWidth, 260)];
+    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake((backgroundViewWidth / 2) - locationInfoViewWidth/2 , 125,  locationInfoViewWidth, 282)];
 //    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, self.view.frame.size.width, 300)];
     locationInfoView.backgroundColor = [UIColor colorWithWhite:.50 alpha:.75];
+//    locationInfoView.backgroundColor = [UIColor airvolutionRed];
     [self.locationInfoBackgroundView addSubview:locationInfoView];
     
 //    self.tableView = [[UITableView alloc] initWithFrame:locationInfoView.bounds style:UITableViewStyleGrouped];
@@ -497,6 +515,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 }
 
 
+#pragma mark - tableView delegate
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     float rowHeight;
@@ -504,10 +523,18 @@ static NSString * const droppedPinTitle = @"cancel or add";
         case 0:
             rowHeight = 60;
             break;
+            
         case 1:
+//            UITableViewCell *notesCell = (tableView cell);
+//            if (tableView cellForRowAtIndexPath:indexPath) {
+                rowHeight = 30;
+//            }
+            break;
+            
+        case 2:
             rowHeight = 90;
             break;
-        default:
+        default:// directions, backToMap
             rowHeight = 40;
             break;
     }
@@ -519,13 +546,13 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     switch (indexPath.row) {
-        case 1:
+        case 2:
             [self.locationInfoBackgroundView removeFromSuperview];
             break;
-        case 2: //directions
+        case 3: //directions
             [self directionsButtonPressedWithAnnotation:self.selectedAnnotation];
             break;
-        case 3: //go back to map
+        case 4: //go back to map
             [self.locationInfoBackgroundView removeFromSuperview];
             break;
         default:

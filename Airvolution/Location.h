@@ -28,6 +28,7 @@ static NSString * const recordIDKey = @"recordID";
 static NSString * const userKey = @"creatorUserRecordID";
 static NSString * const usernameKey = @"username";
 static NSString * const userRecordIDRefKey = @"userRecordID";
+static NSString * const notesKey = @"notes";
 
 
 
@@ -49,6 +50,7 @@ static NSString * const userRecordIDRefKey = @"userRecordID";
 @property (nonatomic, strong) NSString *userRecordName;
 @property (nonatomic, strong) CKRecordID *recordID;
 @property (nonatomic, strong) NSString *username;
+@property (nonatomic, strong) NSString *locationNotes;
 
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary;

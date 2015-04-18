@@ -29,10 +29,9 @@
 -(void)saveLocationWithName:(NSString *)name
                    location:(CLLocation *)location
               streetAddress:(NSString *)street
-                       city:(NSString *)city
-                      state:(NSString *)state
-                        zip:(NSString *)zip
+                       city:(NSString *)city state:(NSString *)state zip:(NSString *)zip
                     country:(NSString *)country
+                      notes:(NSString *)notes
 {
     
     CKReference *userReference = [[CKReference alloc] initWithRecordID:[UserController sharedInstance].currentUserRecordID action:CKReferenceActionNone];
@@ -47,6 +46,7 @@
     cloudKitLocation[zipKey] = zip;
     cloudKitLocation[countryKey] = country;
     cloudKitLocation[userRecordIDRefKey] = userReference;
+    cloudKitLocation[notesKey] = notes;
     
     
     if ([[UserController sharedInstance].currentUser.username isEqualToString:@""]) {
