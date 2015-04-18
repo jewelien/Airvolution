@@ -14,6 +14,9 @@
 
 @interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate, UITableViewDelegate>
 
+@property (nonatomic, strong) UIActivityIndicatorView *initialLoadingIndicatorView;
+
+
 @property (nonatomic) CLLocationManager *locationManager;
 
 @property (nonatomic, strong) UIButton *dropPinButton;
@@ -55,8 +58,6 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [self setTitle:@"AIRVOLUTION"];
     self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor],
                                                                     };
-
-    
 //    UIImage *logoImage = [UIImage imageNamed:@"logo"];
 //    UIImageView *logoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 10, 20)];
 //    logoImageView.image = logoImage;
@@ -65,13 +66,33 @@ static NSString * const droppedPinTitle = @"cancel or add";
     
     self.navigationController.navigationBar.barTintColor = [UIColor airvolutionRed];
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
-
-
-    [self registerForNotifications];
-//    self.view.backgroundColor = [UIColor colorWithWhite:0.96 alpha:5.0];
+    //    self.view.backgroundColor = [UIColor colorWithWhite:0.96 alpha:5.0];
     self.view.backgroundColor = [UIColor airvolutionRed];
     
+    [self loadingViewAtLaunch];
     
+    [self setupMap];
+    [self navigationBarButtonItems];
+    [self registerForNotifications];
+    
+//    self.searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(20, -30, 285, 30)];
+    [self showSearchBar];
+//    UIBarButtonItem *searchButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(showSearchBar)];
+//    [self.navigationItem setLeftBarButtonItem:searchButton];
+
+}
+
+- (void)loadingViewAtLaunch {
+    self.initialLoadingIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    self.initialLoadingIndicatorView.frame = self.view.bounds;
+    self.initialLoadingIndicatorView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
+    [self.initialLoadingIndicatorView startAnimating];
+    [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
+    [self.navigationController.navigationBar addSubview:self.initialLoadingIndicatorView];
+}
+
+
+- (void)setupMap {
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
     if ([self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
@@ -83,18 +104,20 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [self.view addSubview:self.mapView];
     self.mapView.showsUserLocation = YES;
     self.mapView.userTrackingMode = MKUserTrackingModeFollow;
-    
-//    self.dropPinButton = [[UIButton alloc] initWithFrame:CGRectMake(260, 400, 45, 55)];
-////    self.dropPinButton.backgroundColor = [UIColor grayColor];
-//    [self.dropPinButton setImage:[UIImage imageNamed:@"location"] forState:UIControlStateNormal];
-//    [self.view addSubview:self.dropPinButton];
-//    [self.dropPinButton addTarget:self action:@selector(dropPinAtCurrentLocation) forControlEvents:UIControlEventTouchUpInside];
+}
 
+- (void)navigationBarButtonItems{
+    //    self.dropPinButton = [[UIButton alloc] initWithFrame:CGRectMake(260, 400, 45, 55)];
+    ////    self.dropPinButton.backgroundColor = [UIColor grayColor];
+    //    [self.dropPinButton setImage:[UIImage imageNamed:@"location"] forState:UIControlStateNormal];
+    //    [self.view addSubview:self.dropPinButton];
+    //    [self.dropPinButton addTarget:self action:@selector(dropPinAtCurrentLocation) forControlEvents:UIControlEventTouchUpInside];
+    
     
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
     self.dropPinButton = [[UIButton alloc] initWithFrame:view.frame];
     [self.dropPinButton setImage:[UIImage imageNamed:@"marker"] forState:UIControlStateNormal];
-
+    
     [self.dropPinButton addTarget:self action:@selector(dropPinAtCenterOfMap) forControlEvents:UIControlEventTouchUpInside];
     [view addSubview:self.dropPinButton];
     UIBarButtonItem *pinDrop = [[UIBarButtonItem alloc] initWithCustomView:view];
@@ -111,12 +134,6 @@ static NSString * const droppedPinTitle = @"cancel or add";
     UIImageView *currentLocationView = [[UIImageView alloc] initWithImage:currentLocationImage];
     [barButtonItem setCustomView:currentLocationView] ;
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
-    
-    
-//    self.searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(20, -30, 285, 30)];
-    [self showSearchBar];
-//    UIBarButtonItem *searchButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(showSearchBar)];
-//    [self.navigationItem setLeftBarButtonItem:searchButton];
 
 }
 
@@ -181,6 +198,13 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitFailedAlert) name:newLocationSaveFailedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitSuccess) name:newLocationSavedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeMapAnnotations) name:locationDeletedNotificationKey object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeLaunchScreen) name:removeLoadingLaunchScreenNotification object:nil];
+}
+
+- (void)removeLaunchScreen {
+    [self.initialLoadingIndicatorView stopAnimating];
+    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
 }
 
 - (void)notLoggedIniCloudAlert {
@@ -273,7 +297,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 }
 
-#pragma mark - drop Pin
+#pragma mark - drop Pin Action
 - (void)dropPinAtCenterOfMap {
     
     self.droppedPinAnnotation = [[MKPointAnnotation alloc] init];

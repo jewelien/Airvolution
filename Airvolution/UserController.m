@@ -203,10 +203,14 @@
     }
     NSLog(@"self.currentUser == %@", self.currentUser);
     [self checkUsername];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:removeLoadingLaunchScreenNotification object:nil];
+    });
 }
 
 -(void)checkUsername {
-    
+    //if user saved a blank username a default username will be assigned.
     if ([self.currentUser.username isEqualToString:@""]) {
         
         NSString *defaultUsername = [self.currentUserRecordName substringFromIndex:[self.currentUserRecordName length] - 12];

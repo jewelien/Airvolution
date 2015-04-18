@@ -10,6 +10,8 @@
 #import <CloudKit/CloudKit.h>
 #import "User.h"
 
+static NSString * const removeLoadingLaunchScreenNotification = @"remove launch screen";
+
 static NSString * const UsersLocationsNotificationKey = @"users shared locations updated";
 static NSString * const NotLoggedIniCloudNotificationKey = @"iCloud user not found";
 static NSString * const AllUsersFetchNotificationKey = @"all users fetched";

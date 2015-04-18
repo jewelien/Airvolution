@@ -28,10 +28,8 @@
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-//    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
     UITableViewCell *cell = [[UITableViewCell alloc]init];
     
-//    UITableViewCell *nameCell = [[UITableViewCell alloc] init];
     UITableViewCell *nameCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
     UITableViewCell *addressCell = [[UITableViewCell alloc] init];
     UITableViewCell *locationNotesCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
@@ -50,7 +48,6 @@
     }
     
     if (indexPath.row == 2) {
-//        locationCell.textLabel.text = [LocationController sharedInstance].selectedLocation.street;
         cell = addressCell;
         [self addressCell:addressCell];
         
