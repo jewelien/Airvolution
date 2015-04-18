@@ -69,7 +69,6 @@ static NSString * const droppedPinTitle = @"cancel or add";
     //    self.view.backgroundColor = [UIColor colorWithWhite:0.96 alpha:5.0];
     self.view.backgroundColor = [UIColor airvolutionRed];
     
-    [self loadingViewAtLaunch];
     
     [self setupMap];
     [self navigationBarButtonItems];
@@ -79,6 +78,8 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [self showSearchBar];
 //    UIBarButtonItem *searchButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(showSearchBar)];
 //    [self.navigationItem setLeftBarButtonItem:searchButton];
+
+    [self loadingViewAtLaunch];
 
 }
 
@@ -208,8 +209,18 @@ static NSString * const droppedPinTitle = @"cancel or add";
 }
 
 - (void)notLoggedIniCloudAlert {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Required" message:@"Please log in to your iCloud account in iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:nil];
+    [self.initialLoadingIndicatorView stopAnimating];
+    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Required" message:@"To use this app please log in to your iCloud account in your iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [alert removeFromParentViewController];
+    }];
+    [alert addAction:cancelAction];
+    
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"Take me there" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+    }];
     [alert addAction:action];
     
     [self presentViewController:alert animated:YES completion:nil];
