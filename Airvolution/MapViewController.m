@@ -317,7 +317,11 @@ static NSString * const droppedPinTitle = @"cancel or add";
     if ([annotation isKindOfClass:[MKUserLocation class]]) {
         return nil;
     }
+    
+    
     MKPinAnnotationView *pinView;
+    
+    
 //    if ([annotation isKindOfClass:[MKPlacemark class] ]) {
     if ([self.searchedAnnotations containsObject:annotation]) {
         pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"placemarksPin"];
