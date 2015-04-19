@@ -359,14 +359,15 @@ static NSString * const droppedPinTitle = @"cancel or add";
     
 //    if ([annotation isKindOfClass:[MKPlacemark class] ]) {
     if ([self.searchedAnnotations containsObject:annotation]) {
-        pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"placemarksPin"];
         pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"placemarksPin"];
+//        pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"placemarksPin"];
+
         pinView.pinColor = MKPinAnnotationColorGreen;
         pinView.canShowCallout = YES;
     } else if ([[annotation title] isEqualToString:droppedPinTitle]) {
         if (pinView == nil) {
-            pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"droppedPin"];
             pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"droppedPin"];
+//            pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"droppedPin"];
             pinView.draggable = YES;
             pinView.canShowCallout = YES;
             pinView.animatesDrop = YES;
@@ -386,8 +387,9 @@ static NSString * const droppedPinTitle = @"cancel or add";
             pinView.annotation = annotation;
         }
     } else { //pinview for saved/shared locations
-        pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"savedPin"];
         pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"savedPin"];
+//        pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"savedPin"];
+
         pinView.canShowCallout = YES;
     
         UIImage *directionsImage = [UIImage imageNamed:@"rightFilled"];

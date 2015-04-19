@@ -65,7 +65,7 @@
         }
     }
     self.usersSharedLocations = tempArray;
-    NSLog(@"User has %ld locations", self.usersSharedLocations.count);
+//    NSLog(@"User has %ld locations", self.usersSharedLocations.count);
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:UsersLocationsNotificationKey object:nil];

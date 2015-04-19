@@ -129,7 +129,6 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
             break; command = NO;
     }
     return command;
-//    return NO;
 }
 
 
