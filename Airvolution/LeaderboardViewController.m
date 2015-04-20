@@ -50,14 +50,15 @@ static NSString * const cellKey = @"cell";
 -(void)sortUsersByPoints {
     
     NSMutableArray *tempArray = [[NSMutableArray alloc] initWithArray:[UserController sharedInstance].allUsers];
-    User *airvolutionUser;
+    
+    NSMutableArray *usersToRemoveFromLeaderboard = [[NSMutableArray alloc] init];
     for (User *user in tempArray) {
-        if ([user.username isEqualToString:@"airvolution"]) {
-            airvolutionUser = user;
+        if ([user.username isEqualToString:@"airvolution"] || [user.points isEqualToString:@"0"]) {
+            [usersToRemoveFromLeaderboard addObject:user];
         }
     }
-    
-    [tempArray removeObject: airvolutionUser];
+    [tempArray removeObjectsInArray:usersToRemoveFromLeaderboard];
+//    [tempArray removeObject: airvolutionUser];
     NSMutableArray *leaderboardUsers = [[NSMutableArray alloc] initWithArray:tempArray];
     
     NSLog(@"LEADERBOARD USERS %@", leaderboardUsers);
