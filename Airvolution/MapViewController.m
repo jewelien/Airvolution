@@ -487,13 +487,19 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [self.indicatorView startAnimating];
     [self.view addSubview:self.indicatorView];
     
-    [[LocationController sharedInstance] saveLocationWithName:locationName
-                                                     location:self.location
-                                                streetAddress:self.selectedPinStreet
-                                                         city:self.selectedPinCity state:self.selectedPinState zip:self.selectedPinZip
-                                                      country:self.selectedPinCountry
-                                                        notes:notes];
+    if (![UserController sharedInstance].currentUserRecordID) {
+        [self notLoggedIniCloudAlert];
+    } else {
+        [[LocationController sharedInstance] saveLocationWithName:locationName
+                                                         location:self.location
+                                                    streetAddress:self.selectedPinStreet
+                                                             city:self.selectedPinCity state:self.selectedPinState zip:self.selectedPinZip
+                                                          country:self.selectedPinCountry
+                                                            notes:notes];
+    }
 }
+    
+
 
 
 
