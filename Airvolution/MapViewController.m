@@ -209,8 +209,8 @@ static NSString * const droppedPinTitle = @"cancel or add";
 }
 
 - (void)notLoggedIniCloudAlert {
-//    [self.initialLoadingIndicatorView stopAnimating];
-//    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
+    [self.initialLoadingIndicatorView stopAnimating];
+    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
     
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Required" message:@"To use this app please log in to your iCloud account in your iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
     
