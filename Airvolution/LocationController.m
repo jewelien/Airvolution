@@ -48,8 +48,9 @@
     cloudKitLocation[userRecordIDRefKey] = userReference;
     cloudKitLocation[notesKey] = notes;
     
-    
-    if ([[UserController sharedInstance].currentUser.username isEqualToString:@""]) {
+    if (![UserController sharedInstance].currentUser.username) {
+        NSLog(@"currentUser.username %@", [UserController sharedInstance].currentUser.username);
+//    if ([[UserController sharedInstance].currentUser.username isEqualToString:@""]) {
         NSString *currentUserRecordName = [UserController sharedInstance].currentUserRecordName;
         NSString *defaultUsername = [currentUserRecordName substringFromIndex:[currentUserRecordName length] - 12];
         cloudKitLocation [usernameKey] = defaultUsername;
@@ -77,7 +78,9 @@
         
         NSMutableArray *locationsIdentifiers = [[NSMutableArray alloc] init];
         for (Location *location in self.locations) {
-            [locationsIdentifiers addObject:location.identifier];
+            if  (location.identifier) {
+                [locationsIdentifiers addObject:location.identifier];
+            }
         }
         if (![locationsIdentifiers containsObject:identifier]) {
             [self loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {

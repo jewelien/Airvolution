@@ -217,7 +217,8 @@
 
 -(void)checkUsername {
     //if user saved a blank username a default username will be assigned.
-    if ([self.currentUser.username isEqualToString:@""]) {
+    if (!self.currentUser.username) {
+//    if ([self.currentUser.username isEqualToString:@""]) {
         
         NSString *defaultUsername = [self.currentUserRecordName substringFromIndex:[self.currentUserRecordName length] - 12];
         

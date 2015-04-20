@@ -10,6 +10,7 @@
 #import "UserController.h"
 #import "UserController.h"
 #import "UIColor+Color.h"
+#import "User.h"
 
 @interface LeaderboardViewController () <UITableViewDataSource, UITableViewDelegate>
 
@@ -47,8 +48,24 @@ static NSString * const cellKey = @"cell";
 }
 
 -(void)sortUsersByPoints {
+    
+    NSMutableArray *tempArray = [[NSMutableArray alloc] initWithArray:[UserController sharedInstance].allUsers];
+    User *airvolutionUser;
+    for (User *user in tempArray) {
+        if ([user.username isEqualToString:@"airvolution"]) {
+            airvolutionUser = user;
+        }
+    }
+    
+    [tempArray removeObject: airvolutionUser];
+    NSMutableArray *leaderboardUsers = [[NSMutableArray alloc] initWithArray:tempArray];
+    
+    NSLog(@"LEADERBOARD USERS %@", leaderboardUsers);
+    
+    
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:PointsKey ascending:NO];
-    self.sortedUsers = [[UserController sharedInstance].allUsers sortedArrayUsingDescriptors:@[sortDescriptor]];
+    self.sortedUsers = [leaderboardUsers sortedArrayUsingDescriptors:@[sortDescriptor]];
+//    self.sortedUsers = [[UserController sharedInstance].allUsers sortedArrayUsingDescriptors:@[sortDescriptor]];
     [self.tableView reloadData];
 }
 
@@ -60,7 +77,8 @@ static NSString * const cellKey = @"cell";
 
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [UserController sharedInstance].allUsers.count;
+//    return [UserController sharedInstance].allUsers.count;
+    return self.sortedUsers.count;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
