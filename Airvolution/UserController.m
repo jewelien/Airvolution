@@ -32,7 +32,10 @@
 
 - (void)fetchUserRecordIDWithCompletion:(void (^)(NSString *userRecordName))completion {
 
-    [[CKContainer containerWithIdentifier:@"iCloud.com.julienguanzon.Airvolution"] fetchUserRecordIDWithCompletionHandler:^(CKRecordID *recordID, NSError *error) {
+    
+    [[CKContainer defaultContainer]
+//    [[CKContainer containerWithIdentifier:@"iCloud.com.julienguanzon.Airvolution"]
+     fetchUserRecordIDWithCompletionHandler:^(CKRecordID *recordID, NSError *error) {
     
         if (recordID) {
             self.currentUserRecordID = recordID;
@@ -69,6 +72,7 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:UsersLocationsNotificationKey object:nil];
+        
     });
     
     [self checkUserinCloudKitUserList];

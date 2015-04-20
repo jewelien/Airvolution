@@ -133,13 +133,15 @@
     }];
     [usernameAlertController addAction:cancelAction];
     
+    
+    UITextField *usernameField = usernameAlertController.textFields [0];
+    NSMutableArray *usernames = [[NSMutableArray alloc] init];
+    for (User *user in [UserController sharedInstance].allUsers ) {
+        [usernames addObject:user.username];
+    }
+    
     UIAlertAction *saveAction = [UIAlertAction actionWithTitle:@"save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        NSLog(@"save username");
-        UITextField *usernameField = usernameAlertController.textFields [0];
-        NSMutableArray *usernames = [[NSMutableArray alloc] init];
-        for (User *user in [UserController sharedInstance].allUsers ) {
-            [usernames addObject:user.username];
-        }
+
         
         if ([usernames containsObject:usernameField.text]) {
             NSLog(@"already taken");
@@ -282,8 +284,8 @@
 -(void)locationDeletedAlert {
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Deleted" message:@"The location you selected was deleted." preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [self.tableView reloadData];
         [self.deletingLocationView stopAnimating];
+        [self.tableView reloadData];
         [controller removeFromParentViewController];
     }];
     [controller addAction:action];

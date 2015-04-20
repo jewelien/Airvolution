@@ -11,9 +11,10 @@
 		FC0BCBDA1AD59DA600EAF9BF /* LocationCustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FC0BCBD91AD59DA600EAF9BF /* LocationCustomCell.m */; };
 		FC1F21CD1AC342AB00A8DCD8 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */; };
 		FC1F21CF1AC3563300A8DCD8 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC1F21CE1AC3563300A8DCD8 /* CoreLocation.framework */; };
+		FC366CB51AE4753A00B28D68 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC366CB41AE4753A00B28D68 /* CloudKit.framework */; };
+		FC3A1BFB1AE46D18001E9B82 /* Airvolution.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = FC3A1BFA1AE46D18001E9B82 /* Airvolution.entitlements */; };
 		FC58E8FF1ACDE33B00CF6A0C /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = FC58E8FE1ACDE33B00CF6A0C /* User.m */; };
 		FC799E411AC5D6F800F8BD70 /* Location.m in Sources */ = {isa = PBXBuildFile; fileRef = FC799E401AC5D6F800F8BD70 /* Location.m */; };
-		FC799E461AC5D89E00F8BD70 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC799E451AC5D89E00F8BD70 /* CloudKit.framework */; };
 		FC8B18F61AC4B7E000051693 /* LocationController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8B18F51AC4B7E000051693 /* LocationController.m */; };
 		FCA0ECA41ACC662A006E1B8B /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCA0ECA31ACC662A006E1B8B /* ProfileViewController.m */; };
 		FCA0ECA71ACC663B006E1B8B /* LeaderboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */; };
@@ -47,12 +48,12 @@
 		FC0BCBD91AD59DA600EAF9BF /* LocationCustomCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationCustomCell.m; sourceTree = "<group>"; };
 		FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		FC1F21CE1AC3563300A8DCD8 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		FC366CB41AE4753A00B28D68 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		FC3A1BFA1AE46D18001E9B82 /* Airvolution.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Airvolution.entitlements; sourceTree = "<group>"; };
 		FC58E8FD1ACDE33B00CF6A0C /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
 		FC58E8FE1ACDE33B00CF6A0C /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
 		FC799E3F1AC5D6F800F8BD70 /* Location.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Location.h; sourceTree = "<group>"; };
 		FC799E401AC5D6F800F8BD70 /* Location.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Location.m; sourceTree = "<group>"; };
-		FC799E441AC5D89A00F8BD70 /* Airvolution.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Airvolution.entitlements; sourceTree = "<group>"; };
-		FC799E451AC5D89E00F8BD70 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		FC8B18F41AC4B7E000051693 /* LocationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationController.h; sourceTree = "<group>"; };
 		FC8B18F51AC4B7E000051693 /* LocationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationController.m; sourceTree = "<group>"; };
 		FCA0ECA21ACC662A006E1B8B /* ProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileViewController.h; sourceTree = "<group>"; };
@@ -88,7 +89,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FCBCA31F1ADDC322000D4F49 /* AddressBook.framework in Frameworks */,
-				FC799E461AC5D89E00F8BD70 /* CloudKit.framework in Frameworks */,
+				FC366CB51AE4753A00B28D68 /* CloudKit.framework in Frameworks */,
 				FC1F21CF1AC3563300A8DCD8 /* CoreLocation.framework in Frameworks */,
 				FC1F21CD1AC342AB00A8DCD8 /* MapKit.framework in Frameworks */,
 			);
@@ -122,8 +123,8 @@
 		FCE4011F1AC0C9E800DBB19A = {
 			isa = PBXGroup;
 			children = (
+				FC366CB41AE4753A00B28D68 /* CloudKit.framework */,
 				FCBCA31E1ADDC322000D4F49 /* AddressBook.framework */,
-				FC799E451AC5D89E00F8BD70 /* CloudKit.framework */,
 				FC1F21CE1AC3563300A8DCD8 /* CoreLocation.framework */,
 				FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */,
 				FCE4012A1AC0C9E800DBB19A /* Airvolution */,
@@ -144,7 +145,7 @@
 		FCE4012A1AC0C9E800DBB19A /* Airvolution */ = {
 			isa = PBXGroup;
 			children = (
-				FC799E441AC5D89A00F8BD70 /* Airvolution.entitlements */,
+				FC3A1BFA1AE46D18001E9B82 /* Airvolution.entitlements */,
 				FCE4012F1AC0C9E800DBB19A /* AppDelegate.h */,
 				FCE401301AC0C9E800DBB19A /* AppDelegate.m */,
 				FCE401321AC0C9E800DBB19A /* MapViewController.h */,
@@ -251,6 +252,9 @@
 							com.apple.Maps.iOS = {
 								enabled = 1;
 							};
+							com.apple.iCloud = {
+								enabled = 1;
+							};
 						};
 					};
 					FCE401401AC0C9E800DBB19A = {
@@ -283,6 +287,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC3A1BFB1AE46D18001E9B82 /* Airvolution.entitlements in Resources */,
 				FCE4013C1AC0C9E800DBB19A /* LaunchScreen.xib in Resources */,
 				FCE401391AC0C9E800DBB19A /* Images.xcassets in Resources */,
 			);
