@@ -166,6 +166,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
 {
+    [self.mapView removeAnnotations:self.searchedAnnotations];
     [searchBar resignFirstResponder];
     // Create and initialize a search request object.
     MKLocalSearchRequest *request = [[MKLocalSearchRequest alloc] init];
