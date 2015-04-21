@@ -9,6 +9,10 @@
 #import <Foundation/Foundation.h>
 @import UIKit;
 
+
+static NSString * const confirmNotificationKey = @"confirmPressed";
+
+
 @interface MapTableViewDataSource : NSObject <UITableViewDataSource>
 
 - (void)registerTableView:(UITableView *)tableView ;

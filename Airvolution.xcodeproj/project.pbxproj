@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		FC0BCBD41AD48F9200EAF9BF /* UserCustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FC0BCBD31AD48F9200EAF9BF /* UserCustomCell.m */; };
 		FC0BCBDA1AD59DA600EAF9BF /* LocationCustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FC0BCBD91AD59DA600EAF9BF /* LocationCustomCell.m */; };
+		FC12FB881AE59999001BD174 /* ConfirmLocationController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC12FB871AE59999001BD174 /* ConfirmLocationController.m */; };
 		FC1F21CD1AC342AB00A8DCD8 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */; };
 		FC1F21CF1AC3563300A8DCD8 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC1F21CE1AC3563300A8DCD8 /* CoreLocation.framework */; };
 		FC366CB51AE4753A00B28D68 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC366CB41AE4753A00B28D68 /* CloudKit.framework */; };
@@ -46,6 +47,8 @@
 		FC0BCBD31AD48F9200EAF9BF /* UserCustomCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserCustomCell.m; sourceTree = "<group>"; };
 		FC0BCBD81AD59DA600EAF9BF /* LocationCustomCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationCustomCell.h; sourceTree = "<group>"; };
 		FC0BCBD91AD59DA600EAF9BF /* LocationCustomCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationCustomCell.m; sourceTree = "<group>"; };
+		FC12FB861AE59999001BD174 /* ConfirmLocationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConfirmLocationController.h; sourceTree = "<group>"; };
+		FC12FB871AE59999001BD174 /* ConfirmLocationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConfirmLocationController.m; sourceTree = "<group>"; };
 		FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		FC1F21CE1AC3563300A8DCD8 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		FC366CB41AE4753A00B28D68 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
@@ -157,6 +160,8 @@
 				FCB55F711AD9ECD800FDEF0A /* Profile */,
 				FCA0ECA51ACC663B006E1B8B /* LeaderboardViewController.h */,
 				FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */,
+				FC12FB861AE59999001BD174 /* ConfirmLocationController.h */,
+				FC12FB871AE59999001BD174 /* ConfirmLocationController.m */,
 				FC8B18F41AC4B7E000051693 /* LocationController.h */,
 				FC8B18F51AC4B7E000051693 /* LocationController.m */,
 				FC799E3F1AC5D6F800F8BD70 /* Location.h */,
@@ -321,6 +326,7 @@
 				FCE401311AC0C9E800DBB19A /* AppDelegate.m in Sources */,
 				FCE4012E1AC0C9E800DBB19A /* main.m in Sources */,
 				FCBCA3281AE16122000D4F49 /* UIColor+Color.m in Sources */,
+				FC12FB881AE59999001BD174 /* ConfirmLocationController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

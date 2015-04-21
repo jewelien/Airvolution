@@ -202,6 +202,8 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeMapAnnotations) name:locationDeletedNotificationKey object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeLaunchScreen) name:removeLoadingLaunchScreenNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(confirmLocationButtonPressed) name:confirmNotificationKey object:nil];
 }
 
 - (void)removeLaunchScreen {
@@ -546,7 +548,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     int backgroundViewWidth = self.locationInfoBackgroundView.frame.size.width;
     int locationInfoViewWidth = backgroundViewWidth - 40;
     
-    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake((backgroundViewWidth / 2) - locationInfoViewWidth/2 , 125,  locationInfoViewWidth, 282)];
+    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake((backgroundViewWidth / 2) - locationInfoViewWidth/2 , 125,  locationInfoViewWidth, 322)];
 //    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, self.view.frame.size.width, 300)];
     locationInfoView.backgroundColor = [UIColor colorWithWhite:.50 alpha:.75];
 //    locationInfoView.backgroundColor = [UIColor airvolutionRed];
@@ -584,7 +586,8 @@ static NSString * const droppedPinTitle = @"cancel or add";
         case 2:
             rowHeight = 90;
             break;
-        default:// directions, backToMap
+            
+        default:// directions, backToMap, confirm
             rowHeight = 40;
             break;
     }
@@ -596,13 +599,13 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     switch (indexPath.row) {
-        case 2:
+        case 2: //address, go back to map
             [self.locationInfoBackgroundView removeFromSuperview];
             break;
-        case 3: //directions
+        case 4: //directions
             [self directionsButtonPressedWithAnnotation:self.selectedAnnotation];
             break;
-        case 4: //go back to map
+        case 5: //go back to map
             [self.locationInfoBackgroundView removeFromSuperview];
             break;
         default:
@@ -612,7 +615,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 -(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    BOOL command;
+//    BOOL command;
     switch (indexPath.row) {
         case 0:
             return NO;
@@ -621,12 +624,20 @@ static NSString * const droppedPinTitle = @"cancel or add";
         default: return YES;
             break;
     }
-    return command;
+//    return command;
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+
+#pragma mark Confirm Location
+-(void)confirmLocationButtonPressed {
+    NSLog(@"confirm pressed for location %@, %@", self.selectedAnnotation, self.selectedPinAddress);
+    NSLog(@"selected location %@",[LocationController sharedInstance].selectedLocation.street);
+    
 }
 
 @end
