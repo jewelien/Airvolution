@@ -50,24 +50,22 @@ static NSString * const cellKey = @"cell";
 -(void)sortUsersByPoints {
     
     NSMutableArray *tempArray = [[NSMutableArray alloc] initWithArray:[UserController sharedInstance].allUsers];
-    
     NSMutableArray *usersToRemoveFromLeaderboard = [[NSMutableArray alloc] init];
+
     for (User *user in tempArray) {
-        if ([user.username isEqualToString:@"airvolution"] || [user.points isEqualToString:@"0"]) {
+        if ([user.username isEqualToString:@"airvolution"] || [user.points isEqualToString:@"0"] || !user.points) {
             [usersToRemoveFromLeaderboard addObject:user];
         }
     }
     [tempArray removeObjectsInArray:usersToRemoveFromLeaderboard];
-//    [tempArray removeObject: airvolutionUser];
-    NSMutableArray *leaderboardUsers = [[NSMutableArray alloc] initWithArray:tempArray];
     
-    NSLog(@"LEADERBOARD USERS %@", leaderboardUsers);
+//    NSMutableArray *leaderboardUsers = [[NSMutableArray alloc] initWithArray:tempArray];
     
-    
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:PointsKey ascending:NO];
-    self.sortedUsers = [leaderboardUsers sortedArrayUsingDescriptors:@[sortDescriptor]];
-//    self.sortedUsers = [[UserController sharedInstance].allUsers sortedArrayUsingDescriptors:@[sortDescriptor]];
+    NSString *pointsInt = [NSString stringWithFormat:@"%@.intValue", PointsKey];
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:pointsInt ascending:NO];
+    self.sortedUsers = [tempArray sortedArrayUsingDescriptors:@[sortDescriptor]];
     [self.tableView reloadData];
+    
 }
 
 
