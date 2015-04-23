@@ -46,7 +46,7 @@
             NSString *defaultUsername = [currentUserRecordName substringFromIndex:[currentUserRecordName length] - 12];
             cloudKitConfirmLocation[ConfirmedUsernameKey] = defaultUsername;
         } else {
-            cloudKitConfirmLocation[usernameKey] = [UserController sharedInstance]. currentUser.username;
+            cloudKitConfirmLocation[ConfirmedUsernameKey] = [UserController sharedInstance]. currentUser.username;
         }
         
         [[ConfirmLocationController publicDatabase] saveRecord:cloudKitConfirmLocation completionHandler:^(CKRecord *record, NSError *error) {
@@ -56,10 +56,15 @@
 //                //            NSLog(@"IDENTIFIER %@", cloudKitLocation[identifierKey]);
 //                [self loadLocationsAfterSavingLocationIdentifier:cloudKitLocation[identifierKey]];
                 
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[NSNotificationCenter defaultCenter] postNotificationName:confirmLocationCompleteNotification object:nil];
+                });
                 
             } else {
                 NSLog(@"confirm location NOT saved to CloudKit");
-                [[NSNotificationCenter defaultCenter] postNotificationName:confirmLocationFailedNotification object:nil];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[NSNotificationCenter defaultCenter] postNotificationName:confirmLocationFailedNotification object:nil];
+                });
             }
         }];
     

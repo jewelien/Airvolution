@@ -202,10 +202,11 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitFailedAlert) name:newLocationSaveFailedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitSuccess) name:newLocationSavedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeMapAnnotations) name:locationDeletedNotificationKey object:nil];
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeLaunchScreen) name:removeLoadingLaunchScreenNotification object:nil];
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(confirmLocationButtonPressedAlert) name:confirmNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(confirmLocationSuccessAlert) name:confirmLocationCompleteNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(failedToConfirmLocationAlert) name:confirmLocationFailedNotification object:nil];
+    
 }
 
 - (void)removeLaunchScreen {
@@ -638,7 +639,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 #pragma mark Confirm Location
 -(void)confirmLocationButtonPressedAlert {
 
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Confirm" message:@"By confirming you confirm that this location and information provided for this location (free or paid) is correct." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Confirm location?" message:@"By confirming you confirm that this location has a free air pump." preferredStyle:UIAlertControllerStyleAlert];
     
     [controller addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.placeholder = @"notes (optional)";
@@ -675,7 +676,27 @@ static NSString * const droppedPinTitle = @"cancel or add";
     } else {
         [[ConfirmLocationController sharedInstance] confirmLocation:selectedLocation withNotes:notes];
     }
+}
 
+- (void)confirmLocationSuccessAlert {
+    [self.confirmIndicatorView stopAnimating];
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Location confirmed!" message:@"Thank you for confirming this location." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [controller removeFromParentViewController];
+        [self.locationInfoBackgroundView removeFromSuperview];
+    }];
+    [controller addAction:okAction];
+    [self presentViewController:controller animated:YES completion:nil];
+    
+}
+
+- (void)failedToConfirmLocationAlert {
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Confirm location failed." message:@"Sorry! Confirming the locations you selected did not go through. Please try again." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [controller removeFromParentViewController];
+    }];
+    [controller addAction:okAction];
+    [self presentViewController:controller animated:YES completion:nil];
 }
 
 
