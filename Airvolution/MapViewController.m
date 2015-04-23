@@ -11,6 +11,7 @@
 #import "UserController.h"
 #import "MapTableViewDataSource.h"
 #import "UIColor+Color.h"
+#import "ConfirmLocationController.h"
 
 @interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate, UITableViewDelegate>
 
@@ -35,6 +36,7 @@
 @property (nonatomic, strong) NSString *selectedPinCountry;
 
 @property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
+@property (nonatomic,strong) UIActivityIndicatorView *confirmIndicatorView;
 
 @property (nonatomic, strong) NSArray *allLocations;
 @property (nonatomic, strong) MKPointAnnotation *selectedAnnotation;
@@ -203,7 +205,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeLaunchScreen) name:removeLoadingLaunchScreenNotification object:nil];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(confirmLocationButtonPressed) name:confirmNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(confirmLocationButtonPressedAlert) name:confirmNotificationKey object:nil];
 }
 
 - (void)removeLaunchScreen {
@@ -634,10 +636,47 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 
 #pragma mark Confirm Location
--(void)confirmLocationButtonPressed {
-    NSLog(@"confirm pressed for location %@, %@", self.selectedAnnotation, self.selectedPinAddress);
-    NSLog(@"selected location %@",[LocationController sharedInstance].selectedLocation.street);
+-(void)confirmLocationButtonPressedAlert {
+
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Confirm" message:@"By confirming you confirm that this location and information provided for this location (free or paid) is correct." preferredStyle:UIAlertControllerStyleAlert];
+    
+    [controller addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = @"notes (optional)";
+    }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [controller removeFromParentViewController];
+    }];
+    [controller addAction:cancelAction];
+    
+    UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:@"confirm" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        UITextField *notesTextfield = controller.textFields[0];
+        [self confirmButtonPressedWithNotes:notesTextfield.text];
+    }];
+    [controller addAction:confirmAction];
+    
+    [self presentViewController:controller animated:YES completion:nil];
     
 }
+
+- (void)confirmButtonPressedWithNotes:(NSString *)notes
+{
+    
+    Location *selectedLocation = [LocationController sharedInstance].selectedLocation;
+    
+    self.confirmIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    self.confirmIndicatorView.frame = self.view.bounds;
+    self.confirmIndicatorView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
+    [self.confirmIndicatorView startAnimating];
+    [self.view addSubview:self.confirmIndicatorView];
+    
+    if (![UserController sharedInstance].currentUserRecordID) {
+        [self notLoggedIniCloudAlert];
+    } else {
+        [[ConfirmLocationController sharedInstance] confirmLocation:selectedLocation withNotes:notes];
+    }
+
+}
+
 
 @end

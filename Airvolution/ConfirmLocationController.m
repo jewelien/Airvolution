@@ -12,12 +12,21 @@
 @implementation ConfirmLocationController
 
 
++ (ConfirmLocationController *)sharedInstance {
+    static ConfirmLocationController *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [ConfirmLocationController new];
+    });
+    return sharedInstance;
+}
+
 + (CKDatabase*)publicDatabase {
     CKDatabase *database = [[CKContainer defaultContainer] publicCloudDatabase];
     return database;
 }
 
-- (void)confirmLocation:(Location *)location WithUsername:(NSString *)username andNotes:(NSString *)notes
+- (void)confirmLocation:(Location *)location withNotes:(NSString *)notes
 {
         
         CKReference *locationReference = [[CKReference alloc] initWithRecordID:location.recordID action:CKReferenceActionNone];
@@ -25,7 +34,7 @@
     
         CKRecord *cloudKitConfirmLocation = [[CKRecord alloc] initWithRecordType:ConfirmLocationTypeKey];
         cloudKitConfirmLocation[ConfirmIdentifierKey] = [[NSUUID UUID] UUIDString];
-        cloudKitConfirmLocation[ConfirmedUsernameKey] = username;
+//        cloudKitConfirmLocation[ConfirmedUsernameKey] = username;
         cloudKitConfirmLocation[ConfirmedNotesKey] = notes;
         cloudKitConfirmLocation[LocationReferenceKey] = locationReference;
         cloudKitConfirmLocation[ConfirmerReferenceKey] = confirmerReference;
@@ -43,13 +52,14 @@
         [[ConfirmLocationController publicDatabase] saveRecord:cloudKitConfirmLocation completionHandler:^(CKRecord *record, NSError *error) {
             if (!error) {
                 NSLog(@"Location saved to CloudKit");
-                NSLog(@"record saved: %@", record);
+                NSLog(@"confirm locations record saved: %@", record);
 //                //            NSLog(@"IDENTIFIER %@", cloudKitLocation[identifierKey]);
 //                [self loadLocationsAfterSavingLocationIdentifier:cloudKitLocation[identifierKey]];
                 
+                
             } else {
-                NSLog(@"NOT saved to CloudKit");
-//                [[NSNotificationCenter defaultCenter] postNotificationName:newLocationSaveFailedNotificationKey object:nil];
+                NSLog(@"confirm location NOT saved to CloudKit");
+                [[NSNotificationCenter defaultCenter] postNotificationName:confirmLocationFailedNotification object:nil];
             }
         }];
     

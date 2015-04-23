@@ -6,8 +6,14 @@
 //  Copyright (c) 2015 Julien Guanzon. All rights reserved.
 //
 
+
+
 #import <Foundation/Foundation.h>
 #import "Location.h"
+
+static NSString * const confirmLocationCompleteNotification = @"location confirmed";
+static NSString * const confirmLocationFailedNotification = @"location not confirmed";
+
 
 static NSString * const ConfirmLocationTypeKey = @"ConfirmLocation";
 static NSString * const ConfirmedUsernameKey = @"confirmedByUsername";
@@ -26,6 +32,6 @@ static NSString * const ConfirmerReferenceKey = @"confirmedByRecordID";
 @property (nonatomic, strong) CKRecordID *locationRecordID;
 @property (nonatomic, strong) CKRecordID *confirmedByRecordID;
 
-- (void)confirmLocation:(Location *)location WithUsername:(NSString *)username andNotes:(NSString *)notes;
-
++ (ConfirmLocationController *)sharedInstance;
+- (void)confirmLocation:(Location *)location withNotes:(NSString *)notes;
 @end
