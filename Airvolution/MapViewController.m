@@ -577,7 +577,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
         case 1:
 //            UITableViewCell *notesCell = (tableView cell);
 //            if (tableView cellForRowAtIndexPath:indexPath) {
-                rowHeight = 30;
+                rowHeight = 20;
 //            }
             break;
             
