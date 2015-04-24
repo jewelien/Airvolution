@@ -26,6 +26,25 @@
     return database;
 }
 
+//fetch all confirmations check if user has already confirmed location. yes send an alert that user cannot confirm the same location more than once. if no save the confirmation.
+
+//fetch confirmations only for the selected location to appear in tableview.
+
+- (void)fetchConfirmations {
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"TRUEPREDICATE"];
+    CKQuery *query = [[CKQuery alloc] initWithRecordType:ConfirmLocationTypeKey predicate:predicate];
+    [[ConfirmLocationController publicDatabase] performQuery:query inZoneWithID:nil completionHandler:^(NSArray *results, NSError *error) {
+        if (error) {
+            NSLog(@"fetch confirmations failed");
+        } else {
+            NSLog(@"fetch confirmations success, results %@", results);
+        }
+    }];
+    
+    
+}
+
+
 - (void)confirmLocation:(Location *)location withNotes:(NSString *)notes
 {
         
@@ -34,7 +53,6 @@
     
         CKRecord *cloudKitConfirmLocation = [[CKRecord alloc] initWithRecordType:ConfirmLocationTypeKey];
         cloudKitConfirmLocation[ConfirmIdentifierKey] = [[NSUUID UUID] UUIDString];
-//        cloudKitConfirmLocation[ConfirmedUsernameKey] = username;
         cloudKitConfirmLocation[ConfirmedNotesKey] = notes;
         cloudKitConfirmLocation[LocationReferenceKey] = locationReference;
         cloudKitConfirmLocation[ConfirmerReferenceKey] = confirmerReference;
@@ -55,7 +73,7 @@
                 NSLog(@"confirm locations record saved: %@", record);
 //                //            NSLog(@"IDENTIFIER %@", cloudKitLocation[identifierKey]);
 //                [self loadLocationsAfterSavingLocationIdentifier:cloudKitLocation[identifierKey]];
-                
+                [self fetchConfirmations];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[NSNotificationCenter defaultCenter] postNotificationName:confirmLocationCompleteNotification object:nil];
                 });
@@ -70,9 +88,7 @@
     
 }
 
-- (void)fetchConfirmations {
-    
-}
+
 
 
 @end
