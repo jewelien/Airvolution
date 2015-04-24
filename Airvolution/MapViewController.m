@@ -361,23 +361,22 @@ static NSString * const droppedPinTitle = @"cancel or add";
         return nil;
     }
     
-    
     MKPinAnnotationView *pinView;
-    
+    pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"pin"];
     
 //    if ([annotation isKindOfClass:[MKPlacemark class] ]) {
     if ([self.searchedAnnotations containsObject:annotation]) {
-        pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"placemarksPin"];
-//        pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"placemarksPin"];
-
-        pinView.pinColor = MKPinAnnotationColorGreen;
+        
+        pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
         pinView.canShowCallout = YES;
+        pinView.pinColor = MKPinAnnotationColorGreen;
+        
     } else if ([[annotation title] isEqualToString:droppedPinTitle]) {
+        
         if (pinView == nil) {
-            pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"droppedPin"];
-//            pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"droppedPin"];
-            pinView.draggable = YES;
+            pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
             pinView.canShowCallout = YES;
+            pinView.draggable = YES;
             pinView.animatesDrop = YES;
             pinView.pinColor = MKPinAnnotationColorPurple;
             
@@ -394,10 +393,9 @@ static NSString * const droppedPinTitle = @"cancel or add";
         }     else {
             pinView.annotation = annotation;
         }
+        
     } else { //pinview for saved/shared locations
-        pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"savedPin"];
-//        pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"savedPin"];
-
+        pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
         pinView.canShowCallout = YES;
     
         UIImage *directionsImage = [UIImage imageNamed:@"rightFilled"];
