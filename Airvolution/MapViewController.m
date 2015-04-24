@@ -357,17 +357,17 @@ static NSString * const droppedPinTitle = @"cancel or add";
     }
     
     MKPinAnnotationView *pinView;
-    pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"pin"];
+//    pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"pin"];
     
 //    if ([annotation isKindOfClass:[MKPlacemark class] ]) {
     if ([self.searchedAnnotations containsObject:annotation]) {
-        pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
+        pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"searchedPin"];
 
         pinView.pinColor = MKPinAnnotationColorGreen;
         pinView.canShowCallout = YES;
     } else if ([[annotation title] isEqualToString:droppedPinTitle]) {
         if (pinView == nil) {
-            pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
+            pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"droppedPin"];
             pinView.draggable = YES;
             pinView.canShowCallout = YES;
             pinView.animatesDrop = YES;
@@ -387,7 +387,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
             pinView.annotation = annotation;
         }
     } else { //pinview for saved/shared locations
-        pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
+        pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"sharedPin"];
         pinView.canShowCallout = YES;
     
         UIImage *directionsImage = [UIImage imageNamed:@"rightFilled"];
@@ -409,7 +409,9 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 
 -(void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views {
-    [mapView selectAnnotation:self.droppedPinAnnotation animated:YES];
+    if (self.droppedPinAnnotation) {
+        [mapView selectAnnotation:self.droppedPinAnnotation animated:YES];
+    }
 }
 
 
