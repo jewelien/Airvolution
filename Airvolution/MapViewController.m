@@ -426,6 +426,10 @@ static NSString * const droppedPinTitle = @"cancel or add";
     }
 }
 
+-(void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views {
+    [mapView selectAnnotation:self.droppedPinAnnotation animated:YES];
+}
+
 
 -(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
 {
