@@ -56,7 +56,7 @@
 
 #pragma mark - Finding User's shared locations from all locations array
 
--(void)fetchUsersSavedLocationsFromArray:(NSArray *)allLocationsArray {
+-(void)fetchUsersSavedLocationsFromArray:(NSArray *)allLocationsArray withCompletion:(void (^)(NSArray *usersLocations))completion {
     NSMutableArray *tempArray = [NSMutableArray new];
     for (Location *location in [LocationController sharedInstance].locations) {
         
@@ -67,7 +67,7 @@
 //            NSLog(@"not user's location");
         }
     }
-    self.usersSharedLocations = tempArray;
+    completion(self.usersSharedLocations = tempArray);
 //    NSLog(@"User has %ld locations", self.usersSharedLocations.count);
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -75,7 +75,8 @@
         
     });
     
-    [self checkUserinCloudKitUserList];
+//    [self checkUserinCloudKitUserList];
+    [self updateUserPoints];
 }
 
 
@@ -199,7 +200,7 @@
 }
 
 
-- (void)findCurrentUser{
+- (void)findCurrentUser {
     for (User *user in self.allUsers) {
         if ([user.recordName isEqualToString:self.currentUserRecordName]) {
             self.currentUser = user;
@@ -210,9 +211,9 @@
     NSLog(@"self.currentUser == %@", self.currentUser);
     [self checkUsername];
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:removeLoadingLaunchScreenNotification object:nil];
-    });
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        [[NSNotificationCenter defaultCenter] postNotificationName:removeLoadingLaunchScreenNotification object:nil];
+//    });
 }
 
 -(void)checkUsername {

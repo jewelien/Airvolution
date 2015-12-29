@@ -33,7 +33,9 @@
 
     [[UserController sharedInstance]fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
         [[LocationController sharedInstance]loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
-            [[UserController sharedInstance]fetchUsersSavedLocationsFromArray:array];
+            [[UserController sharedInstance]checkUserinCloudKitUserList];
+            [[UserController sharedInstance]fetchUsersSavedLocationsFromArray:array withCompletion:^(NSArray *usersLocations) {
+            }];
         }];
     }];
 

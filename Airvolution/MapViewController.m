@@ -201,7 +201,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitSuccess) name:newLocationSavedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeMapAnnotations) name:locationDeletedNotificationKey object:nil];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeLaunchScreen) name:removeLoadingLaunchScreenNotification object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeLaunchScreen) name:removeLoadingLaunchScreenNotification object:nil];
 }
 
 - (void)removeLaunchScreen {
@@ -247,8 +247,9 @@ static NSString * const droppedPinTitle = @"cancel or add";
     self.allLocations = locationsArray;
     [self.mapView addAnnotations:locationsArray];
     [self.mapView reloadInputViews];
+    
+    [self removeLaunchScreen];
 }
-
 
 - (void)savedToCloudKitFailedAlert {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Location failed to save. Please make sure you have a network connection and logged in to your iCloud account in your iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
@@ -265,8 +266,10 @@ static NSString * const droppedPinTitle = @"cancel or add";
         [self.indicatorView stopAnimating];
     }];
     [alert addAction:action];
-    [self presentViewController:alert animated:YES completion:nil];
-
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self presentViewController:alert animated:YES completion:nil];
+    });
     
 }
 
@@ -407,7 +410,6 @@ static NSString * const droppedPinTitle = @"cancel or add";
     return pinView;
 }
 
-
 -(void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views {
     if (self.droppedPinAnnotation) {
         [mapView selectAnnotation:self.droppedPinAnnotation animated:YES];
@@ -545,6 +547,10 @@ static NSString * const droppedPinTitle = @"cancel or add";
 //    UIView *locationInfoBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, locationInfoBackgroundView.frame.size.width, 300)];
     self.locationInfoBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
     [self.view addSubview:self.locationInfoBackgroundView];
+
+    [UIView animateWithDuration:.25f animations:^{
+        self.locationInfoBackgroundView.frame = self.view.bounds;
+    }];
     
     int backgroundViewWidth = self.locationInfoBackgroundView.frame.size.width;
     int locationInfoViewWidth = backgroundViewWidth - 40;

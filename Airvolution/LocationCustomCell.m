@@ -13,20 +13,21 @@
 -(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        
-        self.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 10, self.contentView.frame.size.width / 2 + 15, 25)];
+        CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+
+        self.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 10, screenWidth - 130, 25)];
 //        self.nameLabel.backgroundColor = [UIColor grayColor];
         self.nameLabel.font = [UIFont systemFontOfSize:20];
         [self.contentView addSubview:self.nameLabel];
         
-        self.dateLabel = [[UILabel alloc] initWithFrame:CGRectMake((self.contentView.frame.size.width / 2) + 35, 10, 110, 15)];
+        self.dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(screenWidth - 115, 10, 100, 15)];
 //        self.dateLabel.backgroundColor = [UIColor orangeColor];
         self.dateLabel.textColor = [UIColor lightGrayColor];
         self.dateLabel.textAlignment = NSTextAlignmentRight;
         self.dateLabel.font = [UIFont systemFontOfSize:10 weight:5];
         [self.contentView addSubview:self.dateLabel];
         
-        self.addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 35, self.contentView.frame.size.width - 30, 15)];
+        self.addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 35, screenWidth - 30, 15)];
 //        self.addressLabel.backgroundColor = [UIColor grayColor];
         self.addressLabel.textColor = [UIColor grayColor];
         self.addressLabel.textAlignment = NSTextAlignmentCenter;
@@ -34,7 +35,6 @@
         self.addressLabel.numberOfLines = 0;
         [self.contentView addSubview:self.addressLabel];
         
-
     }
     return self;
 }

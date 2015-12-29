@@ -38,8 +38,10 @@ static NSString * const UserImageNotificationKey = @"profile image saved";
 
 
 - (void)fetchUserRecordIDWithCompletion:(void (^)(NSString *userRecordName))completion;
--(void)fetchUsersSavedLocationsFromArray:(NSArray *)allLocationsArray;
+-(void)fetchUsersSavedLocationsFromArray:(NSArray *)allLocationsArray withCompletion:(void (^)(NSArray *usersLocations))completion;
 -(void)updateUsernameWith:(NSString *)newUsername;
 -(void)updateUserImageWithData:(NSData *)imageData;
+-(void)checkUserinCloudKitUserList;
+-(void)updateUserPoints;
 
 @end
