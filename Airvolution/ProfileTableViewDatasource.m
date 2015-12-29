@@ -100,6 +100,7 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
             userCell.usernameLabel.text = currentUser.username;
             userCell.pointsLabel.text = [NSString stringWithFormat:@"Points: %@", currentUser.points];
             userCell.viewForImage.image = currentUser.profileImage;
+            [userCell.editButton addTarget:self action:@selector(editUser) forControlEvents:UIControlEventTouchUpInside];
             break;
         default:
             cell = locationCell;
@@ -117,6 +118,9 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
     return cell;
 }
 
+- (void)editUser {
+    [[NSNotificationCenter defaultCenter] postNotificationName:editProfileNotificationKey object:nil];
+}
 
 
 -(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -131,33 +135,6 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
     return command;
 }
 
-
--(NSArray *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSArray *rowAction;
-    
-    UITableViewRowAction *editAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Edit" handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:editProfileNotificationKey object:nil];
-    }];
-    editAction.backgroundColor = [UIColor orangeColor];
-    
-//    UITableViewRowAction *deleteAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"Delete" handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-//        NSLog(@"swiped");
-////        [[NSNotificationCenter defaultCenter] postNotificationName:deleteLocationNotificationKey object:nil];
-//    }];
-    
-    switch (indexPath.section) {
-        case 0:
-            rowAction = @[editAction];
-            break;
-        default: //rowAction = @[deleteAction];
-            break;
-    }
-    
-    return rowAction;
-}
-
-
-
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
@@ -169,12 +146,16 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 
 
 -(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    switch (indexPath.section) {
+        case 0:
+            return NO;
+            break;
+            
+        default: YES;
+            break;
+    }
     return YES;
 }
-
-
-
-
 
 
 @end

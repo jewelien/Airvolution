@@ -14,22 +14,28 @@
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        
-        self.viewForImage = [[UIImageView alloc] initWithFrame:CGRectMake(50, 10, 60, 60)];
-//        self.viewForImage.backgroundColor = [UIColor lightGrayColor];
-        self.viewForImage.backgroundColor = [UIColor airvolutionRed];
+        CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+        CGFloat profileImageWidth = 60;
+        self.viewForImage = [[UIImageView alloc] initWithFrame:CGRectMake(25, 10, profileImageWidth, 60)];
+        self.viewForImage.backgroundColor = [UIColor lightGrayColor];
+//        self.viewForImage.backgroundColor = [UIColor airvolutionRed];
         self.viewForImage.layer.cornerRadius = 10;
         self.viewForImage.clipsToBounds = YES;
         [self.contentView addSubview:self.viewForImage];
         
-        self.usernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(125, 11, 150, 30)];
+        self.usernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(profileImageWidth + 35, 11, screenWidth - profileImageWidth - 85, 30)];
         self.usernameLabel.font = [UIFont systemFontOfSize:25];
 //        self.usernameLabel.backgroundColor = [UIColor orangeColor];
         [self.contentView addSubview:self.usernameLabel];
         
-        self.pointsLabel = [[UILabel alloc] initWithFrame:CGRectMake(125, 47, 150, 20)];
+        self.pointsLabel = [[UILabel alloc] initWithFrame:CGRectMake(profileImageWidth + 35, 47, 150, 20)];
 //        self.pointsLabel.backgroundColor = [UIColor orangeColor];
         [self.contentView addSubview:self.pointsLabel];
+        
+        self.editButton = [[UIButton alloc] initWithFrame:CGRectMake(screenWidth - 25 - 7.5, (self.contentView.frame.size.height / 2) + 7.5, 15, 15)];
+//        self.editButton.backgroundColor = [UIColor yellowColor];
+        [self.editButton setImage:[UIImage imageNamed:@"editUser"] forState:UIControlStateNormal];
+        [self.contentView addSubview:self.editButton];
         
     }
     return self;

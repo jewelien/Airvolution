@@ -13,5 +13,6 @@
 @property (nonatomic, strong) UILabel *usernameLabel;
 @property (nonatomic, strong) UILabel *pointsLabel;
 @property (nonatomic, strong) UIImageView *viewForImage;
+@property (nonatomic, strong) UIButton *editButton;
 
 @end
