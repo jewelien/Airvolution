@@ -25,6 +25,7 @@
         self.country = dictionary[countryKey];
         self.identifier = dictionary[identifierKey];
         [self formatNSDate:dictionary[creationDateKey]];
+        self.creationDate = dictionary[creationDateKey];
         [self retrieveUserRecordNamefromUserRecordID:dictionary[userKey]];
         self.recordID = dictionary[recordIDKey];
         self.username = dictionary[usernameKey];
@@ -36,7 +37,7 @@
 - (void)formatNSDate:(NSDate *)date {
     NSDateFormatter *dateFormatter = [NSDateFormatter new];
     [dateFormatter setDateStyle:NSDateFormatterShortStyle];
-    self.creationDate = [dateFormatter stringFromDate:date];
+    self.creationDateString = [dateFormatter stringFromDate:date];
 }
 
 - (void)retrieveUserRecordNamefromUserRecordID:(CKRecordID *)recordID {

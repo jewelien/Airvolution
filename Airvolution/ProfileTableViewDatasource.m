@@ -35,17 +35,50 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     NSString *headerTitle;
     switch (section) {
-        case 0:
-            headerTitle = @"";
-            break;
         case 1:
             headerTitle = @"My Shared Locations";
             break;
-//        default:
-//            break;
     }
     return headerTitle;
     
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    if (section == 1) {
+        return 40;
+    }
+    return 10;
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    CGRect frame = tableView.frame;
+    
+    UIButton *addButton = [[UIButton alloc] initWithFrame:CGRectMake(frame.size.width-40, 8, 30, 30)];
+    addButton.titleLabel.text = @"+";
+    [addButton setImage:[UIImage imageNamed:@"sort"] forState:UIControlStateNormal];
+    [addButton addTarget:self action:@selector(filterSharedLocationsTapped) forControlEvents:UIControlEventTouchUpInside];
+    
+    UILabel *title = [[UILabel alloc] initWithFrame:CGRectMake(10, 8, 200, 30)];
+    title.text = @"MY SHARED LOCATIONS";
+    title.textColor = [UIColor darkGrayColor];
+    title.font = [UIFont systemFontOfSize:14];
+    
+    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, frame.size.height)];
+    [headerView addSubview:title];
+    [headerView addSubview:addButton];
+    
+    switch (section) {
+        case 1:
+            return headerView;
+            break;
+    }
+    UIView* view = [[UIView alloc] initWithFrame: CGRectMake(0.0f, 0.0f, frame.size.width, 0.0f)];
+    return view;
+    
+}
+
+- (void)filterSharedLocationsTapped {
+    [[NSNotificationCenter defaultCenter] postNotificationName:editSortNotificationKey object:nil];
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -59,8 +92,6 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
         case 1:
             numberOfRows = [UserController sharedInstance].usersSharedLocations.count;
             break;
-//        default:
-//            break;
     }
     
     return numberOfRows;
@@ -90,7 +121,6 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
     LocationCustomCell *locationCell = [tableView dequeueReusableCellWithIdentifier:LocationCellKey];
     UserCustomCell *userCell = [[UserCustomCell alloc] init];
     User *currentUser = [UserController sharedInstance].currentUser;
-
     
     switch (indexPath.section) {
         case 0:
@@ -98,23 +128,26 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
             cell = userCell;
 //            userCell.usernameLabel.text = [[UserControll]];
             userCell.usernameLabel.text = currentUser.username;
-            userCell.pointsLabel.text = [NSString stringWithFormat:@"Points: %@", currentUser.points];
+            userCell.pointsLabel.text = [NSString stringWithFormat:@"total shared: %@", currentUser.points];
             userCell.viewForImage.image = currentUser.profileImage;
             [userCell.editButton addTarget:self action:@selector(editUser) forControlEvents:UIControlEventTouchUpInside];
             break;
         default:
             cell = locationCell;
-            if ([UserController sharedInstance].usersSharedLocations.count > indexPath.row) {
-                Location *location = [UserController sharedInstance].usersSharedLocations[indexPath.row];
+            NSArray *usersSharedLocations = [UserController sharedInstance].usersSharedLocations;
+//            NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:NO];
+//            NSArray *sortedArray = [usersSharedLocations sortedArrayUsingDescriptors:@[sortDescriptor]];
+
+            if (usersSharedLocations.count > indexPath.row) {
+                Location *location = usersSharedLocations[indexPath.row];
                 locationCell.nameLabel.text = location.locationName;
-                locationCell.dateLabel.text = [NSString stringWithFormat:@"added: %@",location.creationDate];
+                locationCell.dateLabel.text = [NSString stringWithFormat:@"added: %@",location.creationDateString];
                 locationCell.addressLabel.text = [NSString stringWithFormat:@"%@ %@ %@ %@", location.street, location.city, location.state, location.zip];
 //                locationCell.addressLabel.text = [NSString stringWithFormat:@"%@, %@", location.street, location.cityStateZip];
             }
             break;
     }
 
-    
     return cell;
 }
 

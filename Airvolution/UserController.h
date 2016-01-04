@@ -43,5 +43,5 @@ static NSString * const UserImageNotificationKey = @"profile image saved";
 -(void)updateUserImageWithData:(NSData *)imageData;
 -(void)checkUserinCloudKitUserList;
 -(void)updateUserPoints;
-
+- (void)saveLocationFilter:(LocationFilter)filter;
 @end

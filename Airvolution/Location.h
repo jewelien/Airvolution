@@ -44,7 +44,8 @@ static NSString * const notesKey = @"notes";
 @property (nonatomic, strong) NSString *country;
 
 
-@property (nonatomic, strong) NSString *creationDate;
+@property (nonatomic, strong) NSDate *creationDate;
+@property (nonatomic, strong) NSString *creationDateString;
 @property (nonatomic, strong) NSString *identifier;
 
 @property (nonatomic, strong) NSString *userRecordName;

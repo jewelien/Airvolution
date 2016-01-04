@@ -79,7 +79,7 @@
     nameCell.textLabel.text = self.selectedLocation.locationName;
     nameCell.textLabel.font = [UIFont boldSystemFontOfSize:20];
     nameCell.textLabel.textAlignment = NSTextAlignmentCenter;
-    nameCell.detailTextLabel.text = [NSString stringWithFormat:@"shared by: %@  on: %@", self.selectedLocation.username, self.selectedLocation.creationDate];
+    nameCell.detailTextLabel.text = [NSString stringWithFormat:@"shared by: %@  on: %@", self.selectedLocation.username, self.selectedLocation.creationDateString];
     nameCell.detailTextLabel.font = [UIFont italicSystemFontOfSize:12];
 }
 

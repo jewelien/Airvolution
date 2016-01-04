@@ -23,7 +23,8 @@
         self.identifier = dictionary[IdentifierKey];
         self.points = dictionary[PointsKey];
         self.username = dictionary[UsernameKey];
-        
+//        self.locationFilterString = dictionary[LocationFilterKey];
+        [self assignLocationFilterString:dictionary[LocationFilterKey]];
         self.image = dictionary[ImageKey];
         self.profileImage = [UIImage imageWithContentsOfFile:self.image.fileURL.path];
         
@@ -32,7 +33,19 @@
     return  self;
 }
 
-
+- (void)assignLocationFilterString:(NSString*)string {
+    if ([string isEqualToString:@"dateAscending"]) {
+        self.filter = dateAscending;
+    } else if ([string isEqualToString:@"dateDescending"]) {
+        self.filter = dateDescending;
+    } else if ([string isEqualToString:@"distance"]) {
+        self.filter = distance;
+    } else if ([string isEqualToString:@"name"]) {
+        self.filter = name;
+    } else {
+        self.filter = dateDescending;
+    }
+}
 
 
 

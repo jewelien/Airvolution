@@ -16,6 +16,8 @@
     if (self) {
         CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
         CGFloat profileImageWidth = 60;
+        CGFloat usernameWidth = screenWidth - profileImageWidth - 85;
+        
         self.viewForImage = [[UIImageView alloc] initWithFrame:CGRectMake(25, 10, profileImageWidth, 60)];
         self.viewForImage.backgroundColor = [UIColor lightGrayColor];
 //        self.viewForImage.backgroundColor = [UIColor airvolutionRed];
@@ -23,12 +25,12 @@
         self.viewForImage.clipsToBounds = YES;
         [self.contentView addSubview:self.viewForImage];
         
-        self.usernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(profileImageWidth + 35, 11, screenWidth - profileImageWidth - 85, 30)];
+        self.usernameLabel = [[UILabel alloc] initWithFrame:CGRectMake(profileImageWidth + 35, 11, usernameWidth, 30)];
         self.usernameLabel.font = [UIFont systemFontOfSize:25];
 //        self.usernameLabel.backgroundColor = [UIColor orangeColor];
         [self.contentView addSubview:self.usernameLabel];
         
-        self.pointsLabel = [[UILabel alloc] initWithFrame:CGRectMake(profileImageWidth + 35, 47, 150, 20)];
+        self.pointsLabel = [[UILabel alloc] initWithFrame:CGRectMake(profileImageWidth + 35, 47, usernameWidth, 20)];
 //        self.pointsLabel.backgroundColor = [UIColor orangeColor];
         [self.contentView addSubview:self.pointsLabel];
         

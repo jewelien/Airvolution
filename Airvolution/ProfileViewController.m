@@ -60,6 +60,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deleteLocationCheckAlert:) name:deleteLocationNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(locationDeletedAlert) name:locationDeletedNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sortSharedLocationsAlert) name:editSortNotificationKey object:nil];
 }
 
 - (void)updateProfile {
@@ -261,6 +262,12 @@
     [[UserController sharedInstance] updateUserImageWithData:self.imageData];
 }
 
+#pragma mark filterOptions
+
+
+
+#pragma mark deleteLocation
+
 -(void)deleteLocationCheckAlert:(NSNotification *)notification {
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Confirm Delete" message:@"Are you sure you want delete this location?" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
@@ -290,6 +297,24 @@
     }];
     [controller addAction:action];
     [self presentViewController:controller animated:YES completion:nil];
+}
+
+-(void)sortSharedLocationsAlert {
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Sort" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    UIAlertAction *ascendingSortAction = [UIAlertAction actionWithTitle:@"oldest to newest" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[UserController sharedInstance] saveLocationFilter:dateAscending];
+    }];
+    [controller addAction:ascendingSortAction];
+    UIAlertAction *descendingSortAction = [UIAlertAction actionWithTitle:@"newest to oldest" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[UserController sharedInstance] saveLocationFilter:dateDescending];
+    }];
+    [controller addAction:descendingSortAction];
+    UIAlertAction *alphabeticalSortAction = [UIAlertAction actionWithTitle:@"a to z" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[UserController sharedInstance] saveLocationFilter:name];
+    }];
+    [controller addAction:alphabeticalSortAction];
+    [self presentViewController:controller animated:YES completion:nil];
+    
 }
 
 - (void)didReceiveMemoryWarning {

@@ -17,8 +17,6 @@
 
 @implementation UserController
 
-
-
 + (UserController *)sharedInstance {
     static UserController *sharedInstance = nil;
     static dispatch_once_t onceToken;
@@ -31,7 +29,6 @@
 #pragma mark - Finding User's iCloud
 
 - (void)fetchUserRecordIDWithCompletion:(void (^)(NSString *userRecordName))completion {
-
     
 //    [[CKContainer defaultContainer]
     [[CKContainer containerWithIdentifier:@"iCloud.com.julienguanzon.Airvolution"]
@@ -67,7 +64,8 @@
 //            NSLog(@"not user's location");
         }
     }
-    completion(self.usersSharedLocations = tempArray);
+//    completion(self.usersSharedLocations = tempArray);
+    completion(self.usersSharedLocations = [self sortSharedLocations:tempArray]);
 //    NSLog(@"User has %ld locations", self.usersSharedLocations.count);
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -77,6 +75,44 @@
     
 //    [self checkUserinCloudKitUserList];
     [self updateUserPoints];
+}
+
+- (NSArray*)sortSharedLocations:(NSArray*)locations {
+    if (self.currentUser && self.currentUser.filter >= 0) {
+        switch (self.currentUser.filter) {
+            case dateAscending:
+                return [self sortLocationsAscending:YES locations:locations];
+                break;
+                
+            case dateDescending:
+                return [self sortLocationsAscending:NO locations:locations];
+                break;
+            case name:
+                return [self sortLocationsByName:locations];
+                break;
+            case distance:
+                return [self sortLocationsByDistance:locations];
+                break;
+        }
+    } else {
+        return [self sortLocationsAscending:NO locations:locations];
+    }
+}
+
+- (NSArray*)sortLocationsAscending:(BOOL)ascending locations:(NSArray*)locations {
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"_creationDate" ascending:ascending];
+    return [locations sortedArrayUsingDescriptors:@[sortDescriptor]];
+}
+
+- (NSArray*)sortLocationsByName:(NSArray*)locations {
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"_locationName" ascending:YES selector:@selector(caseInsensitiveCompare:)];
+    return [locations sortedArrayUsingDescriptors:@[sortDescriptor]];
+}
+
+- (NSArray*)sortLocationsByDistance:(NSArray*)locations {
+    //NEED TO CHANGE to sort by distance nearest to farthers from current location
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"_creationDate" ascending:YES];
+    return [locations sortedArrayUsingDescriptors:@[sortDescriptor]];
 }
 
 
@@ -210,7 +246,9 @@
     }
     NSLog(@"self.currentUser == %@", self.currentUser);
     [self checkUsername];
-    
+    [self fetchUsersSavedLocationsFromArray:self.usersSharedLocations withCompletion:^(NSArray *usersLocations) {
+        //
+    }];
 //    dispatch_async(dispatch_get_main_queue(), ^{
 //        [[NSNotificationCenter defaultCenter] postNotificationName:removeLoadingLaunchScreenNotification object:nil];
 //    });
@@ -260,7 +298,7 @@
 
 -(void)updateUserPoints {
 //    NSString *username = [self.currentUserRecordName substringFromIndex:[self.currentUserRecordName length] - 12];
-    NSInteger integer = self.usersSharedLocations.count * 25 ;
+    NSInteger integer = self.usersSharedLocations.count * 1;
     NSString *pointsString = [@(integer)stringValue];
 
     if (![self.currentUser.points isEqualToString:pointsString]) {
@@ -365,5 +403,58 @@
     [[UserController publicDatabase] addOperation:fetchOperation];
 }
 
+- (void)saveLocationFilter:(LocationFilter)filter {
+    NSString *filterString;
+    switch (filter) {
+        case dateAscending:
+            self.currentUser.filter = dateAscending;
+            filterString = @"dateAscending";
+            break;
+           
+        case dateDescending:
+            self.currentUser.filter = dateDescending;
+            filterString = @"dateDescending";
+            break;
+            
+        case distance:
+            filterString = @"distance";
+            break;
+            
+        case name:
+            self.currentUser.filter = name;
+            filterString = @"name";
+            break;
+            
+        default: filterString = @"dateDescending";
+            break;
+    }
+    
+    CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
+    fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
+        
+        CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
+        
+        cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
+        cloudKitUser[LocationFilterKey] = filterString;
+        
+        [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
+            if (!error) {
+                NSLog(@"saved location filter %@", record);
+                
+                [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        [[NSNotificationCenter defaultCenter] postNotificationName:UserImageNotificationKey object:nil];
+                        [self fetchUsersSavedLocationsFromArray:self.usersSharedLocations withCompletion:^(NSArray *usersLocations) {
+                            //
+                        }];
+                    });
+                    
+                }];
+            }
+        }];
+        
+    };
+    [[UserController publicDatabase] addOperation:fetchOperation];
+}
 
 @end
