@@ -38,7 +38,7 @@ static NSString * const cellKey = @"cell";
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:cellKey];
     [self.view addSubview:self.tableView];
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sortUsersByPoints) name:UserPointsNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sortUsersByPoints) name:updateProfileKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sortUsersByPoints) name:AllUsersFetchNotificationKey object:nil];
     
 }

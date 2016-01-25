@@ -37,8 +37,8 @@
             [[UserController sharedInstance]checkUserinCloudKitUserList];
             [[UserController sharedInstance]findCurrentUser];
             dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:allLocationsFetchedNotificationKey object:nil];
-                [[NSNotificationCenter defaultCenter] postNotificationName:UsersLocationsNotificationKey object:nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:updateMapKey object:nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
             });
         }];
 

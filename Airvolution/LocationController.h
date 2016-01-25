@@ -16,7 +16,7 @@
 
 static NSString *const newLocationSavedNotificationKey = @"new location saved";
 static NSString *const newLocationSaveFailedNotificationKey = @"new location not saved";
-static NSString *const allLocationsFetchedNotificationKey = @"all locations fetched";
+static NSString *const updateMapKey = @"all locations fetched";
 static NSString *const locationDeletedNotificationKey = @"location deleted";
 
 

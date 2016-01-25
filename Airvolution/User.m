@@ -31,11 +31,11 @@
 }
 
 - (NSSortDescriptor*)sortLocationsForFilter:(NSString*)filter {
-    if ([filter isEqualToString:AscendingFilter]) {
+    if ([filter isEqualToString:AscendingSort]) {
         return [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:YES];
-    } else if ([filter isEqualToString:DescendingFilter]) {
+    } else if ([filter isEqualToString:DescendingSort]) {
         return [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:NO];
-    } else if ([filter isEqualToString:AlphabeticalFilter]) {
+    } else if ([filter isEqualToString:AlphabeticalSort]) {
         return [[NSSortDescriptor alloc] initWithKey:@"locationName" ascending:YES];
     } else {
         return [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:YES];

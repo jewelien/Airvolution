@@ -187,7 +187,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 -(void)registerForNotifications
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notLoggedIniCloudAlert) name:NotLoggedIniCloudNotificationKey object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateMapWithSavedLocations) name:allLocationsFetchedNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateMapWithSavedLocations) name:updateMapKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitFailedAlert) name:newLocationSaveFailedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitSuccess) name:newLocationSavedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeMapAnnotations) name:locationDeletedNotificationKey object:nil];

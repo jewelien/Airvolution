@@ -176,9 +176,9 @@
                     CKAsset *asset = userDictionary[ImageKey];
                     user.profileImage = [[UIImage alloc]initWithContentsOfFile:asset.fileURL.path];
                     user.recordName = recordID.recordName;
-                    user.filter = DescendingFilter;
+                    user.filter = DescendingSort;
                     if (!existingUser && existingUser.filter.length < 1) {
-                        user.filter = AscendingFilter;
+                        user.filter = AscendingSort;
                     }
                     if (![user isInserted]) {
                         [[Stack sharedInstance].managedObjectContext insertObject:user];
@@ -282,7 +282,7 @@
                     NSLog(@"saved defaultUsername %@", record);
                     [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            [[NSNotificationCenter defaultCenter] postNotificationName:UserPointsNotificationKey object:nil];
+                            [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
                         });
                         
                     }];
@@ -299,48 +299,7 @@
 //        NSLog(@"User has a username");
     }
 
-    
-
 }
-
-//-(void)updateUserPoints {
-////    NSString *username = [self.currentUserRecordName substringFromIndex:[self.currentUserRecordName length] - 12];
-//    NSInteger integer = self.currentUser.locations.count * 1;
-//    NSString *pointsString = [@(integer)stringValue];
-//
-//    if (![self.currentUser.points isEqualToString:pointsString]) {
-//
-//        CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
-//        fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
-//        
-//            CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
-//            
-//            cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
-//            cloudKitUser[PointsKey] = pointsString;
-//            
-//            [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
-//                if (!error) {
-//                    NSLog(@"saved new points %@", record);
-//                    [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
-//                        dispatch_async(dispatch_get_main_queue(), ^{
-//                            [[NSNotificationCenter defaultCenter] postNotificationName:UserPointsNotificationKey object:nil];
-//                        });
-//                        
-//                    }];
-//                } else {
-//                    NSLog(@"error updating points error %@", error);
-//                }
-//            }];
-//
-//        };
-//
-//        [[UserController publicDatabase] addOperation:fetchOperation];
-//        
-//    } else {
-//        NSLog(@"points matching no need to update");
-//    }
-//}
-
 
 -(void)updateUsernameWith:(NSString *)newUsername
 {
@@ -411,15 +370,15 @@
 }
 
 - (void)saveLocationFilter:(NSString*)filter {
-    if ([filter isEqualToString:AscendingFilter]) {
-        self.currentUser.filter = AscendingFilter;
-    } else if ([filter isEqualToString:DescendingFilter]) {
-        self.currentUser.filter = DescendingFilter;
-    } else if ([filter isEqualToString:AlphabeticalFilter]) {
-        self.currentUser.filter = AlphabeticalFilter;
+    if ([filter isEqualToString:AscendingSort]) {
+        self.currentUser.filter = AscendingSort;
+    } else if ([filter isEqualToString:DescendingSort]) {
+        self.currentUser.filter = DescendingSort;
+    } else if ([filter isEqualToString:AlphabeticalSort]) {
+        self.currentUser.filter = AlphabeticalSort;
     }
     [self saveToCoreData];
-    [[NSNotificationCenter defaultCenter]postNotificationName:FilterSavedKey object:nil];
+    [[NSNotificationCenter defaultCenter]postNotificationName:SortSavedKey object:nil];
 }
 
 
