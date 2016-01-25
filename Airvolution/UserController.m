@@ -11,6 +11,7 @@
 #import "Location.h"
 #import "ProfileViewController.h"
 #import "User.h"
+#import "Stack.h"
 
 @interface UserController ()
 @end
@@ -26,12 +27,20 @@
     return sharedInstance;
 }
 
+- (void)initialLoad {
+    [self fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
+        [[LocationController sharedInstance]loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
+            [self checkUserinCloudKitUserList];
+        }];
+    }];
+}
+
 #pragma mark - Finding User's iCloud
 
 - (void)fetchUserRecordIDWithCompletion:(void (^)(NSString *userRecordName))completion {
     
-//    [[CKContainer defaultContainer]
-    [[CKContainer containerWithIdentifier:@"iCloud.com.julienguanzon.Airvolution"]
+    [[CKContainer defaultContainer]
+//    [[CKContainer containerWithIdentifier:@"iCloud.com.julienguanzon.Airvolution"]
      fetchUserRecordIDWithCompletionHandler:^(CKRecordID *recordID, NSError *error) {
     
         if (recordID) {
@@ -50,71 +59,6 @@
     }];
 
 }
-
-#pragma mark - Finding User's shared locations from all locations array
-
--(void)fetchUsersSavedLocationsFromArray:(NSArray *)allLocationsArray withCompletion:(void (^)(NSArray *usersLocations))completion {
-    NSMutableArray *tempArray = [NSMutableArray new];
-    for (Location *location in [LocationController sharedInstance].locations) {
-        
-        if ([location.userRecordName isEqualToString: @"__defaultOwner__"]) {
-            [tempArray addObject:location];
-//            NSLog(@"user's locations found");
-        } else {
-//            NSLog(@"not user's location");
-        }
-    }
-//    completion(self.usersSharedLocations = tempArray);
-    completion(self.usersSharedLocations = [self sortSharedLocations:tempArray]);
-//    NSLog(@"User has %ld locations", self.usersSharedLocations.count);
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:UsersLocationsNotificationKey object:nil];
-        
-    });
-    
-//    [self checkUserinCloudKitUserList];
-    [self updateUserPoints];
-}
-
-- (NSArray*)sortSharedLocations:(NSArray*)locations {
-    if (self.currentUser && self.currentUser.filter >= 0) {
-        switch (self.currentUser.filter) {
-            case dateAscending:
-                return [self sortLocationsAscending:YES locations:locations];
-                break;
-                
-            case dateDescending:
-                return [self sortLocationsAscending:NO locations:locations];
-                break;
-            case name:
-                return [self sortLocationsByName:locations];
-                break;
-            case distance:
-                return [self sortLocationsByDistance:locations];
-                break;
-        }
-    } else {
-        return [self sortLocationsAscending:NO locations:locations];
-    }
-}
-
-- (NSArray*)sortLocationsAscending:(BOOL)ascending locations:(NSArray*)locations {
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"_creationDate" ascending:ascending];
-    return [locations sortedArrayUsingDescriptors:@[sortDescriptor]];
-}
-
-- (NSArray*)sortLocationsByName:(NSArray*)locations {
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"_locationName" ascending:YES selector:@selector(caseInsensitiveCompare:)];
-    return [locations sortedArrayUsingDescriptors:@[sortDescriptor]];
-}
-
-- (NSArray*)sortLocationsByDistance:(NSArray*)locations {
-    //NEED TO CHANGE to sort by distance nearest to farthers from current location
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"_creationDate" ascending:YES];
-    return [locations sortedArrayUsingDescriptors:@[sortDescriptor]];
-}
-
 
 + (CKDatabase*)publicDatabase {
     CKDatabase *database = [[CKContainer defaultContainer] publicCloudDatabase];
@@ -138,17 +82,20 @@
                 NSLog(@"no users in user list");
                 [self saveUserinCloudKitUserList];
             } else {
-                
                 for (CKRecord *record in results) {
+                    if (record[RecordNameKey]) {
                         [userListMutableArray addObject:record[RecordNameKey]];
+                    }
                 }
                 if ([userListMutableArray containsObject:self.currentUserRecordName]) {
                     NSLog(@"user is in cloudkit");
                     self.allUsersRecordNames = userListMutableArray;
                     NSLog(@"self.allUsersRecordNames %@", self.allUsersRecordNames);
-                    [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
-                        [self updateUserPoints];
-                    }];
+                    if (self.allUsers.count == 0) {
+                        [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
+//                            [self updateUserPoints];
+                        }];
+                    }
                 } else {
                     NSLog(@"user is not in cloudkit");
                     [self saveUserinCloudKitUserList];
@@ -184,13 +131,15 @@
             NSLog(@"fetch CloudKit UserList failed, error %@", error);
         } else {
             for (CKRecord *record in results) {
-                [userListMutableArray addObject:record[RecordNameKey]];
+                if (record[RecordNameKey]) {
+                    [userListMutableArray addObject:record[RecordNameKey]];
+                }
             }
             if ([userListMutableArray containsObject:self.currentUserRecordName]) {
                 NSLog(@"user is in cloudkit");
                 self.allUsersRecordNames = userListMutableArray;
                 [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
-                    [self updateUserPoints];
+//                    [self updateUserPoints];
                 }];
             } else {
                 NSLog(@"user is not yet in cloudkit");
@@ -213,14 +162,32 @@
     NSLog(@"retrieving all users ");
     CKFetchRecordsOperation *fetchOperation = [[CKFetchRecordsOperation alloc] initWithRecordIDs:recordIDs];
     
-    NSMutableArray *allUsersTempArray = [[NSMutableArray alloc] init];
     fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
         if (!operationError) {
             for (CKRecordID *recordID in recordsByRecordID) {
-                User *user = [[User alloc] initWithDictionary:recordsByRecordID[recordID]];
-                [allUsersTempArray addObject:user];
+                NSDictionary *userDictionary = recordsByRecordID[recordID];
+                User *user;
+                User *existingUser = [self findUserInCoreDataWithUserUserRecordName:recordID.recordName];
+                if (!existingUser) {
+                    user = [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:[Stack sharedInstance].managedObjectContext];
+                    user.points = userDictionary[PointsKey];
+                    user.identifier = userDictionary[IdentifierKey];
+                    user.username = userDictionary[UsernameKey];
+                    CKAsset *asset = userDictionary[ImageKey];
+                    user.profileImage = [[UIImage alloc]initWithContentsOfFile:asset.fileURL.path];
+                    user.recordName = recordID.recordName;
+                    user.filter = DescendingFilter;
+                    if (!existingUser && existingUser.filter.length < 1) {
+                        user.filter = AscendingFilter;
+                    }
+                    if (![user isInserted]) {
+                        [[Stack sharedInstance].managedObjectContext insertObject:user];
+                    }
+                    [user.managedObjectContext refreshObject:user mergeChanges:YES];
+                    [self saveToCoreData];
+                }
             }
-            self.allUsers = allUsersTempArray;
+
             NSLog(@"RETRIEVED ALL USERS %@", self.allUsers);
             [self findCurrentUser];
             [[NSNotificationCenter defaultCenter] postNotificationName:AllUsersFetchNotificationKey object:nil];
@@ -235,6 +202,47 @@
 
 }
 
+- (User *)findUserInCoreDataWithUserUserRecordName:(NSString*)recordName {
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"User"];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"recordName == %@", recordName]];
+    NSArray *array = [[Stack sharedInstance].managedObjectContext executeFetchRequest:fetchRequest error:NULL];
+    return array.firstObject;
+}
+
+- (NSArray *)fetchLocationsForUser:(User *)user {
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Location"];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"userRecordName == %@", user.recordName]];
+    NSArray *array = [[Stack sharedInstance].managedObjectContext executeFetchRequest:fetchRequest error:NULL];
+    return array;
+}
+
+- (NSArray *)allUsers {
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"User"];
+    NSArray *array = [[Stack sharedInstance].managedObjectContext executeFetchRequest:fetchRequest error:NULL];
+    NSLog(@"USERS COUNT = %ld", array.count);
+    return array;
+}
+
+
+-(void)saveToCoreData {
+//    [[Stack sharedInstance].managedObjectContext refreshAllObjects];
+    [[Stack sharedInstance].managedObjectContext save:nil];
+//    [[Stack sharedInstance].managedObjectContext performBlock:^{
+//        NSError *error = nil;
+//        BOOL success = [[Stack sharedInstance].managedObjectContext save:&error];
+//        if (!success) {
+//            NSLog(@"Core Data save ERROR %@", error);
+//        }
+//    }];
+    
+//    if (![[NSThread currentThread] isMainThread]) {
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            [[Stack sharedInstance].managedObjectContext save:NULL];
+//        });
+//        return;
+//    }
+}
+
 
 - (void)findCurrentUser {
     for (User *user in self.allUsers) {
@@ -246,9 +254,9 @@
     }
     NSLog(@"self.currentUser == %@", self.currentUser);
     [self checkUsername];
-    [self fetchUsersSavedLocationsFromArray:self.usersSharedLocations withCompletion:^(NSArray *usersLocations) {
-        //
-    }];
+//    [self fetchUsersSavedLocationsFromArray:self.usersSharedLocations withCompletion:^(NSArray *usersLocations) {
+//        //
+//    }];
 //    dispatch_async(dispatch_get_main_queue(), ^{
 //        [[NSNotificationCenter defaultCenter] postNotificationName:removeLoadingLaunchScreenNotification object:nil];
 //    });
@@ -295,44 +303,43 @@
 
 }
 
-
--(void)updateUserPoints {
-//    NSString *username = [self.currentUserRecordName substringFromIndex:[self.currentUserRecordName length] - 12];
-    NSInteger integer = self.usersSharedLocations.count * 1;
-    NSString *pointsString = [@(integer)stringValue];
-
-    if (![self.currentUser.points isEqualToString:pointsString]) {
-
-        CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
-        fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
-        
-            CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
-            
-            cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
-            cloudKitUser[PointsKey] = pointsString;
-            
-            [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
-                if (!error) {
-                    NSLog(@"saved new points %@", record);
-                    [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [[NSNotificationCenter defaultCenter] postNotificationName:UserPointsNotificationKey object:nil];
-                        });
-                        
-                    }];
-                } else {
-                    NSLog(@"error updating points error %@", error);
-                }
-            }];
-
-        };
-
-        [[UserController publicDatabase] addOperation:fetchOperation];
-        
-    } else {
-        NSLog(@"points matching no need to update");
-    }
-}
+//-(void)updateUserPoints {
+////    NSString *username = [self.currentUserRecordName substringFromIndex:[self.currentUserRecordName length] - 12];
+//    NSInteger integer = self.currentUser.locations.count * 1;
+//    NSString *pointsString = [@(integer)stringValue];
+//
+//    if (![self.currentUser.points isEqualToString:pointsString]) {
+//
+//        CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
+//        fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
+//        
+//            CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
+//            
+//            cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
+//            cloudKitUser[PointsKey] = pointsString;
+//            
+//            [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
+//                if (!error) {
+//                    NSLog(@"saved new points %@", record);
+//                    [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
+//                        dispatch_async(dispatch_get_main_queue(), ^{
+//                            [[NSNotificationCenter defaultCenter] postNotificationName:UserPointsNotificationKey object:nil];
+//                        });
+//                        
+//                    }];
+//                } else {
+//                    NSLog(@"error updating points error %@", error);
+//                }
+//            }];
+//
+//        };
+//
+//        [[UserController publicDatabase] addOperation:fetchOperation];
+//        
+//    } else {
+//        NSLog(@"points matching no need to update");
+//    }
+//}
 
 
 -(void)updateUsernameWith:(NSString *)newUsername
@@ -403,58 +410,17 @@
     [[UserController publicDatabase] addOperation:fetchOperation];
 }
 
-- (void)saveLocationFilter:(LocationFilter)filter {
-    NSString *filterString;
-    switch (filter) {
-        case dateAscending:
-            self.currentUser.filter = dateAscending;
-            filterString = @"dateAscending";
-            break;
-           
-        case dateDescending:
-            self.currentUser.filter = dateDescending;
-            filterString = @"dateDescending";
-            break;
-            
-        case distance:
-            filterString = @"distance";
-            break;
-            
-        case name:
-            self.currentUser.filter = name;
-            filterString = @"name";
-            break;
-            
-        default: filterString = @"dateDescending";
-            break;
+- (void)saveLocationFilter:(NSString*)filter {
+    if ([filter isEqualToString:AscendingFilter]) {
+        self.currentUser.filter = AscendingFilter;
+    } else if ([filter isEqualToString:DescendingFilter]) {
+        self.currentUser.filter = DescendingFilter;
+    } else if ([filter isEqualToString:AlphabeticalFilter]) {
+        self.currentUser.filter = AlphabeticalFilter;
     }
-    
-    CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
-    fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
-        
-        CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
-        
-        cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
-        cloudKitUser[LocationFilterKey] = filterString;
-        
-        [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
-            if (!error) {
-                NSLog(@"saved location filter %@", record);
-                
-                [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-//                        [[NSNotificationCenter defaultCenter] postNotificationName:UserImageNotificationKey object:nil];
-                        [self fetchUsersSavedLocationsFromArray:self.usersSharedLocations withCompletion:^(NSArray *usersLocations) {
-                            //
-                        }];
-                    });
-                    
-                }];
-            }
-        }];
-        
-    };
-    [[UserController publicDatabase] addOperation:fetchOperation];
+    [self saveToCoreData];
+    [[NSNotificationCenter defaultCenter]postNotificationName:FilterSavedKey object:nil];
 }
+
 
 @end

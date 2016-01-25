@@ -15,30 +15,21 @@
 @interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate, UITableViewDelegate>
 
 @property (nonatomic, strong) UIActivityIndicatorView *initialLoadingIndicatorView;
-
-
 @property (nonatomic) CLLocationManager *locationManager;
-
 @property (nonatomic, strong) UIButton *dropPinButton;
 @property (nonatomic, strong) UISearchBar *searchBar;
-
 @property (nonatomic) CLLocation *location;
 @property (nonatomic, strong) MKPointAnnotation *droppedPinAnnotation;
-
 @property (nonatomic, strong) NSMutableArray *searchedAnnotations;
-
 @property (nonatomic, strong) NSArray *selectedPinAddress;
 @property (nonatomic, strong) NSString *selectedPinStreet;
 @property (nonatomic, strong) NSString *selectedPinCity;
 @property (nonatomic, strong) NSString *selectedPinState;
 @property (nonatomic, strong) NSString *selectedPinZip;
 @property (nonatomic, strong) NSString *selectedPinCountry;
-
 @property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
-
 @property (nonatomic, strong) NSArray *allLocations;
 @property (nonatomic, strong) MKPointAnnotation *selectedAnnotation;
-
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) MapTableViewDataSource *datasource;
 @property (nonatomic, strong) UIView *locationInfoBackgroundView;
@@ -46,7 +37,7 @@
 
 @end
 
-static NSString * const droppedPinTitle = @"cancel or add";
+static NSString * const droppedPinTitle = @"Dropped Pin";
 
 
 @implementation MapViewController
@@ -245,10 +236,19 @@ static NSString * const droppedPinTitle = @"cancel or add";
         [locationsArray addObject:savedAnnotation];
     }
     self.allLocations = locationsArray;
-    [self.mapView addAnnotations:locationsArray];
-    [self.mapView reloadInputViews];
+    //    if (![[NSThread currentThread] isMainThread]) {
+    //        dispatch_async(dispatch_get_main_queue(), ^{
+    //            [[Stack sharedInstance].managedObjectContext save:NULL];
+    //        });
+    //        return;
+    //    }
     
-    [self removeLaunchScreen];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.mapView addAnnotations:locationsArray];
+        [self.mapView reloadInputViews];
+        
+        [self removeLaunchScreen];
+    });
 }
 
 - (void)savedToCloudKitFailedAlert {

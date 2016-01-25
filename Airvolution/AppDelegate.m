@@ -30,14 +30,30 @@
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-
-    [[UserController sharedInstance]fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
-        [[LocationController sharedInstance]loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
+    if ([self isFirstTimeOpening] == true) {
+        [[UserController sharedInstance]initialLoad];
+    } else {
+        [[UserController sharedInstance]fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
             [[UserController sharedInstance]checkUserinCloudKitUserList];
-            [[UserController sharedInstance]fetchUsersSavedLocationsFromArray:array withCompletion:^(NSArray *usersLocations) {
-            }];
+            [[UserController sharedInstance]findCurrentUser];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:allLocationsFetchedNotificationKey object:nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:UsersLocationsNotificationKey object:nil];
+            });
         }];
-    }];
+
+
+    }
+    
+//        [[UserController sharedInstance]fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
+//            [[LocationController sharedInstance]loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
+//                [[UserController sharedInstance]checkUserinCloudKitUserList];
+//                //            [[UserController sharedInstance]fetchLocationsForUser:[UserController sharedInstance].currentUser];
+//                //            [[UserController sharedInstance]fetchUsersSavedLocationsFromArray:array withCompletion:^(NSArray *usersLocations) {
+//                //            }];
+//            }];
+//        }];
+    
 
     [[UITabBar appearance] setTintColor:[UIColor airvolutionRed]];
     
@@ -74,9 +90,17 @@
     UITabBarController *tabBar = (UITabBarController *)self.window.rootViewController;
     tabBar.selectedIndex = 1;
     
-    
-    
     return YES;
+}
+
+- (BOOL) isFirstTimeOpening {
+    NSUserDefaults *theDefaults = [NSUserDefaults standardUserDefaults];
+    if([theDefaults integerForKey:@"hasRun"] == 0) {
+        [theDefaults setInteger:1 forKey:@"hasRun"];
+        [theDefaults synchronize];
+        return true;
+    }
+    return false;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {

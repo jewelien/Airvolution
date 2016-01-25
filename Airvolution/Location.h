@@ -9,7 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 #import <CloudKit/CloudKit.h>
-
+#import <CoreData/CoreData.h>
+#import "User.h"
 
 static NSString * const locationRecordKey = @"location";
 static NSString * const identifierKey = @"identifier";
@@ -19,12 +20,9 @@ static NSString * const streetKey = @"street";
 static NSString * const cityKey = @"city";
 static NSString * const stateKey = @"state";
 static NSString * const zipKey = @"zip";
-//static NSString * const cityStateZipKey = @"cityStateZip";
 static NSString * const countryKey = @"country";
-
 static NSString * const creationDateKey = @"creationDate";
 static NSString * const recordIDKey = @"recordID";
-
 static NSString * const userKey = @"creatorUserRecordID";
 static NSString * const usernameKey = @"username";
 static NSString * const userRecordIDRefKey = @"userRecordID";
@@ -32,29 +30,29 @@ static NSString * const notesKey = @"notes";
 
 
 
-@interface Location : NSObject
+@interface Location : NSManagedObject
 
-@property (nonatomic, strong) NSString *locationName;
-@property (nonatomic) CLLocation *location;
-@property (nonatomic, strong) NSString *street;
-@property (nonatomic, strong) NSString *city;
+@property (nonatomic, retain) NSString *locationName;
+@property (nonatomic, retain) NSString *street;
+@property (nonatomic, retain) NSString *city;
 @property (nonatomic, strong) NSString *state;
-@property (nonatomic, strong) NSString *zip;
-//@property (nonatomic, strong) NSString *cityStateZip;
-@property (nonatomic, strong) NSString *country;
+@property (nonatomic, retain) NSString *zip;
+@property (nonatomic, retain) NSString *country;
+@property (nonatomic, retain) NSDate *creationDate;
+@property (nonatomic, retain) NSString *identifier;
+@property (nonatomic, retain) NSString *locationNotes;
+@property (nonatomic) CLLocation *location;
+@property (nonatomic, retain) NSString *userRecordName;
+@property (nonatomic, retain) NSString *recordName;
+@property (nonatomic, retain) User *user; //relationship
+//@property (nonatomic, retain) NSString *userRecordID;
+//@property (nonatomic, retain) NSString *username;
+//@property (nonatomic, retain) NSString *recordID;
 
 
-@property (nonatomic, strong) NSDate *creationDate;
-@property (nonatomic, strong) NSString *creationDateString;
-@property (nonatomic, strong) NSString *identifier;
+@property (nonatomic, retain) NSString *creationDateString;
 
-@property (nonatomic, strong) NSString *userRecordName;
-@property (nonatomic, strong) CKRecordID *recordID;
-@property (nonatomic, strong) NSString *username;
-@property (nonatomic, strong) NSString *locationNotes;
-
-
-- (instancetype)initWithDictionary:(NSDictionary *)dictionary;
+//- (instancetype)initWithDictionary:(NSDictionary *)dictionary;
 
 
 @end

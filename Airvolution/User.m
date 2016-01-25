@@ -7,45 +7,80 @@
 //
 
 #import "User.h"
+#import "UserController.h"
 
 @interface User ()
-    @property (nonatomic, strong) CKAsset *image;
+//    @property (nonatomic, strong) CKAsset *image;
 @end
 
 @implementation User
 
--(instancetype)initWithDictionary:(NSDictionary *)dictionary {
-    
-    self = [super init];
-    if (self) {
-        self.recordID = dictionary[RecordIDKey];
-        self.recordName = self.recordID.recordName;
-        self.identifier = dictionary[IdentifierKey];
-        self.points = dictionary[PointsKey];
-        self.username = dictionary[UsernameKey];
-//        self.locationFilterString = dictionary[LocationFilterKey];
-        [self assignLocationFilterString:dictionary[LocationFilterKey]];
-        self.image = dictionary[ImageKey];
-        self.profileImage = [UIImage imageWithContentsOfFile:self.image.fileURL.path];
-        
-    }
-//    NSLog(@"%@, %@, %@, %@, %@", self.recordID, self.recordName, self.identifier, self.points, self.username);
-    return  self;
+//@dynamic recordID;
+@dynamic recordName;
+@dynamic identifier;
+@dynamic points;
+@dynamic username;
+@dynamic profileImage;
+@dynamic locations;
+@dynamic filter;
+
+- (NSArray *)sortedLocations {
+    NSSortDescriptor *sortDescriptor = [self sortLocationsForFilter:self.filter];
+    NSArray *sortedArray = [self.locations sortedArrayUsingDescriptors:@[ sortDescriptor ]];
+    return sortedArray;
 }
 
-- (void)assignLocationFilterString:(NSString*)string {
-    if ([string isEqualToString:@"dateAscending"]) {
-        self.filter = dateAscending;
-    } else if ([string isEqualToString:@"dateDescending"]) {
-        self.filter = dateDescending;
-    } else if ([string isEqualToString:@"distance"]) {
-        self.filter = distance;
-    } else if ([string isEqualToString:@"name"]) {
-        self.filter = name;
+- (NSSortDescriptor*)sortLocationsForFilter:(NSString*)filter {
+    if ([filter isEqualToString:AscendingFilter]) {
+        return [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:YES];
+    } else if ([filter isEqualToString:DescendingFilter]) {
+        return [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:NO];
+    } else if ([filter isEqualToString:AlphabeticalFilter]) {
+        return [[NSSortDescriptor alloc] initWithKey:@"locationName" ascending:YES];
     } else {
-        self.filter = dateDescending;
+        return [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:YES];
     }
 }
+
+-(NSSet *)locations{
+    NSArray *array = [[UserController sharedInstance] fetchLocationsForUser:self];
+    return [NSSet setWithArray: array];
+}
+-(NSString *)points{
+    return [NSString stringWithFormat:@"%ld", self.locations.count];
+}
+//-(instancetype)initWithDictionary:(NSDictionary *)dictionary {
+//    
+//    self = [super init];
+//    if (self) {
+//        self.recordID = dictionary[RecordIDKey];
+//        self.recordName = self.recordID.recordName;
+//        self.identifier = dictionary[IdentifierKey];
+//        self.points = dictionary[PointsKey];
+//        self.username = dictionary[UsernameKey];
+////        self.locationFilterString = dictionary[LocationFilterKey];
+////        [self assignLocationFilterString:dictionary[LocationFilterKey]];
+//        self.image = dictionary[ImageKey];
+//        self.profileImage = [UIImage imageWithContentsOfFile:self.image.fileURL.path];
+//        
+//    }
+////    NSLog(@"%@, %@, %@, %@, %@", self.recordID, self.recordName, self.identifier, self.points, self.username);
+//    return  self;
+//}
+
+//- (void)assignLocationFilterString:(NSString*)string {
+//    if ([string isEqualToString:@"dateAscending"]) {
+//        self.filter = dateAscending;
+//    } else if ([string isEqualToString:@"dateDescending"]) {
+//        self.filter = dateDescending;
+//    } else if ([string isEqualToString:@"distance"]) {
+//        self.filter = distance;
+//    } else if ([string isEqualToString:@"name"]) {
+//        self.filter = name;
+//    } else {
+//        self.filter = dateDescending;
+//    }
+//}
 
 
 

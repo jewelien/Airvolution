@@ -90,7 +90,7 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
             numberOfRows = 1;
             break;
         case 1:
-            numberOfRows = [UserController sharedInstance].usersSharedLocations.count;
+            numberOfRows = [UserController sharedInstance].currentUser.locations.count;
             break;
     }
     
@@ -124,6 +124,7 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
     
     switch (indexPath.section) {
         case 0:
+        {
 //            tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
             cell = userCell;
 //            userCell.usernameLabel.text = [[UserControll]];
@@ -132,11 +133,13 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
             userCell.viewForImage.image = currentUser.profileImage;
             [userCell.editButton addTarget:self action:@selector(editUser) forControlEvents:UIControlEventTouchUpInside];
             break;
+        }
         default:
+        {
             cell = locationCell;
-            NSArray *usersSharedLocations = [UserController sharedInstance].usersSharedLocations;
-//            NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:NO];
-//            NSArray *sortedArray = [usersSharedLocations sortedArrayUsingDescriptors:@[sortDescriptor]];
+//            NSArray *usersSharedLocations = [[UserController sharedInstance].currentUser.locations allObjects];
+//            usersSharedLocations = [usersSharedLocations sortedArrayUsingDescriptors:@[[self sortLocationsForFilter:[UserController sharedInstance].currentUser.filter]]];
+            NSArray *usersSharedLocations = [[UserController sharedInstance].currentUser sortedLocations];
 
             if (usersSharedLocations.count > indexPath.row) {
                 Location *location = usersSharedLocations[indexPath.row];
@@ -146,9 +149,21 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 //                locationCell.addressLabel.text = [NSString stringWithFormat:@"%@, %@", location.street, location.cityStateZip];
             }
             break;
+        }
     }
 
     return cell;
+}
+
+
+- (NSSortDescriptor*)sortLocationsAscending {
+    return [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:YES];
+}
+- (NSSortDescriptor*)sortLocationsDescending {
+    return [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:NO];
+}
+- (NSSortDescriptor*)sortLocationsAlphabetical {
+    return [[NSSortDescriptor alloc] initWithKey:@"locationName" ascending:YES];
 }
 
 - (void)editUser {
@@ -172,8 +187,9 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         NSLog(@"destructive");
-        Location *location = [UserController sharedInstance].usersSharedLocations[indexPath.row];
-        [[NSNotificationCenter defaultCenter] postNotificationName:deleteLocationNotificationKey object:location.recordID];
+
+        Location *location = [UserController sharedInstance].currentUser.sortedLocations[indexPath.row];
+        [[NSNotificationCenter defaultCenter] postNotificationName:deleteLocationNotificationKey object:location.recordName];
     }
 } 
 
