@@ -26,7 +26,7 @@
     return database;
 }
 
-
+#pragma mark save
 -(void)saveLocationWithName:(NSString *)name
                    location:(CLLocation *)location
               streetAddress:(NSString *)street
@@ -76,6 +76,7 @@
     
 }
 
+#pragma mark load
 - (void)loadLocationsFromCloudKitWithCompletion:(void (^)(NSArray *array))completion
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"TRUEPREDICATE"];
@@ -126,56 +127,39 @@
     [self saveToCoreData];
 }
 
-- (Location *)findLocationInCoreDataWithLocationIdentifier:(NSString*)identifier {
-    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Location"];
-    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"identifier == %@ || recordName == %@", identifier, identifier]];
-    NSError *error;
-    NSArray *array = [[Stack sharedInstance].managedObjectContext executeFetchRequest:fetchRequest error:&error];
-    if (error) {
-        NSLog(@"%@", error);
-    }
-    return array.firstObject;
-}
-
-
--(NSArray *)locations {
-    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Location"];
-    NSArray *array = [[Stack sharedInstance].managedObjectContext executeFetchRequest:fetchRequest error:NULL];
-    NSLog(@"ALL LOCATIONS COUNT = %ld", array.count);
-    return array;
-}
 
 -(void)saveToCoreData {
-//    [[Stack sharedInstance].managedObjectContext refreshAllObjects];
+    //    [[Stack sharedInstance].managedObjectContext refreshAllObjects];
     [[Stack sharedInstance].managedObjectContext save:nil];
-//    NSError *error = nil;
-//    if(![[Stack sharedInstance].managedObjectContext save:&error]) {
-//        NSLog(@"Failed to save to data store: %@", [error localizedDescription]);
-//        NSArray* detailedErrors = [[error userInfo] objectForKey:NSDetailedErrorsKey];
-//        if(detailedErrors != nil && [detailedErrors count] > 0) {
-//            for(NSError* detailedError in detailedErrors) {
-//                NSLog(@"  DetailedError: %@", [detailedError userInfo]);
-//            }
-//        }
-//        else {
-//            NSLog(@"  %@", [error userInfo]);
-//        }
-//    }
-//    [[Stack sharedInstance].managedObjectContext performBlock:^{
-//        NSError *error = nil;
-//        BOOL success = [[Stack sharedInstance].managedObjectContext save:&error];
-//        if (!success) {
-//            NSLog(@"Core Data save ERROR %@", error);
-//        }
-//    }];
-//    if (![[NSThread currentThread] isMainThread]) {
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            [[Stack sharedInstance].managedObjectContext save:NULL];
-//        });
-//        return;
-//    }
+    //    NSError *error = nil;
+    //    if(![[Stack sharedInstance].managedObjectContext save:&error]) {
+    //        NSLog(@"Failed to save to data store: %@", [error localizedDescription]);
+    //        NSArray* detailedErrors = [[error userInfo] objectForKey:NSDetailedErrorsKey];
+    //        if(detailedErrors != nil && [detailedErrors count] > 0) {
+    //            for(NSError* detailedError in detailedErrors) {
+    //                NSLog(@"  DetailedError: %@", [detailedError userInfo]);
+    //            }
+    //        }
+    //        else {
+    //            NSLog(@"  %@", [error userInfo]);
+    //        }
+    //    }
+    //    [[Stack sharedInstance].managedObjectContext performBlock:^{
+    //        NSError *error = nil;
+    //        BOOL success = [[Stack sharedInstance].managedObjectContext save:&error];
+    //        if (!success) {
+    //            NSLog(@"Core Data save ERROR %@", error);
+    //        }
+    //    }];
+    //    if (![[NSThread currentThread] isMainThread]) {
+    //        dispatch_async(dispatch_get_main_queue(), ^{
+    //            [[Stack sharedInstance].managedObjectContext save:NULL];
+    //        });
+    //        return;
+    //    }
 }
 
+#pragma mark delete
 - (void)deleteLocationWithRecordName:(NSString*)recordName {
     CKRecordID *recordID = [[CKRecordID alloc]initWithRecordName:[NSString stringWithFormat:@"%@",recordName]];
     CKModifyRecordsOperation *operation = [[CKModifyRecordsOperation alloc] initWithRecordsToSave:nil recordIDsToDelete:@[recordID]];
@@ -197,6 +181,26 @@
 
     };
     [[LocationController publicDatabase]addOperation:operation];
+}
+
+#pragma mark fetch
+- (Location *)findLocationInCoreDataWithLocationIdentifier:(NSString*)identifier {
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Location"];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"identifier == %@ || recordName == %@", identifier, identifier]];
+    NSError *error;
+    NSArray *array = [[Stack sharedInstance].managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error) {
+        NSLog(@"%@", error);
+    }
+    return array.firstObject;
+}
+
+
+-(NSArray *)locations {
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Location"];
+    NSArray *array = [[Stack sharedInstance].managedObjectContext executeFetchRequest:fetchRequest error:NULL];
+    NSLog(@"ALL LOCATIONS COUNT = %ld", array.count);
+    return array;
 }
 
 - (NSDictionary *)addressDictionaryForLocationWithCLLocation:(CLLocation *)location {

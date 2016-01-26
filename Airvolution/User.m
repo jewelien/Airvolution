@@ -38,7 +38,7 @@
     } else if ([filter isEqualToString:AlphabeticalSort]) {
         return [[NSSortDescriptor alloc] initWithKey:@"locationName" ascending:YES];
     } else {
-        return [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:YES];
+        return [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:NO];
     }
 }
 
