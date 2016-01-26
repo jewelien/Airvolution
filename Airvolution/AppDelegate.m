@@ -31,18 +31,9 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
     if ([self isFirstTimeOpening] == true) {
-        [[UserController sharedInstance]initialLoad];
+        [[UserController sharedInstance]initialLoad:YES];
     } else {
-        [[UserController sharedInstance]fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
-            [[UserController sharedInstance]checkUserinCloudKitUserList];
-            [[UserController sharedInstance]findCurrentUser];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:updateMapKey object:nil];
-                [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
-            });
-        }];
-
-
+        [[UserController sharedInstance]initialLoad:NO];
     }
     
 //        [[UserController sharedInstance]fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {

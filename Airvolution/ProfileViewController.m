@@ -174,87 +174,55 @@
 
 -(void)editProfileImage {
     UIAlertController *imageDestinationAlertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleAlert];
+    UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
     UIAlertAction *fromCameraRoll = [UIAlertAction actionWithTitle:@"From Camera Roll" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
         imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
         imagePicker.delegate = self;
         [self presentViewController:imagePicker animated:YES completion:nil];
     }];
-    [imageDestinationAlertController addAction:fromCameraRoll];
-    
+    UIAlertAction *takePhoto = [UIAlertAction actionWithTitle:@"Take Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+        imagePicker.delegate = self;
+        [self presentViewController:imagePicker animated:YES completion:nil];
+    }];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [imageDestinationAlertController removeFromParentViewController];
     }];
-                                   
+    [imageDestinationAlertController addAction:fromCameraRoll];
+    [imageDestinationAlertController addAction: takePhoto];
     [imageDestinationAlertController addAction:cancelAction];
-    
     [self presentViewController:imageDestinationAlertController animated:YES completion:nil];
 }
 
--(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+-(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info {
     self.selectedImage = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
     self.imageData = UIImagePNGRepresentation(self.selectedImage);
-    
     [picker dismissViewControllerAnimated:YES completion:^{
-        [self confirmImageView:self.selectedImage];
+        [self confirmImageAlert:self.selectedImage];
     }];
-    
 }
 
-
--(void)confirmImageView:(UIImage *)selectedImage {
-    self.backgroundView = [[UIView alloc] initWithFrame:self.view.bounds];
-    self.backgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
+-(void)confirmImageAlert:(UIImage*)selectedImage {
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Update profile image?" message:@"\n \n \n \n " preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [controller removeFromParentViewController];
+    }];
+//    NSLayoutConstraint *height = [NSLayoutConstraint constraintWithItem:controller.view attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:0 constant: 210];
+//    [controller.view addConstraint:height];
     
-    UIView *confirmImageView = [[UIView alloc] initWithFrame:CGRectMake((self.backgroundView.frame.size.width / 2) - 140, 90, 280, 260)];
-    confirmImageView.backgroundColor = [UIColor colorWithWhite:.95 alpha:2.0];
-//    confirmImageView.backgroundColor = [UIColor grayColor];
-    [self.backgroundView addSubview:confirmImageView];
+    UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:@"confirm" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[UserController sharedInstance] updateUserImageWithData:self.imageData];
+        [controller removeFromParentViewController];
+    }];
+    [controller addAction: cancelAction];
+    [controller addAction:confirmAction];
     
-    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake((confirmImageView.frame.size.width / 2) - 70, 40, 140, 140)];
+    float estimatedCenter =[UIScreen mainScreen].bounds.size.width * .25 ;
+    UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(estimatedCenter, 50, 80, 80)];
+    imageView.backgroundColor = [UIColor redColor];
     imageView.image = selectedImage;
-    [confirmImageView addSubview:imageView];
-    
-    
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake((confirmImageView.frame.size.width / 2) - 70, 10, 140, 30)];
-    label.text = @"Confirm Image";
-    label.textAlignment = NSTextAlignmentCenter;
-//    label.font = [UIFont boldSystemFontOfSize:20];
-    label.font = [UIFont systemFontOfSize:13 weight:1.0];
-    [confirmImageView addSubview:label];
-
-    
-    UIButton *cancelButton = [[UIButton alloc] initWithFrame:CGRectMake((confirmImageView.frame.size.width / 2) - 70, 185, 140, 30)];
-//    cancelButton.backgroundColor = [UIColor lightGrayColor];
-    [cancelButton setTitle:@"cancel" forState:UIControlStateNormal];
-    [cancelButton setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
-    [confirmImageView addSubview:cancelButton];
-    [cancelButton addTarget:self action:@selector(imageCancelButtonPressed) forControlEvents:UIControlEventTouchUpInside];
-    
-    UIButton *confirmButton = [[UIButton alloc] initWithFrame:CGRectMake((confirmImageView.frame.size.width / 2) - 70, 220, 140, 30)];
-//    confirmButton.backgroundColor = [UIColor lightGrayColor];
-    [confirmButton setTitle:@"confirm" forState:UIControlStateNormal];
-    [confirmButton setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
-    [confirmImageView addSubview:confirmButton];
-    [confirmButton addTarget:self action:@selector(imageConfirmButtonPressed) forControlEvents:UIControlEventTouchUpInside];
-    
-    [self.view addSubview:self.backgroundView];
-}
-
--(void)imageCancelButtonPressed {
-    [self.backgroundView removeFromSuperview];
-}
-
--(void)imageConfirmButtonPressed {
-    [self.backgroundView removeFromSuperview];
-    
-    self.savingImageView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    self.savingImageView.frame = self.view.bounds;
-    self.savingImageView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
-    [self.view addSubview:self.savingImageView];
-    [self.savingImageView startAnimating];
-    
-    [[UserController sharedInstance] updateUserImageWithData:self.imageData];
+    [controller.view addSubview:imageView];
+    [self presentViewController:controller animated:YES completion:nil];
 }
 
 #pragma mark deleteLocation

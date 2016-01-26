@@ -33,7 +33,7 @@ static NSString * const AlphabeticalSort = @"alphabetical";
 
 
 + (UserController *)sharedInstance;
-- (void)initialLoad;
+- (void)initialLoad:(BOOL)isInitialLoad;
 - (void)findCurrentUser;
 
 - (void)fetchUserRecordIDWithCompletion:(void (^)(NSString *userRecordName))completion;

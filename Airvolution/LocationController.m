@@ -73,7 +73,6 @@
             [[NSNotificationCenter defaultCenter] postNotificationName:newLocationSaveFailedNotificationKey object:nil];
         }
     }];
-    
 }
 
 #pragma mark load
@@ -92,14 +91,9 @@
                     [self saveLocationToCoreData:record];
                 }
             }
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:updateMapKey object:nil];
-                [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
-            });
             completion(self.locations);
         }
     }];
-    
 }
 
 - (void)saveLocationToCoreData:(NSDictionary*)record {
