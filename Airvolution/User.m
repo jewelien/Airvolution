@@ -9,10 +9,6 @@
 #import "User.h"
 #import "UserController.h"
 
-@interface User ()
-//    @property (nonatomic, strong) CKAsset *image;
-@end
-
 @implementation User
 
 //@dynamic recordID;
@@ -49,39 +45,6 @@
 -(NSString *)points{
     return [NSString stringWithFormat:@"%ld", self.locations.count];
 }
-//-(instancetype)initWithDictionary:(NSDictionary *)dictionary {
-//    
-//    self = [super init];
-//    if (self) {
-//        self.recordID = dictionary[RecordIDKey];
-//        self.recordName = self.recordID.recordName;
-//        self.identifier = dictionary[IdentifierKey];
-//        self.points = dictionary[PointsKey];
-//        self.username = dictionary[UsernameKey];
-////        self.locationFilterString = dictionary[LocationFilterKey];
-////        [self assignLocationFilterString:dictionary[LocationFilterKey]];
-//        self.image = dictionary[ImageKey];
-//        self.profileImage = [UIImage imageWithContentsOfFile:self.image.fileURL.path];
-//        
-//    }
-////    NSLog(@"%@, %@, %@, %@, %@", self.recordID, self.recordName, self.identifier, self.points, self.username);
-//    return  self;
-//}
-
-//- (void)assignLocationFilterString:(NSString*)string {
-//    if ([string isEqualToString:@"dateAscending"]) {
-//        self.filter = dateAscending;
-//    } else if ([string isEqualToString:@"dateDescending"]) {
-//        self.filter = dateDescending;
-//    } else if ([string isEqualToString:@"distance"]) {
-//        self.filter = distance;
-//    } else if ([string isEqualToString:@"name"]) {
-//        self.filter = name;
-//    } else {
-//        self.filter = dateDescending;
-//    }
-//}
-
 
 
 /*

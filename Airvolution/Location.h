@@ -29,7 +29,6 @@ static NSString * const userRecordIDRefKey = @"userRecordID";
 static NSString * const notesKey = @"notes";
 
 
-
 @interface Location : NSManagedObject
 
 @property (nonatomic, retain) NSString *locationName;
@@ -45,14 +44,7 @@ static NSString * const notesKey = @"notes";
 @property (nonatomic, retain) NSString *userRecordName;
 @property (nonatomic, retain) NSString *recordName;
 @property (nonatomic, retain) User *user; //relationship
-//@property (nonatomic, retain) NSString *userRecordID;
-//@property (nonatomic, retain) NSString *username;
-//@property (nonatomic, retain) NSString *recordID;
-
 
 @property (nonatomic, retain) NSString *creationDateString;
-
-//- (instancetype)initWithDictionary:(NSDictionary *)dictionary;
-
 
 @end

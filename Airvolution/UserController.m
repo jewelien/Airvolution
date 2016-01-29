@@ -36,16 +36,16 @@
     if (isInitialLoad || (!isInitialLoad && [LocationController sharedInstance].locations.count == 0)) {
         [self fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
             [[LocationController sharedInstance]loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
-                [self checkUserinCloudKitUserList];
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [[NSNotificationCenter defaultCenter] postNotificationName:updateMapKey object:nil];
-                    [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
-                });
+                [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [[NSNotificationCenter defaultCenter] postNotificationName:updateMapKey object:nil];
+                        [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
+                    });
+                }];
             }];
         }];
     } else {
         [[UserController sharedInstance]fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
-            [[UserController sharedInstance]checkUserinCloudKitUserList];
             [[UserController sharedInstance]findCurrentUser];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:updateMapKey object:nil];
@@ -71,91 +71,6 @@
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:NotLoggedIniCloudNotificationKey object:nil];
             });
-        }
-    }];
-}
-
-
--(void)checkUserinCloudKitUserList {
-    NSLog(@"checking if user is in CK UserList");
-    
-    NSMutableArray *userListMutableArray = [[NSMutableArray alloc] init];
-
-    NSPredicate *predicate = [NSPredicate predicateWithValue:YES];
-    CKQuery *query = [[CKQuery alloc] initWithRecordType:UserListRecordTypeKey predicate:predicate];
-    
-    [[UserController publicDatabase] performQuery:query inZoneWithID:nil completionHandler:^(NSArray *results, NSError *error) {
-        if (error) {
-            NSLog(@"fetch CloudKit UserList failed, error %@", error);
-        } else {
-            
-            if (results.count == 0) {
-                NSLog(@"no users in user list");
-                [self saveUserinCloudKitUserList];
-            } else {
-                for (CKRecord *record in results) {
-                    if (record[RecordNameKey]) {
-                        [userListMutableArray addObject:record[RecordNameKey]];
-                    }
-                }
-                if ([userListMutableArray containsObject:self.currentUserRecordName]) {
-                    NSLog(@"user is in cloudkit");
-                    self.allUsersRecordNames = userListMutableArray;
-                    NSLog(@"self.allUsersRecordNames %@", self.allUsersRecordNames);
-                    if (self.allUsers.count == 0) {
-                        [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
-//                            [self updateUserPoints];
-                        }];
-                    }
-                } else {
-                    NSLog(@"user is not in cloudkit");
-                    [self saveUserinCloudKitUserList];
-                }
-            }
-        }
-    }];
-}
-
-- (void)saveUserinCloudKitUserList {
-    CKRecord *cloudKitUserList = [[CKRecord alloc] initWithRecordType:UserListRecordTypeKey];
-    cloudKitUserList[RecordNameKey] = self.currentUserRecordName;
-    
-    [[UserController publicDatabase] saveRecord:cloudKitUserList completionHandler:^(CKRecord *record, NSError *error) {
-        if (!error) {
-            NSLog(@"record saved: %@", record);
-            [self checkUserInUserListAfterSave];
-        } else {
-            NSLog(@"NOT saved to CloudKit");
-        }
-    }];
-}
-
--(void)checkUserInUserListAfterSave {
-    NSLog(@"checking user in CK UserList after save");
-    NSMutableArray *userListMutableArray = [[NSMutableArray alloc] init];
-    
-    NSPredicate *predicate = [NSPredicate predicateWithValue:YES];
-    CKQuery *query = [[CKQuery alloc] initWithRecordType:UserListRecordTypeKey predicate:predicate];
-    
-    [[UserController publicDatabase] performQuery:query inZoneWithID:nil completionHandler:^(NSArray *results, NSError *error) {
-        if (error) {
-            NSLog(@"fetch CloudKit UserList failed, error %@", error);
-        } else {
-            for (CKRecord *record in results) {
-                if (record[RecordNameKey]) {
-                    [userListMutableArray addObject:record[RecordNameKey]];
-                }
-            }
-            if ([userListMutableArray containsObject:self.currentUserRecordName]) {
-                NSLog(@"user is in cloudkit");
-                self.allUsersRecordNames = userListMutableArray;
-                [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
-//                    [self updateUserPoints];
-                }];
-            } else {
-                NSLog(@"user is not yet in cloudkit");
-                [self checkUserInUserListAfterSave];
-            }
         }
     }];
 }
@@ -301,6 +216,15 @@
     return array;
 }
 
+-(NSArray *)allUsersRecordNames {
+    NSMutableSet *recordNamesSet = [[NSMutableSet alloc] init];
+    for (Location *location in [LocationController sharedInstance].locations) {
+        if (![recordNamesSet containsObject:location.userRecordName]) {
+            [recordNamesSet addObject:location.userRecordName];
+        }
+    }
+    return [recordNamesSet allObjects];
+}
 #pragma mark update Profile
 -(void)updateUsernameWith:(NSString *)newUsername
 {

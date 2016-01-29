@@ -39,7 +39,6 @@ static NSString * const AlphabeticalSort = @"alphabetical";
 - (void)fetchUserRecordIDWithCompletion:(void (^)(NSString *userRecordName))completion;
 -(void)updateUsernameWith:(NSString *)newUsername;
 -(void)updateUserImageWithData:(NSData *)imageData;
--(void)checkUserinCloudKitUserList;
 - (User *)findUserInCoreDataWithUserUserRecordName:(NSString*)recordName;
 - (NSArray*)fetchLocationsForUser:(User*)user;
 - (void)saveLocationFilter:(NSString*)filter;

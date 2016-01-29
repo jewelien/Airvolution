@@ -11,13 +11,11 @@
 #import <CloudKit/CloudKit.h>
 #import <CoreData/CoreData.h>
 
-static NSString *const UserListRecordTypeKey = @"UserList";
-static NSString *const RecordNameKey = @"recordName";
+//static NSString *const RecordNameKey = @"recordName";
 static NSString *const RecordIDKey = @"recordID";
 static NSString *const IdentifierKey = @"identifier";
 static NSString *const PointsKey = @"points";
 static NSString *const UsernameKey = @"username";
-static NSString *const LocationFilterKey = @"locationFilter";
 static NSString *const ImageKey = @"profileImage";
 
 
@@ -33,8 +31,5 @@ static NSString *const ImageKey = @"profileImage";
 @property (nonatomic, strong) NSString *filter;
 
 - (NSArray *)sortedLocations;
-//@property (nonatomic, strong) NSString *locationFilterString;
-
-//-(instancetype)initWithDictionary:(NSDictionary *)dictionary;
 
 @end
