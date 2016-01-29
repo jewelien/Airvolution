@@ -263,6 +263,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Success" message:@"Location saved. Thank you!" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [self.mapView removeAnnotation:self.droppedPinAnnotation];
+        self.droppedPinAnnotation = nil;
         [self.indicatorView stopAnimating];
     }];
     [alert addAction:action];
@@ -439,6 +440,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         
     } else if ([control tag] == 1) {
         [self.mapView removeAnnotation:self.droppedPinAnnotation];
+        self.droppedPinAnnotation = nil;
         
     } else if ([control tag] == 3) {
         //directions
@@ -504,10 +506,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
                                                             notes:notes];
     }
 }
-    
-
-
-
 
 #pragma mark - directions
 -(void)directionsButtonPressedWithAnnotation:(MKPointAnnotation *)annotation

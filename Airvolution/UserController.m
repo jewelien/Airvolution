@@ -61,6 +61,7 @@
 //    [[CKContainer containerWithIdentifier:@"iCloud.com.julienguanzon.Airvolution"]
      fetchUserRecordIDWithCompletionHandler:^(CKRecordID *recordID, NSError *error) {
         if (recordID) {
+            [[LocationController sharedInstance] subscribe];
             self.currentUserRecordID = recordID;
             self.currentUserRecordName = recordID.recordName;
             NSLog(@"USER RECORD NAME Fetched %@", self.currentUserRecordName);
@@ -159,9 +160,9 @@
     }];
 }
 
-
 - (void)retrieveAllUsersWithCompletion:(void (^)(NSArray *allUsers))completion
 {
+    //"Can't query system types", CloudKit doesn't let you query User records ("Users" record type in CKDashboard). Can only pull user info with recordID. 
     NSMutableArray *recordIDs = [[NSMutableArray alloc] init];
     for (NSString *recordName in self.allUsersRecordNames) {
         CKRecordID *recordID = [[CKRecordID alloc] initWithRecordName:recordName];
@@ -175,22 +176,9 @@
         if (!operationError) {
             for (CKRecordID *recordID in recordsByRecordID) {
                 NSDictionary *userDictionary = recordsByRecordID[recordID];
-                User *user;
                 User *existingUser = [self findUserInCoreDataWithUserUserRecordName:recordID.recordName];
                 if (!existingUser) {
-                    user = [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:[Stack sharedInstance].managedObjectContext];
-                    user.points = userDictionary[PointsKey];
-                    user.identifier = userDictionary[IdentifierKey];
-                    user.username = userDictionary[UsernameKey];
-                    CKAsset *asset = userDictionary[ImageKey];
-                    user.profileImage = [[UIImage alloc]initWithContentsOfFile:asset.fileURL.path];
-                    user.recordName = recordID.recordName;
-                    user.filter = DescendingSort;
-                    if (![user isInserted]) {
-                        [[Stack sharedInstance].managedObjectContext insertObject:user];
-                    }
-                    [user.managedObjectContext refreshObject:user mergeChanges:YES];
-                    [self saveToCoreData];
+                    [self saveUserToCoreData:userDictionary];
                 }
             }
 
@@ -207,6 +195,22 @@
     [[UserController publicDatabase] addOperation:fetchOperation];
 }
 
+-(void)saveUserToCoreData:(NSDictionary*)userInfo {
+    User *user = [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:[Stack sharedInstance].managedObjectContext];
+    user.points = userInfo[PointsKey];
+    user.identifier = userInfo[IdentifierKey];
+    user.username = userInfo[UsernameKey];
+    CKAsset *asset = userInfo[ImageKey];
+    user.profileImage = [[UIImage alloc]initWithContentsOfFile:asset.fileURL.path];
+    CKRecordID *recordID = userInfo[RecordIDKey];
+    user.recordName = recordID.recordName;
+    user.filter = DescendingSort;
+    if (![user isInserted]) {
+        [[Stack sharedInstance].managedObjectContext insertObject:user];
+    }
+    [user.managedObjectContext refreshObject:user mergeChanges:YES];
+    [self saveToCoreData];
+}
 
 
 -(void)saveToCoreData {

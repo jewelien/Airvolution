@@ -24,7 +24,6 @@ static NSString *const locationDeletedNotificationKey = @"location deleted";
 
 @property (nonatomic,strong) NSArray *locations;
 @property (nonatomic, strong) Location *selectedLocation;
-
 + (LocationController *)sharedInstance;
 //- (void)saveLocationWithName:(NSString *)name location:(CLLocation *)location addressArray:(NSArray *)address;
 -(void)saveLocationWithName:(NSString *)name
@@ -35,12 +34,12 @@ static NSString *const locationDeletedNotificationKey = @"location deleted";
                         zip:(NSString *)zip
                     country:(NSString *)country
                       notes:(NSString *)notes;
-
+- (void)saveLocationToCoreData:(NSDictionary*)record;
 - (void)loadLocationsFromCloudKitWithCompletion:(void (^)(NSArray *array))completion;
 - (void)deleteLocationWithRecordName:(NSString*)recordName;
 - (NSDictionary *)addressDictionaryForLocationWithCLLocation:(CLLocation *)location;
 - (Location *)findLocationMatchingLocation:(CLLocation *)location;
 -(void)updateUsersSharedLocationsUsernameIfChanged:(NSString *)newUsername;
-
-
+-(void)didReceiveNotification:(NSDictionary*)notificationInfo;
+-(void)subscribe;
 @end

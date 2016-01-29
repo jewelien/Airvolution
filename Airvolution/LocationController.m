@@ -64,9 +64,7 @@
             [self saveLocationToCoreData:(NSDictionary*)record];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:newLocationSavedNotificationKey object:nil];
-                [[NSNotificationCenter defaultCenter] postNotificationName:updateMapKey object:nil];
-                [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
-
+                [self updateUI];
             });
         } else {
             NSLog(@"NOT saved to CloudKit");
@@ -153,6 +151,97 @@
     //    }
 }
 
+
+- (void)updateUI{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:updateMapKey object:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
+    });
+}
+
+#pragma mark subscription
+-(void)subscribe {
+    [[LocationController publicDatabase]fetchAllSubscriptionsWithCompletionHandler:^(NSArray<CKSubscription *> * _Nullable subscriptions, NSError * _Nullable error) {
+        if (!error) {
+            NSLog(@"subsrtiptions fetched = %@", subscriptions);
+            if (!subscriptions || subscriptions.count == 0) {
+                [self setupSubscription];
+            }
+        } else {
+            NSLog(@"Error fetching subscriptions - %@", error);
+        }
+    }];
+}
+
+-(void)setupSubscription{
+    NSPredicate *truePredicate = [NSPredicate predicateWithValue:YES];
+    CKSubscription *itemSubscription = [[CKSubscription alloc]initWithRecordType:locationRecordKey
+                                                                       predicate:truePredicate
+                                                                         options:CKSubscriptionOptionsFiresOnRecordCreation | CKSubscriptionOptionsFiresOnRecordUpdate | CKSubscriptionOptionsFiresOnRecordDeletion];
+    CKNotificationInfo *notification = [[CKNotificationInfo alloc]init];
+    notification.shouldSendContentAvailable = YES;
+    notification.desiredKeys = @[nameKey];
+    itemSubscription.notificationInfo = notification;
+    
+    [self saveSubscription:itemSubscription];
+}
+
+-(void)saveSubscription:(CKSubscription *)subscriptionInfo {
+    [[LocationController publicDatabase]saveSubscription:subscriptionInfo completionHandler:^(CKSubscription * _Nullable subscription, NSError * _Nullable error) {
+        if (!error) {
+            NSLog(@"Subsription saved = %@", subscription);
+        } else {
+            NSLog(@"Subscription save error = %@", error);
+        }
+    }];
+}
+
+-(void)didReceiveNotification:(NSDictionary*)notificationInfo {
+    CKNotification *note = [CKNotification notificationFromRemoteNotificationDictionary:notificationInfo];
+    if (![note isKindOfClass:[CKNotification class]]) {
+        return;
+    }
+    CKQueryNotification *queryNote = (CKQueryNotification*)note;
+    //    CKRecordID *recordID = [queryNote recordID];
+    //    NSDictionary *recordFields = [queryNote recordFields];
+    //    NSString *containterIdentifier = [note containerIdentifier];
+    //    CKNotificationType noteType = [note notificationType];
+    
+    CKQueryNotificationReason reason = [queryNote queryNotificationReason];
+    switch (reason) {
+        case CKQueryNotificationReasonRecordCreated:
+            [self saveLocationFromNotification:queryNote];
+            break;
+        case CKQueryNotificationReasonRecordDeleted:
+            [self deleteLocationFromNotification:queryNote];
+            break;
+        default:
+            break;
+    }
+}
+
+- (void)saveLocationFromNotification:(CKQueryNotification*)queryNotification {
+    [[LocationController publicDatabase]fetchRecordWithID:queryNotification.recordID completionHandler:^(CKRecord * _Nullable record, NSError * _Nullable error) {
+        if (!error) {
+            [self saveLocationToCoreData:(NSDictionary*)record];
+            [self updateUI];
+        } else {
+            NSLog(@"Error with remote notification: %@",error);
+        }
+    }];
+}
+
+-(void)deleteLocationFromNotification:(CKQueryNotification*)queryNotification{
+    CKRecordID *recordID = [queryNotification recordID];
+    Location *location = [self findLocationInCoreDataWithLocationIdentifier:recordID.recordName];
+    [self deleteLocationInCoreData:location];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:nil];
+    });
+    [self updateUI];
+}
+
+
 #pragma mark delete
 - (void)deleteLocationWithRecordName:(NSString*)recordName {
     CKRecordID *recordID = [[CKRecordID alloc]initWithRecordName:[NSString stringWithFormat:@"%@",recordName]];
@@ -162,12 +251,10 @@
         if (!error) {
             //delete in CoreData
             Location *locationToDelete = [self findLocationInCoreDataWithLocationIdentifier:recordName];
-            [[Stack sharedInstance].managedObjectContext deleteObject:locationToDelete];
-            [self saveToCoreData];
+            [self deleteLocationInCoreData:locationToDelete];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:nil];
-                [[NSNotificationCenter defaultCenter] postNotificationName:updateMapKey object:nil];
-                [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
+                [self updateUI];
             });
         } else {
             NSLog(@"Error: %@",error);
@@ -175,6 +262,10 @@
 
     };
     [[LocationController publicDatabase]addOperation:operation];
+}
+-(void)deleteLocationInCoreData:(Location*)location {
+    [[Stack sharedInstance].managedObjectContext deleteObject:location];
+    [self saveToCoreData];
 }
 
 #pragma mark fetch

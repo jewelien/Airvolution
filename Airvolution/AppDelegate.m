@@ -36,15 +36,7 @@
         [[UserController sharedInstance]initialLoad:NO];
     }
     
-//        [[UserController sharedInstance]fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
-//            [[LocationController sharedInstance]loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
-//                [[UserController sharedInstance]checkUserinCloudKitUserList];
-//                //            [[UserController sharedInstance]fetchLocationsForUser:[UserController sharedInstance].currentUser];
-//                //            [[UserController sharedInstance]fetchUsersSavedLocationsFromArray:array withCompletion:^(NSArray *usersLocations) {
-//                //            }];
-//            }];
-//        }];
-    
+    [application registerForRemoteNotifications];
 
     [[UITabBar appearance] setTintColor:[UIColor airvolutionRed]];
     
@@ -92,6 +84,11 @@
         return true;
     }
     return false;
+}
+
+-(void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+    [[LocationController sharedInstance]didReceiveNotification:userInfo];
+    completionHandler(UIBackgroundFetchResultNewData);
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
