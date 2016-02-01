@@ -14,6 +14,9 @@
 #import "LocationCustomCell.h"
 #import "LocationController.h"
 #import "ProfileViewController.h"
+#import "MapViewController.h"
+
+#import "AppDelegate.h"
 
 static NSString *const CellKey = @"cell";
 static NSString *const LocationCellKey = @"locationCell";
@@ -113,6 +116,11 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    Location *selectedLocation =[[UserController sharedInstance].currentUser sortedLocations][indexPath.row];
+    AppDelegate *delegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    MapViewController *mapVC = delegate.tabBarController.viewControllers[1];
+    delegate.tabBarController.selectedViewController = mapVC;
+    [[NSNotificationCenter defaultCenter]postNotificationName:goToLocationNotificationKey object:selectedLocation];
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 

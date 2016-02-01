@@ -11,6 +11,7 @@
 #import "UserController.h"
 #import "MapTableViewDataSource.h"
 #import "UIColor+Color.h"
+#import "ProfileTableViewDatasource.h"
 
 @interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate, UITableViewDelegate>
 
@@ -33,7 +34,7 @@
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) MapTableViewDataSource *datasource;
 @property (nonatomic, strong) UIView *locationInfoBackgroundView;
-
+@property (nonatomic, strong) NSMutableDictionary *locationAnnotationDictionary;
 
 @end
 
@@ -115,7 +116,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     UIBarButtonItem *pinDrop = [[UIBarButtonItem alloc] initWithCustomView:view];
     [self.navigationItem setRightBarButtonItem:pinDrop];
     
-    
     UILongPressGestureRecognizer *dropPinPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(addPinWithGestureRecognizer:)];
     dropPinPress.minimumPressDuration = 1.0;
     [self.mapView addGestureRecognizer:dropPinPress];
@@ -191,7 +191,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitFailedAlert) name:newLocationSaveFailedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitSuccess) name:newLocationSavedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeMapAnnotations) name:locationDeletedNotificationKey object:nil];
-    
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(goToLocation:) name:goToLocationNotificationKey object:nil];
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeLaunchScreen) name:removeLoadingLaunchScreenNotification object:nil];
 }
 
@@ -221,6 +221,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 }
 
 -(void)removeMapAnnotations {
+    [self.locationAnnotationDictionary removeAllObjects];
     [self.mapView removeAnnotations:self.mapView.annotations];
     [self updateMapWithSavedLocations];
 }
@@ -232,23 +233,22 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         MKPointAnnotation *savedAnnotation = [[MKPointAnnotation alloc] init];
         savedAnnotation.coordinate = CLLocationCoordinate2DMake(location.location.coordinate.latitude, location.location.coordinate.longitude);
         savedAnnotation.title = location.locationName;
-        
         [locationsArray addObject:savedAnnotation];
+        [self setDictionaryForLocation:location andAnnotation:savedAnnotation];
     }
     self.allLocations = locationsArray;
-    //    if (![[NSThread currentThread] isMainThread]) {
-    //        dispatch_async(dispatch_get_main_queue(), ^{
-    //            [[Stack sharedInstance].managedObjectContext save:NULL];
-    //        });
-    //        return;
-    //    }
-    
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.mapView addAnnotations:locationsArray];
         [self.mapView reloadInputViews];
-        
         [self removeLaunchScreen];
     });
+}
+
+-(void)setDictionaryForLocation:(Location*)location andAnnotation:(MKPointAnnotation*)annotation{
+    if (!self.locationAnnotationDictionary) {
+        self.locationAnnotationDictionary = [[NSMutableDictionary alloc]init];
+    }
+    [self.locationAnnotationDictionary setValue:annotation forKey:location.recordName];
 }
 
 - (void)savedToCloudKitFailedAlert {
@@ -351,6 +351,13 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     }
     
     [self.mapView addAnnotation:self.droppedPinAnnotation];
+}
+
+- (void)goToLocation:(NSNotification*)notification {
+    Location *profileSelectedLocation = notification.object;
+    [self.mapView setCenterCoordinate:profileSelectedLocation.location.coordinate];
+    MKPointAnnotation *selectedAnnotation = [self.locationAnnotationDictionary valueForKey:profileSelectedLocation.recordName];
+    [self.mapView selectAnnotation:selectedAnnotation animated:YES];
 }
 
 #pragma mark - annotation views

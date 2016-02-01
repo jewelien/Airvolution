@@ -15,13 +15,6 @@
 #import <MapKit/MapKit.h>
 #import "UIColor+Color.h"
 
-
-@interface AppDelegate ()
-
-@property (nonatomic, strong) UITabBarController *tabBarController;
-
-@end
-
 @implementation AppDelegate
 
 
