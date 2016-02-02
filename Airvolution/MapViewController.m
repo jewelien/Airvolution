@@ -35,6 +35,8 @@
 @property (nonatomic, strong) MapTableViewDataSource *datasource;
 @property (nonatomic, strong) UIView *locationInfoBackgroundView;
 @property (nonatomic, strong) NSMutableDictionary *locationAnnotationDictionary;
+@property (nonatomic, strong) NSMutableArray *searchedItems;
+@property (nonatomic, strong) NSString *selectedPhoneNumber;
 
 @end
 
@@ -129,8 +131,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 }
 
-#pragma mark - mapSearch
-
+#pragma mark - search
 - (void)showSearchBar
 {
     [UIView animateWithDuration:1.0 animations:^{
@@ -171,8 +172,12 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     [search startWithCompletionHandler:^(MKLocalSearchResponse *response, NSError *error)
      {
          self.searchedAnnotations = [NSMutableArray new];
+         if (!self.searchedItems) {
+             self.searchedItems = [[NSMutableArray alloc]init];
+         }
          
          for (MKMapItem *item in response.mapItems) {
+             [self.searchedItems addObject:item];
              MKPointAnnotation *searchedAnnotation = [[MKPointAnnotation alloc] init];
              searchedAnnotation.coordinate = item.placemark.coordinate;
              searchedAnnotation.title = item.name;
@@ -181,6 +186,25 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
          
          [self.mapView showAnnotations:self.searchedAnnotations animated:NO];
      }];
+}
+
+- (void)searchForNearbyLocations {
+    
+}
+
+-(void)searchBusinessPhoneForSavedLocation {
+    
+}
+
+-(MKMapItem*)findMapItemFromSearchedList:(MKPointAnnotation*)annotation{
+    for (MKMapItem *item in self.searchedItems) {
+        if (item.placemark.coordinate.latitude == annotation.coordinate.latitude && item.placemark.coordinate.longitude == annotation.coordinate.longitude) {
+            self.selectedPhoneNumber = item.phoneNumber;
+            return item;
+        }
+    }
+    self.selectedPhoneNumber = nil;
+    return nil;
 }
 
 #pragma mark - notification observers
@@ -263,6 +287,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Success" message:@"Location saved. Thank you!" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [self.mapView removeAnnotation:self.droppedPinAnnotation];
+        [self.mapView removeAnnotations:self.searchedAnnotations];
         self.droppedPinAnnotation = nil;
         [self.indicatorView stopAnimating];
     }];
@@ -290,7 +315,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         CLLocation *selectedLocation = [[CLLocation alloc] initWithLatitude:selectedAnnotation.coordinate.latitude longitude:selectedAnnotation.coordinate.longitude];
         [self reverseGeocode:selectedLocation forAnnotation:selectedAnnotation];
     }
-    
 }
 
 - (void)reverseGeocode:(CLLocation *)location forAnnotation:(MKPointAnnotation *)annotation
@@ -308,7 +332,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
             self.selectedPinState = [placemark.addressDictionary valueForKey:@"State"];
             self.selectedPinZip  = [placemark.addressDictionary valueForKey:@"ZIP"];
             self.selectedPinCountry  = [placemark.addressDictionary valueForKey:@"Country"];
-
+            self.location = placemark.location;
             annotation.subtitle = [NSString stringWithFormat:@"%@", self.selectedPinAddress[0]];
         }
     }];
@@ -373,9 +397,20 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 //    if ([annotation isKindOfClass:[MKPlacemark class] ]) {
     if ([self.searchedAnnotations containsObject:annotation]) {
         pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"searchedPin"];
-
+        
         pinView.pinColor = MKPinAnnotationColorGreen;
         pinView.canShowCallout = YES;
+        
+        UIButton *addLocationButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
+        addLocationButton.tag = 2;
+        pinView.rightCalloutAccessoryView = addLocationButton;
+        
+        UIImage *removePinImage = [UIImage imageNamed:@"remove"];
+        UIButton *removePinButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, removePinImage.size.width, removePinImage.size.height)];
+        [removePinButton setImage:removePinImage forState:UIControlStateNormal];
+        removePinButton.tag = 1;
+        pinView.leftCalloutAccessoryView = removePinButton;
+        
     } else if ([[annotation title] isEqualToString:droppedPinTitle]) {
         if (pinView == nil) {
             pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"droppedPin"];
@@ -427,7 +462,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 -(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view didChangeDragState:(MKAnnotationViewDragState)newState fromOldState:(MKAnnotationViewDragState)oldState
 {
-    
     if (newState == MKAnnotationViewDragStateEnding) {
         CLLocationCoordinate2D droppedAt = view.annotation.coordinate;
         self.location = [[CLLocation alloc] initWithLatitude:droppedAt.latitude longitude:droppedAt.longitude];
@@ -436,13 +470,12 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     }
 }
 
-
 -(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
 {
-    
     self.selectedAnnotation = view.annotation;
     
     if ([control tag] == 2) {
+        [self findMapItemFromSearchedList:self.selectedAnnotation];
         [self addLocationButtonClicked];
         
     } else if ([control tag] == 1) {
@@ -457,22 +490,56 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         //more info
         [self locationMoreInfoPressedForAnnotation:self.selectedAnnotation];
     }
-    
+}
+
+-(NSString*)saveLocationString {
+    NSMutableString *string = [NSMutableString stringWithString:@"Address: "];
+    [string appendString:self.selectedPinAddress[0]];
+    [string appendString:[@"\n" stringByAppendingString:self.selectedPinAddress[1]]];
+    if (self.selectedPhoneNumber) {
+        [string appendString:[NSString stringWithFormat:@"\n Phone: %@", self.selectedPhoneNumber]];
+    }
+    return string;
 }
 
 -(void) addLocationButtonClicked {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Enter Location" message:[NSString stringWithFormat:@"Address: %@, \n %@", self.selectedPinAddress[0], self.selectedPinAddress[1]]  preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Enter Location" message:[NSString stringWithFormat:@"%@", [self saveLocationString]]  preferredStyle:UIAlertControllerStyleAlert];
     
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-        textField.placeholder = @"location name";
-        textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
-        textField.textAlignment = NSTextAlignmentCenter;
+    UIAlertAction *callAction = [UIAlertAction actionWithTitle:@"Call to Confirm" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        NSString *cleanedString = [[self.selectedPhoneNumber componentsSeparatedByCharactersInSet:[[NSCharacterSet characterSetWithCharactersInString:@"0123456789-+()"] invertedSet]] componentsJoinedByString:@""];
+        NSString *escapedPhoneNumber = [cleanedString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        NSString *phoneURLString = [NSString stringWithFormat:@"telprompt:%@", escapedPhoneNumber];
+        NSURL *phoneURL = [NSURL URLWithString:phoneURLString];
+        
+        if ([[UIApplication sharedApplication] canOpenURL:phoneURL]) {
+            [[UIApplication sharedApplication] openURL:phoneURL];
+        }
+
     }];
+    if (self.selectedPhoneNumber) {
+        [alertController addAction:callAction];
+    }
+    
+    if ([self.selectedAnnotation.title isEqualToString:droppedPinTitle]) {
+        [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+            textField.placeholder = @"location name";
+            textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
+            textField.textAlignment = NSTextAlignmentCenter;
+        }];
+    } else { //searched item being saved
+        [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+            textField.text = self.selectedAnnotation.title;
+            textField.enabled = NO;
+            textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
+            textField.textAlignment = NSTextAlignmentCenter;
+        }];
+    }
     
     [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.placeholder = @"notes (optional)";
         textField.textAlignment = NSTextAlignmentCenter;
     }];
+    
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [self removeFromParentViewController];
