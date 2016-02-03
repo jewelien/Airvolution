@@ -97,7 +97,7 @@
                 }
             }
 
-            NSLog(@"RETRIEVED ALL USERS %@", self.allUsers);
+//            NSLog(@"RETRIEVED ALL USERS %@", self.allUsers);
             [self findCurrentUser];
             [[NSNotificationCenter defaultCenter] postNotificationName:AllUsersFetchNotificationKey object:nil];
             completion(self.allUsers);
@@ -156,7 +156,7 @@
             NSLog(@"looking for user in all Users array");
         }
     }
-    NSLog(@"self.currentUser == %@", self.currentUser);
+//    NSLog(@"self.currentUser == %@", self.currentUser);
     [self checkUsername];
 }
 

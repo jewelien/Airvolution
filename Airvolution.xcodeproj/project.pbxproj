@@ -20,6 +20,7 @@
 		FC8B18F61AC4B7E000051693 /* LocationController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8B18F51AC4B7E000051693 /* LocationController.m */; };
 		FCA0ECA41ACC662A006E1B8B /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCA0ECA31ACC662A006E1B8B /* ProfileViewController.m */; };
 		FCA0ECA71ACC663B006E1B8B /* LeaderboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */; };
+		FCB3E4061C6138DE000F20CD /* LocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB3E4051C6138DE000F20CD /* LocationViewController.swift */; };
 		FCBB5A761ACDF4000059AC3C /* UserController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCBB5A751ACDF4000059AC3C /* UserController.m */; };
 		FCBB5AAB1ACDF5D20059AC3C /* ProfileTableViewDatasource.m in Sources */ = {isa = PBXBuildFile; fileRef = FCBB5AAA1ACDF5D20059AC3C /* ProfileTableViewDatasource.m */; };
 		FCBCA31F1ADDC322000D4F49 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCBCA31E1ADDC322000D4F49 /* AddressBook.framework */; };
@@ -67,6 +68,8 @@
 		FCA0ECA31ACC662A006E1B8B /* ProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileViewController.m; sourceTree = "<group>"; };
 		FCA0ECA51ACC663B006E1B8B /* LeaderboardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LeaderboardViewController.h; sourceTree = "<group>"; };
 		FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LeaderboardViewController.m; sourceTree = "<group>"; };
+		FCB3E4041C6138DE000F20CD /* Airvolution-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Airvolution-Bridging-Header.h"; sourceTree = "<group>"; };
+		FCB3E4051C6138DE000F20CD /* LocationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationViewController.swift; sourceTree = "<group>"; };
 		FCBB5A741ACDF4000059AC3C /* UserController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserController.h; sourceTree = "<group>"; };
 		FCBB5A751ACDF4000059AC3C /* UserController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserController.m; sourceTree = "<group>"; };
 		FCBB5AA91ACDF5D20059AC3C /* ProfileTableViewDatasource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileTableViewDatasource.h; sourceTree = "<group>"; };
@@ -130,16 +133,18 @@
 				FCE401331AC0C9E800DBB19A /* MapViewController.m */,
 				FCBCA3201ADEC323000D4F49 /* MapTableViewDataSource.h */,
 				FCBCA3211ADEC323000D4F49 /* MapTableViewDataSource.m */,
+				FCA0ECA51ACC663B006E1B8B /* LeaderboardViewController.h */,
+				FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */,
 				FCA0ECA21ACC662A006E1B8B /* ProfileViewController.h */,
 				FCA0ECA31ACC662A006E1B8B /* ProfileViewController.m */,
 				FCBB5AA91ACDF5D20059AC3C /* ProfileTableViewDatasource.h */,
 				FCBB5AAA1ACDF5D20059AC3C /* ProfileTableViewDatasource.m */,
-				FCA0ECA51ACC663B006E1B8B /* LeaderboardViewController.h */,
-				FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */,
 				FC0BCBD21AD48F9200EAF9BF /* UserCustomCell.h */,
 				FC0BCBD31AD48F9200EAF9BF /* UserCustomCell.m */,
 				FC0BCBD81AD59DA600EAF9BF /* LocationCustomCell.h */,
 				FC0BCBD91AD59DA600EAF9BF /* LocationCustomCell.m */,
+				FCB3E4051C6138DE000F20CD /* LocationViewController.swift */,
+				FCB3E4041C6138DE000F20CD /* Airvolution-Bridging-Header.h */,
 			);
 			name = VIew;
 			sourceTree = "<group>";
@@ -337,6 +342,7 @@
 				FC799E411AC5D6F800F8BD70 /* Location.m in Sources */,
 				FC0BCBDA1AD59DA600EAF9BF /* LocationCustomCell.m in Sources */,
 				FC835FEB1C3DB3A1006CDC97 /* Stack.m in Sources */,
+				FCB3E4061C6138DE000F20CD /* LocationViewController.swift in Sources */,
 				FCBB5A761ACDF4000059AC3C /* UserController.m in Sources */,
 				FC58E8FF1ACDE33B00CF6A0C /* User.m in Sources */,
 				FCBB5AAB1ACDF5D20059AC3C /* ProfileTableViewDatasource.m in Sources */,
@@ -463,14 +469,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Airvolution/Airvolution.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEFINES_MODULE = YES;
 				INFOPLIST_FILE = Airvolution/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.julienguanzon.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Airvolution/Airvolution-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -478,14 +488,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Airvolution/Airvolution.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEFINES_MODULE = YES;
 				INFOPLIST_FILE = Airvolution/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.julienguanzon.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Airvolution/Airvolution-Bridging-Header.h";
 			};
 			name = Release;
 		};

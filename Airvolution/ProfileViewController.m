@@ -261,20 +261,23 @@
 #pragma mark sortLocations
 -(void)sortSharedLocationsAlert {
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Sort" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    UIAlertAction *ascendingSortAction = [UIAlertAction actionWithTitle:@"oldest to newest" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [[UserController sharedInstance] saveLocationFilter:AscendingSort];
-    }];
-    [controller addAction:ascendingSortAction];
     UIAlertAction *descendingSortAction = [UIAlertAction actionWithTitle:@"newest to oldest" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [[UserController sharedInstance] saveLocationFilter:DescendingSort];
     }];
     [controller addAction:descendingSortAction];
+    UIAlertAction *ascendingSortAction = [UIAlertAction actionWithTitle:@"oldest to newest" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[UserController sharedInstance] saveLocationFilter:AscendingSort];
+    }];
+    [controller addAction:ascendingSortAction];
     UIAlertAction *alphabeticalSortAction = [UIAlertAction actionWithTitle:@"a to z" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [[UserController sharedInstance] saveLocationFilter:AlphabeticalSort];
     }];
     [controller addAction:alphabeticalSortAction];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [controller removeFromParentViewController];
+    }];
+    [controller addAction:cancelAction];
     [self presentViewController:controller animated:YES completion:nil];
-    
 }
 
 - (void)didReceiveMemoryWarning {

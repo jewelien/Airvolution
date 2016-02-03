@@ -313,6 +313,7 @@
 
 
 -(void)updateUsersSharedLocationsUsernameIfChanged:(NSString *)newUsername {
+    
     NSMutableArray *usersLocationsRecordId = [[NSMutableArray alloc] init];
     for (Location *location in [UserController sharedInstance].currentUser.locations) {
         CKRecordID *recordID = [[CKRecordID alloc]initWithRecordName:location.recordName];

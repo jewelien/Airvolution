@@ -12,6 +12,7 @@
 #import "MapTableViewDataSource.h"
 #import "UIColor+Color.h"
 #import "ProfileTableViewDatasource.h"
+#import <Airvolution-Swift.h>
 
 @interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate, UITableViewDelegate>
 
@@ -503,6 +504,15 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 }
 
 -(void) addLocationButtonClicked {
+    LocationViewController *locationVC = [[LocationViewController alloc]init];
+    locationVC.isSavedLocation = false;
+    locationVC.navBar = self.navigationController.navigationBar;
+    locationVC.selectedMapItem = [self findMapItemFromSearchedList:self.selectedAnnotation];
+    [self presentViewController:locationVC animated:YES completion:nil];
+//    [self showViewController:locationVC sender:nil];
+}
+
+-(void)saveLocationAlert{
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Enter Location" message:[NSString stringWithFormat:@"%@", [self saveLocationString]]  preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction *callAction = [UIAlertAction actionWithTitle:@"Call to Confirm" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
@@ -514,7 +524,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         if ([[UIApplication sharedApplication] canOpenURL:phoneURL]) {
             [[UIApplication sharedApplication] openURL:phoneURL];
         }
-
+        
     }];
     if (self.selectedPhoneNumber) {
         [alertController addAction:callAction];
