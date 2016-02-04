@@ -24,14 +24,27 @@
 @dynamic location;
 @dynamic recordName;
 @dynamic user;
+@dynamic cost;
 
 @synthesize creationDateString;
+@synthesize costString;
 
 -(NSString *)creationDateString {
     NSDateFormatter *formatter = [[NSDateFormatter alloc]init];
     [formatter setDateStyle:NSDateFormatterShortStyle];
     NSString *string = [formatter stringFromDate:self.creationDate];
     return string;
+}
+
+-(NSString *)costString {
+    if (self.cost > 0) {
+        NSNumberFormatter *formatter = [[NSNumberFormatter alloc]init];
+        [formatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
+        [formatter setNumberStyle:NSNumberFormatterCurrencyStyle];
+        NSString *stringResult = [formatter stringFromNumber:[NSNumber numberWithDouble:self.cost]];
+        return stringResult;
+    }
+    return @"FREE";
 }
 
 -(User *)user{

@@ -27,12 +27,13 @@
 }
 
 #pragma mark save
+
 -(void)saveLocationWithName:(NSString *)name
                    location:(CLLocation *)location
               streetAddress:(NSString *)street
                        city:(NSString *)city state:(NSString *)state zip:(NSString *)zip
                     country:(NSString *)country
-                      notes:(NSString *)notes
+                      notes:(NSString *)notes cost:(NSNumber*)cost
 {
     CKReference *userReference = [[CKReference alloc] initWithRecordID:[UserController sharedInstance].currentUserRecordID action:CKReferenceActionNone];
     CKRecord *cloudKitLocation = [[CKRecord alloc] initWithRecordType:locationRecordKey];
@@ -46,6 +47,7 @@
     cloudKitLocation[countryKey] = country;
     cloudKitLocation[userRecordIDRefKey] = userReference;
     cloudKitLocation[notesKey] = notes;
+    cloudKitLocation[costKey] = cost;
     
     if (![UserController sharedInstance].currentUser.username) {
         NSLog(@"currentUser.username %@", [UserController sharedInstance].currentUser.username);
@@ -95,6 +97,7 @@
 }
 
 - (void)saveLocationToCoreData:(NSDictionary*)record {
+    
     Location *location = [NSEntityDescription insertNewObjectForEntityForName:@"Location" inManagedObjectContext:[Stack sharedInstance].managedObjectContext];
     location.locationName = [record objectForKey:nameKey];
     location.street =  [record objectForKey:streetKey];
@@ -111,6 +114,7 @@
     location.recordName = recordID.recordName;
     CKReference *reference = [record objectForKey:userRecordIDRefKey];
     location.userRecordName = reference.recordID.recordName;
+    location.cost = [[record objectForKey:costKey] doubleValue];
     
     if (![location isInserted]) {
         [[Stack sharedInstance].managedObjectContext insertObject:location];

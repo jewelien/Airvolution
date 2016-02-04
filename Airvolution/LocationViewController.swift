@@ -8,6 +8,7 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class LocationViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     var tableView:UITableView!
@@ -18,9 +19,15 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     var savedLocation:Location?
     var savedLocationPhone:NSString = ""
     var isPaid:Bool = false
-    var price:NSNumber?
     var notesTextField:UITextField!
+    var costTextField:UITextField?
     var screenWidth:CGFloat!
+    
+    var street:String?
+    var city:String?
+    var state:String?
+    var zip:String?
+    var country:String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,7 +44,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
             self.savedLocation = (self.selectedLocation as! Location)
         }
     }
-    
+// MARK: tableView
     func setupTableView() {
         var bounds:CGRect = self.view.bounds;
         bounds.origin.y = bounds.origin.y + self.navBar.frame.height
@@ -77,7 +84,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
             case 2: cell!.textLabel?.text = "Phone: \(phoneNumber())"
             case 3: cell!.textLabel?.text = "Air Pump"
             if let location = self.savedLocation {
-                // cell?.addSubview(addCellLabel(cellHeight!, text: location.cost))
+                 cell?.addSubview(addCellLabel(cellHeight!, text: location.costString))
             } else {
                 cell?.addSubview(addSegmentedControl(cellHeight!))
                 }
@@ -92,6 +99,12 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
                     } else {
                         cell?.addSubview(addNotesTextField(cellHeight!))
                     }
+                }
+            case 5: cell!.textLabel?.text = "Notes"
+                if let location = self.savedLocation {
+                    cell?.addSubview(addCellLabel(cellHeight!, text: location.locationNotes))
+                } else {
+                    cell?.addSubview(addNotesTextField(cellHeight!))
                 }
             default: break
             }
@@ -129,16 +142,15 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         }
         if indexPath.section == 1 {
             switch indexPath.row {
-            case 1 : // save and dismiss controller.
-                if self.isPaid {
-
-                }
+            case 1 :
+                saveLocation()
+                self.dismissViewControllerAnimated(true, completion: nil)
             default : self.dismissViewControllerAnimated(true, completion: nil)
             }
         }
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
-
+// MARK: textfield
     func textFieldDidBeginEditing(textField: UITextField) {
         textField.text = "$"
     }
@@ -157,17 +169,8 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         let filtered = components.joinWithSeparator("")
         return string == filtered
     }
-    
-    func textFieldDidEndEditing(textField: UITextField) {
-        if let costString = textField.text {
-            let components = costString.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString:"0123456789.").invertedSet)
-            let filtered = components.joinWithSeparator("")
-            let formatter = NSNumberFormatter()
-            formatter.numberStyle = NSNumberFormatterStyle.DecimalStyle
-            self.price = formatter.numberFromString(filtered)
-        }
-    }
-    
+
+// MARK: cell subviews
     func addNotesTextField(cellHeight:CGFloat) -> UITextField {
         let textField = UITextField(frame: CGRect(x: self.screenWidth / 2 - 100, y:cellHeight / 2 - 12, width: self.screenWidth - 115, height: 25))
         textField.placeholder = "optional"
@@ -181,7 +184,19 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         textField.delegate = self
         textField.textAlignment = NSTextAlignment.Right
         textField.text = "$0.00"
+        self.costTextField = textField
         return textField;
+    }
+    
+    func costNumber() -> NSNumber {
+        if let costString = self.costTextField!.text {
+            let components = costString.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString:"0123456789.").invertedSet)
+            let filtered = components.joinWithSeparator("")
+            let formatter = NSNumberFormatter()
+            formatter.numberStyle = NSNumberFormatterStyle.DecimalStyle
+            return formatter.numberFromString(filtered)!
+        }
+        return 0.00
     }
     
     func addCellLabel(cellHeight:CGFloat, text:String) -> UILabel {
@@ -190,7 +205,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         if text.characters.count > 0 {
             label.text = text
         } else {
-            label.text = "n/a"
+            label.text = "none"
         }
         return label
     }
@@ -218,7 +233,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
             self.tableView.reloadData()
         }
     }
-    
+// MARK: Data
     func locationName() -> String {
         if let name = self.selectedMapItem.name{
             if name != "Unknown Location" {
@@ -229,7 +244,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         if let location = self.savedLocation {
             return location.locationName
         }
-        return "";
+        return "no name";
     }
     
     func phoneNumber() -> String {
@@ -239,7 +254,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         if self.savedLocationPhone.length > 0 {
             return self.savedLocationPhone as String
         }
-        return ""
+        return "not available"
     }
     
     func phoneNumberTapped() {
@@ -259,19 +274,24 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         var addressString: String = ""
         if let addressDict = self.selectedMapItem.placemark.addressDictionary {
             if let street = addressDict["Street"] {
+                self.street = (street as! String)
                 addressString.appendContentsOf("\(street) ")
             }
             if let city = addressDict["City"] {
+                self.city = (city as! String)
                 addressString = addressString + "\n" + "\(city), "
             }
             if let state = addressDict["State"] {
+                self.state = (state as! String)
                 addressString.appendContentsOf("\(state) ")
             }
-            if let postalCode = addressDict["ZIP"] {
-                addressString.appendContentsOf("\(postalCode) ")
+            if let zipCode = addressDict["ZIP"] {
+                self.zip = (zipCode as! String)
+                addressString.appendContentsOf("\(zipCode) ")
             }
-            if let countryCode = addressDict["CountryCode"] {
-                addressString.appendContentsOf("\(countryCode) ")
+            if let country = addressDict["CountryCode"] {
+                self.country = (country as! String)
+                addressString.appendContentsOf("\(country) ")
             }
         }
         
@@ -284,6 +304,10 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         }
         
         return addressString
+    }
+// MARK: SaveLocation
+    func saveLocation() {
+        LocationController.sharedInstance().saveLocationWithName(locationName(), location: self.selectedMapItem.placemark.location, streetAddress: self.street, city: self.city, state: self.state, zip: self.zip, country: self.country, notes: self.notesTextField.text, cost: costNumber())
     }
     
     override func didReceiveMemoryWarning() {

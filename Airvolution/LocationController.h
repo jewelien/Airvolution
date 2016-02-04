@@ -33,7 +33,7 @@ static NSString *const locationDeletedNotificationKey = @"location deleted";
                       state:(NSString *)state
                         zip:(NSString *)zip
                     country:(NSString *)country
-                      notes:(NSString *)notes;
+                      notes:(NSString *)notes cost:(NSNumber*)cost;
 - (void)saveLocationToCoreData:(NSDictionary*)record;
 - (void)loadLocationsFromCloudKitWithCompletion:(void (^)(NSArray *array))completion;
 - (void)deleteLocationWithRecordName:(NSString*)recordName;

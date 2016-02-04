@@ -289,6 +289,9 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     if (!self.locationAnnotationDictionary) {
         self.locationAnnotationDictionary = [[NSMutableDictionary alloc]init];
     }
+    if (!location.recordName) {
+        location.recordName = @"none";
+    }
     [self.locationAnnotationDictionary setValue:annotation forKey:location.recordName];
 }
 
@@ -514,15 +517,15 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     }
 }
 
--(NSString*)saveLocationString {
-    NSMutableString *string = [NSMutableString stringWithString:@"Address: "];
-    [string appendString:self.selectedPinAddress[0]];
-    [string appendString:[@"\n" stringByAppendingString:self.selectedPinAddress[1]]];
-    if (self.selectedPhoneNumber) {
-        [string appendString:[NSString stringWithFormat:@"\n Phone: %@", self.selectedPhoneNumber]];
-    }
-    return string;
-}
+//-(NSString*)saveLocationString {
+//    NSMutableString *string = [NSMutableString stringWithString:@"Address: "];
+//    [string appendString:self.selectedPinAddress[0]];
+//    [string appendString:[@"\n" stringByAppendingString:self.selectedPinAddress[1]]];
+//    if (self.selectedPhoneNumber) {
+//        [string appendString:[NSString stringWithFormat:@"\n Phone: %@", self.selectedPhoneNumber]];
+//    }
+//    return string;
+//}
 
 -(void) addLocationButtonClicked {
     LocationViewController *locationVC = [[LocationViewController alloc]init];
@@ -533,84 +536,84 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 //    [self showViewController:locationVC sender:nil]; //push
 }
 
--(void)saveLocationAlert{
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Enter Location" message:[NSString stringWithFormat:@"%@", [self saveLocationString]]  preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction *callAction = [UIAlertAction actionWithTitle:@"Call to Confirm" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        NSString *cleanedString = [[self.selectedPhoneNumber componentsSeparatedByCharactersInSet:[[NSCharacterSet characterSetWithCharactersInString:@"0123456789-+()"] invertedSet]] componentsJoinedByString:@""];
-        NSString *escapedPhoneNumber = [cleanedString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-        NSString *phoneURLString = [NSString stringWithFormat:@"telprompt:%@", escapedPhoneNumber];
-        NSURL *phoneURL = [NSURL URLWithString:phoneURLString];
-        
-        if ([[UIApplication sharedApplication] canOpenURL:phoneURL]) {
-            [[UIApplication sharedApplication] openURL:phoneURL];
-        }
-        
-    }];
-    if (self.selectedPhoneNumber) {
-        [alertController addAction:callAction];
-    }
-    
-    if ([self.selectedAnnotation.title isEqualToString:droppedPinTitle]) {
-        [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-            textField.placeholder = @"location name";
-            textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
-            textField.textAlignment = NSTextAlignmentCenter;
-        }];
-    } else { //searched item being saved
-        [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-            textField.text = self.selectedAnnotation.title;
-            textField.enabled = NO;
-            textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
-            textField.textAlignment = NSTextAlignmentCenter;
-        }];
-    }
-    
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-        textField.placeholder = @"notes (optional)";
-        textField.textAlignment = NSTextAlignmentCenter;
-    }];
-    
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [self removeFromParentViewController];
-    }];
-    [alertController addAction:cancelAction];
-    
-    UIAlertAction *saveAction = [UIAlertAction actionWithTitle:@"save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        UITextField *locationNameField = alertController.textFields[0];
-        UITextField *locationNotesField = alertController.textFields[1];
-        if ([locationNameField.text isEqualToString:@""]) {
-            NSLog(@"no text no save");
-        } else {
-            [self saveButtonPressedWithLocationName:locationNameField.text andLocationNotes:locationNotesField.text];
-        }
-    }];
-    [alertController addAction:saveAction];
-    
-    [self presentViewController:alertController animated:YES completion:nil];
-}
+//-(void)saveLocationAlert{
+//    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Enter Location" message:[NSString stringWithFormat:@"%@", [self saveLocationString]]  preferredStyle:UIAlertControllerStyleAlert];
+//    
+//    UIAlertAction *callAction = [UIAlertAction actionWithTitle:@"Call to Confirm" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+//        NSString *cleanedString = [[self.selectedPhoneNumber componentsSeparatedByCharactersInSet:[[NSCharacterSet characterSetWithCharactersInString:@"0123456789-+()"] invertedSet]] componentsJoinedByString:@""];
+//        NSString *escapedPhoneNumber = [cleanedString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+//        NSString *phoneURLString = [NSString stringWithFormat:@"telprompt:%@", escapedPhoneNumber];
+//        NSURL *phoneURL = [NSURL URLWithString:phoneURLString];
+//        
+//        if ([[UIApplication sharedApplication] canOpenURL:phoneURL]) {
+//            [[UIApplication sharedApplication] openURL:phoneURL];
+//        }
+//        
+//    }];
+//    if (self.selectedPhoneNumber) {
+//        [alertController addAction:callAction];
+//    }
+//    
+//    if ([self.selectedAnnotation.title isEqualToString:droppedPinTitle]) {
+//        [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+//            textField.placeholder = @"location name";
+//            textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
+//            textField.textAlignment = NSTextAlignmentCenter;
+//        }];
+//    } else { //searched item being saved
+//        [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+//            textField.text = self.selectedAnnotation.title;
+//            textField.enabled = NO;
+//            textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
+//            textField.textAlignment = NSTextAlignmentCenter;
+//        }];
+//    }
+//    
+//    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+//        textField.placeholder = @"notes (optional)";
+//        textField.textAlignment = NSTextAlignmentCenter;
+//    }];
+//    
+//    
+//    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+//        [self removeFromParentViewController];
+//    }];
+//    [alertController addAction:cancelAction];
+//    
+//    UIAlertAction *saveAction = [UIAlertAction actionWithTitle:@"save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+//        UITextField *locationNameField = alertController.textFields[0];
+//        UITextField *locationNotesField = alertController.textFields[1];
+//        if ([locationNameField.text isEqualToString:@""]) {
+//            NSLog(@"no text no save");
+//        } else {
+//            [self saveButtonPressedWithLocationName:locationNameField.text andLocationNotes:locationNotesField.text];
+//        }
+//    }];
+//    [alertController addAction:saveAction];
+//    
+//    [self presentViewController:alertController animated:YES completion:nil];
+//}
 
 
--(void)saveButtonPressedWithLocationName:(NSString *)locationName andLocationNotes:(NSString *)notes {
-    self.indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    self.indicatorView.frame = self.view.bounds;
-    self.indicatorView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
-    //                self.indicatorView.center = CGPointMake(160, 240);
-    [self.indicatorView startAnimating];
-    [self.view addSubview:self.indicatorView];
-    
-    if (![UserController sharedInstance].currentUserRecordID) {
-        [self notLoggedIniCloudAlert];
-    } else {
-        [[LocationController sharedInstance] saveLocationWithName:locationName
-                                                         location:self.location
-                                                    streetAddress:self.selectedPinStreet
-                                                             city:self.selectedPinCity state:self.selectedPinState zip:self.selectedPinZip
-                                                          country:self.selectedPinCountry
-                                                            notes:notes];
-    }
-}
+//-(void)saveButtonPressedWithLocationName:(NSString *)locationName andLocationNotes:(NSString *)notes {
+//    self.indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+//    self.indicatorView.frame = self.view.bounds;
+//    self.indicatorView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
+//    //                self.indicatorView.center = CGPointMake(160, 240);
+//    [self.indicatorView startAnimating];
+//    [self.view addSubview:self.indicatorView];
+//    
+//    if (![UserController sharedInstance].currentUserRecordID) {
+//        [self notLoggedIniCloudAlert];
+//    } else {
+//        [[LocationController sharedInstance] saveLocationWithName:locationName
+//                                                         location:self.location
+//                                                    streetAddress:self.selectedPinStreet
+//                                                             city:self.selectedPinCity state:self.selectedPinState zip:self.selectedPinZip
+//                                                          country:self.selectedPinCountry
+//                                                            notes:notes];
+//    }
+//}
 
 #pragma mark - directions
 -(void)directionsButtonPressedWithAnnotation:(MKPointAnnotation *)annotation
