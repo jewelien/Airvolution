@@ -13,6 +13,7 @@
 #import "UIColor+Color.h"
 #import "ProfileTableViewDatasource.h"
 #import <Airvolution-Swift.h>
+#import "Airvolution-Swift.h"
 
 @interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate, UITableViewDelegate>
 
@@ -193,8 +194,23 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     
 }
 
--(void)searchBusinessPhoneForSavedLocation {
-    
+-(void)searchBusinessPhoneForSavedLocation:(Location*)location withCompletion:(void (^)(NSString *phoneString))completion {
+    CLLocationCoordinate2D locationCoordinates = location.location.coordinate;
+    NSString *locationStreet = location.street;
+    MKLocalSearchRequest *request = [[MKLocalSearchRequest alloc] init];
+    request.naturalLanguageQuery = location.locationName;
+    request.region = self.mapView.region;
+    MKLocalSearch *search = [[MKLocalSearch alloc] initWithRequest:request];
+    [search startWithCompletionHandler:^(MKLocalSearchResponse * _Nullable response, NSError * _Nullable error) {
+        NSString *phoneFound;
+        for (MKMapItem *item in response.mapItems) {
+            NSString *itemStreet = item.placemark.addressDictionary[@"Street"];
+            if ((item.placemark.coordinate.latitude == locationCoordinates.latitude && item.placemark.coordinate.longitude == locationCoordinates.longitude) || [itemStreet isEqualToString:locationStreet]) {
+                phoneFound = item.phoneNumber;
+            }
+        }
+        completion(phoneFound);
+    }];
 }
 
 -(MKMapItem*)findMapItemFromSearchedList:(MKPointAnnotation*)annotation{
@@ -332,7 +348,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
             self.selectedPinCity = [placemark.addressDictionary valueForKey:@"City"];
             self.selectedPinState = [placemark.addressDictionary valueForKey:@"State"];
             self.selectedPinZip  = [placemark.addressDictionary valueForKey:@"ZIP"];
-            self.selectedPinCountry  = [placemark.addressDictionary valueForKey:@"Country"];
+            self.selectedPinCountry  = [placemark.addressDictionary valueForKey:@"CountryCode"];
             self.location = placemark.location;
             annotation.subtitle = [NSString stringWithFormat:@"%@", self.selectedPinAddress[0]];
         }
@@ -443,10 +459,10 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         directionsButton.tag = 3;
         pinView.leftCalloutAccessoryView = directionsButton;
         
-//        UIImage *moreInfo = [UIImage imageNamed:@"right"];
-//        UIButton *moreInfoButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, moreInfo.size.width, moreInfo.size.height)];
-//        [moreInfoButton setImage:moreInfo forState:UIControlStateNormal];
-        UIButton *moreInfoButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+        UIImage *moreInfo = [UIImage imageNamed:@"right"];
+        UIButton *moreInfoButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, moreInfo.size.width, moreInfo.size.height)];
+        [moreInfoButton setImage:moreInfo forState:UIControlStateNormal];
+//        UIButton *moreInfoButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
         moreInfoButton.tag = 4;
         pinView.rightCalloutAccessoryView = moreInfoButton;
     }
@@ -489,7 +505,12 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         
     } else if ([control tag] == 4) {
         //more info
-        [self locationMoreInfoPressedForAnnotation:self.selectedAnnotation];
+        CLLocation *location = [[CLLocation alloc] initWithLatitude:self.selectedAnnotation.coordinate.latitude longitude:self.selectedAnnotation.coordinate.longitude];
+        Location *selectedLocation = [[LocationController sharedInstance] findLocationMatchingLocation:location];
+        [self searchBusinessPhoneForSavedLocation:selectedLocation withCompletion:^(NSString *phoneString) {
+            self.selectedPhoneNumber = phoneString;
+            [self locationMoreInfoPressedForAnnotation:selectedLocation];
+        }];
     }
 }
 
@@ -508,8 +529,8 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     locationVC.isSavedLocation = false;
     locationVC.navBar = self.navigationController.navigationBar;
     locationVC.selectedMapItem = [self findMapItemFromSearchedList:self.selectedAnnotation];
-    [self presentViewController:locationVC animated:YES completion:nil];
-//    [self showViewController:locationVC sender:nil];
+    [self presentViewController:locationVC animated:YES completion:nil]; //modal
+//    [self showViewController:locationVC sender:nil]; //push
 }
 
 -(void)saveLocationAlert{
@@ -620,16 +641,25 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 }
 
 #pragma mark - location info
--(void)locationMoreInfoPressedForAnnotation:(MKPointAnnotation *)annotation
-{
-    CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
-    [[LocationController sharedInstance] findLocationMatchingLocation:location];
+-(void)locationMoreInfoPressedForAnnotation:(Location*)location {
+//    CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
+//    Location *selectedLocation = [[LocationController sharedInstance] findLocationMatchingLocation:location];
+//    [self customViewForLocation];
+    
+    LocationViewController *locationVC = [[LocationViewController alloc]init];
+    locationVC.isSavedLocation = true;
+    locationVC.selectedLocation = location;
+    locationVC.savedLocationPhone = self.selectedPhoneNumber;
+    [self showViewController:locationVC sender:nil];
+}
+
+-(void)customViewForLocation {
 
     self.locationInfoBackgroundView = [[UIView alloc] initWithFrame:self.view.bounds];
-//    UIView *locationInfoBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, locationInfoBackgroundView.frame.size.width, 300)];
+    //    UIView *locationInfoBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, locationInfoBackgroundView.frame.size.width, 300)];
     self.locationInfoBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
     [self.view addSubview:self.locationInfoBackgroundView];
-
+    
     [UIView animateWithDuration:.25f animations:^{
         self.locationInfoBackgroundView.frame = self.view.bounds;
     }];
@@ -638,21 +668,20 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     int locationInfoViewWidth = backgroundViewWidth - 40;
     
     UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake((backgroundViewWidth / 2) - locationInfoViewWidth/2 , 125,  locationInfoViewWidth, 282)];
-//    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, self.view.frame.size.width, 300)];
+    //    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, self.view.frame.size.width, 300)];
     locationInfoView.backgroundColor = [UIColor colorWithWhite:.50 alpha:.75];
-//    locationInfoView.backgroundColor = [UIColor airvolutionRed];
+    //    locationInfoView.backgroundColor = [UIColor airvolutionRed];
     [self.locationInfoBackgroundView addSubview:locationInfoView];
     
-//    self.tableView = [[UITableView alloc] initWithFrame:locationInfoView.bounds style:UITableViewStyleGrouped];
+    //    self.tableView = [[UITableView alloc] initWithFrame:locationInfoView.bounds style:UITableViewStyleGrouped];
     self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(10, 10, locationInfoView.frame.size.width-20, locationInfoView.frame.size.height-20)];
-
+    
     [locationInfoView addSubview:self.tableView];
     self.tableView.scrollEnabled = NO;
     self.datasource = [MapTableViewDataSource new];
     self.tableView.dataSource = self.datasource;
     [self.datasource registerTableView:self.tableView];
     self.tableView.delegate = self;
-    
 }
 
 

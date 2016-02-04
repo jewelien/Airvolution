@@ -11,33 +11,47 @@ import MapKit
 
 class LocationViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     var tableView:UITableView!
-    var isSavedLocation:Bool = true
     var navBar: UINavigationBar = UINavigationBar()
+    var isSavedLocation:Bool = true
     var selectedMapItem: MKMapItem = MKMapItem()
-    var selectedLocation: Location = Location()
+    var selectedLocation:NSManagedObject?
+    var savedLocation:Location?
+    var savedLocationPhone:NSString = ""
     var isPaid:Bool = false
     var price:NSNumber?
     var notesTextField:UITextField!
+    var screenWidth:CGFloat!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        var bounds:CGRect = self.view.bounds;
-        bounds.origin.y = bounds.origin.y + self.navBar.frame.height
-        self.tableView = UITableView(frame: bounds, style: UITableViewStyle.Grouped)
-        let newNavBar = UINavigationBar(frame: self.navBar.frame)
+        self.screenWidth = UIScreen.mainScreen().bounds.width
+        setupTableView()
         if !isSavedLocation {
+            let newNavBar = UINavigationBar(frame: self.navBar.frame)
             let navItem = UINavigationItem()
             navItem.title = "Add Location"
             newNavBar.pushNavigationItem(navItem, animated: true)
+            self.view.addSubview(newNavBar)
+        } else {
+            self.navigationController?.navigationBar.topItem?.title = "Back to Map"
+            self.savedLocation = (self.selectedLocation as! Location)
         }
+    }
+    
+    func setupTableView() {
+        var bounds:CGRect = self.view.bounds;
+        bounds.origin.y = bounds.origin.y + self.navBar.frame.height
+        self.tableView = UITableView(frame: bounds, style: UITableViewStyle.Grouped)
         self.view.addSubview(self.tableView)
-        self.view.addSubview(newNavBar)
         self.tableView.dataSource = self
         self.tableView.delegate = self
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 2;
+        if self.isSavedLocation {
+            return 1
+        }
+        return 2
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -46,7 +60,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         default : return 2
         }
     }
-
+    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCellWithIdentifier("cell")
         cell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "cell")
@@ -57,22 +71,29 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         if indexPath.section == 0 {
             switch indexPath.row {
             case 0: cell!.textLabel?.text = "\(locationName())"
-                    cell?.textLabel?.font = UIFont(name: (cell?.textLabel?.font?.fontName)!, size: 25.0)
-            case 1: cell!.textLabel?.text = "Address: \(niceAddress())"
-                    cell?.textLabel?.numberOfLines = 0
+            cell?.textLabel?.font = UIFont(name: (cell?.textLabel?.font?.fontName)!, size: 25.0)
+            case 1: cell!.textLabel?.text = "Address:" + "\n" + "\(niceAddress())"
+            cell?.textLabel?.numberOfLines = 3
             case 2: cell!.textLabel?.text = "Phone: \(phoneNumber())"
             case 3: cell!.textLabel?.text = "Air Pump"
+            if let location = self.savedLocation {
+                // cell?.addSubview(addCellLabel(cellHeight!, text: location.cost))
+            } else {
                 cell?.addSubview(addSegmentedControl(cellHeight!))
+                }
             case 4:
                 if self.isPaid {
                     cell!.textLabel?.text = "Cost"
                     cell?.addSubview(addCostTextField(cellHeight!))
                 } else {
                     cell!.textLabel?.text = "Notes"
-                    cell?.addSubview(addNotesTextField(cellHeight!))
+                    if let location = self.savedLocation {
+                        cell?.addSubview(addCellLabel(cellHeight!, text: location.locationNotes))
+                    } else {
+                        cell?.addSubview(addNotesTextField(cellHeight!))
+                    }
                 }
-            default: cell!.textLabel?.text = "Notes"
-                cell?.addSubview(addNotesTextField(cellHeight!))
+            default: break
             }
         }
         if indexPath.section == 1 {
@@ -121,10 +142,10 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     func textFieldDidBeginEditing(textField: UITextField) {
         textField.text = "$"
     }
+    
     func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
-        
         //don't allow $ sign to be deleted
-        if string.characters.count == 0 && textField.text?.characters.count == 1 {
+        if string.characters.count == 0 && textField.text == "$"{
             return false;
         }
         //allow backspace everytime. add a max character count 5.
@@ -136,6 +157,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         let filtered = components.joinWithSeparator("")
         return string == filtered
     }
+    
     func textFieldDidEndEditing(textField: UITextField) {
         if let costString = textField.text {
             let components = costString.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString:"0123456789.").invertedSet)
@@ -147,8 +169,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func addNotesTextField(cellHeight:CGFloat) -> UITextField {
-        let screenWidth = UIScreen.mainScreen().bounds.width
-        let textField = UITextField(frame: CGRect(x: screenWidth / 2 - 100, y:cellHeight / 2 - 12, width: screenWidth - 115, height: 25))
+        let textField = UITextField(frame: CGRect(x: self.screenWidth / 2 - 100, y:cellHeight / 2 - 12, width: self.screenWidth - 115, height: 25))
         textField.placeholder = "optional"
         textField.textAlignment = NSTextAlignment.Right
         self.notesTextField = textField;
@@ -156,18 +177,27 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func addCostTextField(cellHeight:CGFloat) -> UITextField {
-        let screenWidth = UIScreen.mainScreen().bounds.width
-        let textField = UITextField(frame: CGRect(x: screenWidth - 75 - 15, y:cellHeight / 2 - 12, width: 75, height: 25))
+        let textField = UITextField(frame: CGRect(x: self.screenWidth - 75 - 15, y:cellHeight / 2 - 12, width: 75, height: 25))
         textField.delegate = self
         textField.textAlignment = NSTextAlignment.Right
         textField.text = "$0.00"
         return textField;
     }
     
+    func addCellLabel(cellHeight:CGFloat, text:String) -> UILabel {
+        let label = UILabel(frame: CGRect(x: self.screenWidth / 2 - 100, y:cellHeight / 2 - 12, width: self.screenWidth - 115, height: 25))
+        label.textAlignment = NSTextAlignment.Right
+        if text.characters.count > 0 {
+            label.text = text
+        } else {
+            label.text = "n/a"
+        }
+        return label
+    }
+    
     func addSegmentedControl(cellHeight:CGFloat) -> UISegmentedControl {
         let segmentedControl = UISegmentedControl(items: ["free", "paid"])
-        let screenSize = UIScreen.mainScreen().bounds
-        segmentedControl.frame = CGRectMake(screenSize.width - 175, (cellHeight / 2) - 10, 150, 25)
+        segmentedControl.frame = CGRectMake(self.screenWidth - 175, (cellHeight / 2) - 10, 150, 25)
         segmentedControl .addTarget(self, action: "action:", forControlEvents: UIControlEvents.ValueChanged)
         if self.isPaid && !segmentedControl.selected{
             segmentedControl.selectedSegmentIndex = 1
@@ -190,15 +220,24 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func locationName() -> String {
-        if let name = self.selectedMapItem.name {
-            return name;
+        if let name = self.selectedMapItem.name{
+            if name != "Unknown Location" {
+                return name;
+            }
+        }
+        
+        if let location = self.savedLocation {
+            return location.locationName
         }
         return "";
     }
     
     func phoneNumber() -> String {
         if let number = self.selectedMapItem.phoneNumber {
-            return number;
+            return number
+        }
+        if self.savedLocationPhone.length > 0 {
+            return self.savedLocationPhone as String
         }
         return ""
     }
@@ -219,30 +258,31 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     func niceAddress() -> String {
         var addressString: String = ""
         if let addressDict = self.selectedMapItem.placemark.addressDictionary {
-            if let address = addressDict["FormattedAddressLines"] {
-                addressString.appendContentsOf("\(address.componentsJoinedByString(" "))")
+            if let street = addressDict["Street"] {
+                addressString.appendContentsOf("\(street) ")
             }
-            else {
-                if let street = addressDict["Thoroughfare"] {
-                    addressString.appendContentsOf("\(street) ")
-                }
-                if let street2 = addressDict["SubThoroughfare"] {
-                    addressString.appendContentsOf("\(street2) ")
-                }
-                if let city = addressDict["City"] {
-                    addressString.appendContentsOf("\(city) ")
-                }
-                if let state = addressDict["AdministrativeArea"] {
-                    addressString.appendContentsOf("\(state) ")
-                }
-                if let postalCode = addressDict["PostalCode"] {
-                    addressString.appendContentsOf("\(postalCode) ")
-                }
-                if let countryCode = addressDict["Country"] {
-                    addressString.appendContentsOf("\(countryCode) ")
-                }
+            if let city = addressDict["City"] {
+                addressString = addressString + "\n" + "\(city), "
+            }
+            if let state = addressDict["State"] {
+                addressString.appendContentsOf("\(state) ")
+            }
+            if let postalCode = addressDict["ZIP"] {
+                addressString.appendContentsOf("\(postalCode) ")
+            }
+            if let countryCode = addressDict["CountryCode"] {
+                addressString.appendContentsOf("\(countryCode) ")
             }
         }
+        
+        if let location = self.savedLocation {
+            addressString.appendContentsOf("\(location.street)")
+            addressString = addressString + "\n" + "\(location.city), "
+            addressString.appendContentsOf("\(location.state) ")
+            addressString.appendContentsOf("\(location.zip) ")
+            addressString.appendContentsOf("\(location.country)")
+        }
+        
         return addressString
     }
     
