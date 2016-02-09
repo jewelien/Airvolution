@@ -33,8 +33,8 @@
 @property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
 @property (nonatomic, strong) NSArray *allLocations;
 @property (nonatomic, strong) MKPointAnnotation *selectedAnnotation;
-@property (nonatomic, strong) UITableView *tableView;
-@property (nonatomic, strong) MapTableViewDataSource *datasource;
+//@property (nonatomic, strong) UITableView *tableView;
+//@property (nonatomic, strong) MapTableViewDataSource *datasource;
 @property (nonatomic, strong) UIView *locationInfoBackgroundView;
 @property (nonatomic, strong) NSMutableDictionary *locationAnnotationDictionary;
 @property (nonatomic, strong) NSMutableArray *searchedItems;
@@ -104,21 +104,22 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 }
 
 - (void)navigationBarButtonItems{
-    //    self.dropPinButton = [[UIButton alloc] initWithFrame:CGRectMake(260, 400, 45, 55)];
-    ////    self.dropPinButton.backgroundColor = [UIColor grayColor];
-    //    [self.dropPinButton setImage:[UIImage imageNamed:@"location"] forState:UIControlStateNormal];
-    //    [self.view addSubview:self.dropPinButton];
-    //    [self.dropPinButton addTarget:self action:@selector(dropPinAtCurrentLocation) forControlEvents:UIControlEventTouchUpInside];
+//        self.dropPinButton = [[UIButton alloc] initWithFrame:CGRectMake(260, 400, 45, 55)];
+//    //    self.dropPinButton.backgroundColor = [UIColor grayColor];
+//        [self.dropPinButton setImage:[UIImage imageNamed:@"location"] forState:UIControlStateNormal];
+//        [self.view addSubview:self.dropPinButton];
+//        [self.dropPinButton addTarget:self action:@selector(dropPinAtCurrentLocation) forControlEvents:UIControlEventTouchUpInside];
     
+//    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
+//    self.dropPinButton = [[UIButton alloc] initWithFrame:view.frame];
+//    [self.dropPinButton setImage:[UIImage imageNamed:@"marker"] forState:UIControlStateNormal];
+//    [self.dropPinButton addTarget:self action:@selector(dropPinAtCenterOfMap) forControlEvents:UIControlEventTouchUpInside];
+//    [view addSubview:self.dropPinButton];
+//    UIBarButtonItem *pinDrop = [[UIBarButtonItem alloc] initWithCustomView:view];
+//    [self.navigationItem setRightBarButtonItem:pinDrop];
     
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
-    self.dropPinButton = [[UIButton alloc] initWithFrame:view.frame];
-    [self.dropPinButton setImage:[UIImage imageNamed:@"marker"] forState:UIControlStateNormal];
-    
-    [self.dropPinButton addTarget:self action:@selector(dropPinAtCenterOfMap) forControlEvents:UIControlEventTouchUpInside];
-    [view addSubview:self.dropPinButton];
-    UIBarButtonItem *pinDrop = [[UIBarButtonItem alloc] initWithCustomView:view];
-    [self.navigationItem setRightBarButtonItem:pinDrop];
+    UIBarButtonItem *add = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonTapped)];
+    [self.navigationItem setRightBarButtonItem:add];
     
     UILongPressGestureRecognizer *dropPinPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(addPinWithGestureRecognizer:)];
     dropPinPress.minimumPressDuration = 1.0;
@@ -190,8 +191,21 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
      }];
 }
 
-- (void)searchForNearbyLocations {
-    
+- (void)searchForGasNear:(CLLocationCoordinate2D)locationCoordinate withCompletion: (void(^)(NSArray *mapItems))completion {
+    MKLocalSearchRequest *request = [[MKLocalSearchRequest alloc] init];
+    request.naturalLanguageQuery = @"gas";
+//    request.region = self.mapView.region;
+    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(locationCoordinate, 10, 10);
+    request.region = region;
+    MKLocalSearch *search = [[MKLocalSearch alloc] initWithRequest:request];
+    [search startWithCompletionHandler:^(MKLocalSearchResponse *response, NSError *error)
+     {
+         if (!error) {
+             completion(response.mapItems);
+         } else {
+             NSLog(@"Nearby locations search error; %@", error);
+         }
+     }];
 }
 
 -(void)searchBusinessPhoneForSavedLocation:(Location*)location withCompletion:(void (^)(NSString *phoneString))completion {
@@ -425,12 +439,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         addLocationButton.tag = 2;
         pinView.rightCalloutAccessoryView = addLocationButton;
         
-        UIImage *removePinImage = [UIImage imageNamed:@"remove"];
-        UIButton *removePinButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, removePinImage.size.width, removePinImage.size.height)];
-        [removePinButton setImage:removePinImage forState:UIControlStateNormal];
-        removePinButton.tag = 1;
-        pinView.leftCalloutAccessoryView = removePinButton;
-        
     } else if ([[annotation title] isEqualToString:droppedPinTitle]) {
         if (pinView == nil) {
             pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"droppedPin"];
@@ -495,19 +503,24 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     self.selectedAnnotation = view.annotation;
     
     if ([control tag] == 2) {
-        [self findMapItemFromSearchedList:self.selectedAnnotation];
-        [self addLocationButtonClicked];
-        
+        //add
+        if ([self.selectedAnnotation.title isEqualToString:droppedPinTitle]) {
+            [self addLocationButtonClickedOn:true];
+        } else {
+            [self findMapItemFromSearchedList:self.selectedAnnotation];
+            [self addLocationButtonClickedOn:false];
+        }
     } else if ([control tag] == 1) {
+        //cancel
         [self.mapView removeAnnotation:self.droppedPinAnnotation];
         self.droppedPinAnnotation = nil;
         
     } else if ([control tag] == 3) {
-        //directions
+        //directions, saved location
         [self directionsButtonPressedWithAnnotation:self.selectedAnnotation];
         
     } else if ([control tag] == 4) {
-        //more info
+        //more info, saved location
         CLLocation *location = [[CLLocation alloc] initWithLatitude:self.selectedAnnotation.coordinate.latitude longitude:self.selectedAnnotation.coordinate.longitude];
         Location *selectedLocation = [[LocationController sharedInstance] findLocationMatchingLocation:location];
         [self searchBusinessPhoneForSavedLocation:selectedLocation withCompletion:^(NSString *phoneString) {
@@ -527,13 +540,35 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 //    return string;
 //}
 
--(void) addLocationButtonClicked {
-    LocationViewController *locationVC = [[LocationViewController alloc]init];
-    locationVC.isSavedLocation = false;
-    locationVC.navBar = self.navigationController.navigationBar;
-    locationVC.selectedMapItem = [self findMapItemFromSearchedList:self.selectedAnnotation];
-    [self presentViewController:locationVC animated:YES completion:nil]; //modal
-//    [self showViewController:locationVC sender:nil]; //push
+#pragma mark - add
+-(void) addLocationButtonClickedOn:(BOOL)droppedPin {
+    if (droppedPin) {
+        [self searchForGasNear:self.droppedPinAnnotation.coordinate withCompletion:^(NSArray *mapItems) {
+            [self showSelectLocationViewWithItems:mapItems];
+        }];
+    } else {
+        LocationViewController *locationVC = [[LocationViewController alloc]init];
+        locationVC.isSavedLocation = false;
+        locationVC.navBar = self.navigationController.navigationBar;
+        locationVC.selectedMapItem = [self findMapItemFromSearchedList:self.selectedAnnotation];
+        [self presentViewController:locationVC animated:YES completion:nil];
+    }
+}
+
+
+-(void)addButtonTapped {
+    [self searchForGasNear:self.mapView.userLocation.coordinate withCompletion:^(NSArray *mapItems) {
+        [self showSelectLocationViewWithItems:mapItems];
+    }];
+}
+
+-(void)showSelectLocationViewWithItems:(NSArray*)items{
+    LocationSearchViewController *searchVC = [[LocationSearchViewController alloc]init];
+    searchVC.navBar = self.navigationController.navigationBar;
+    searchVC.mapItems = items;
+    
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:searchVC];
+    [self presentViewController:nav animated:true completion:nil];
 }
 
 //-(void)saveLocationAlert{
@@ -645,111 +680,107 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 #pragma mark - location info
 -(void)locationMoreInfoPressedForAnnotation:(Location*)location {
-//    CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
-//    Location *selectedLocation = [[LocationController sharedInstance] findLocationMatchingLocation:location];
-//    [self customViewForLocation];
-    
     LocationViewController *locationVC = [[LocationViewController alloc]init];
     locationVC.isSavedLocation = true;
     locationVC.selectedLocation = location;
     locationVC.savedLocationPhone = self.selectedPhoneNumber;
     [self showViewController:locationVC sender:nil];
 }
+//
+//-(void)customViewForLocation {
+//
+//    self.locationInfoBackgroundView = [[UIView alloc] initWithFrame:self.view.bounds];
+//    //    UIView *locationInfoBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, locationInfoBackgroundView.frame.size.width, 300)];
+//    self.locationInfoBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
+//    [self.view addSubview:self.locationInfoBackgroundView];
+//    
+//    [UIView animateWithDuration:.25f animations:^{
+//        self.locationInfoBackgroundView.frame = self.view.bounds;
+//    }];
+//    
+//    int backgroundViewWidth = self.locationInfoBackgroundView.frame.size.width;
+//    int locationInfoViewWidth = backgroundViewWidth - 40;
+//    
+//    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake((backgroundViewWidth / 2) - locationInfoViewWidth/2 , 125,  locationInfoViewWidth, 282)];
+//    //    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, self.view.frame.size.width, 300)];
+//    locationInfoView.backgroundColor = [UIColor colorWithWhite:.50 alpha:.75];
+//    //    locationInfoView.backgroundColor = [UIColor airvolutionRed];
+//    [self.locationInfoBackgroundView addSubview:locationInfoView];
+//    
+//    //    self.tableView = [[UITableView alloc] initWithFrame:locationInfoView.bounds style:UITableViewStyleGrouped];
+//    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(10, 10, locationInfoView.frame.size.width-20, locationInfoView.frame.size.height-20)];
+//    
+//    [locationInfoView addSubview:self.tableView];
+//    self.tableView.scrollEnabled = NO;
+//    self.datasource = [MapTableViewDataSource new];
+//    self.tableView.dataSource = self.datasource;
+//    [self.datasource registerTableView:self.tableView];
+//    self.tableView.delegate = self;
+//}
 
--(void)customViewForLocation {
 
-    self.locationInfoBackgroundView = [[UIView alloc] initWithFrame:self.view.bounds];
-    //    UIView *locationInfoBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, locationInfoBackgroundView.frame.size.width, 300)];
-    self.locationInfoBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
-    [self.view addSubview:self.locationInfoBackgroundView];
-    
-    [UIView animateWithDuration:.25f animations:^{
-        self.locationInfoBackgroundView.frame = self.view.bounds;
-    }];
-    
-    int backgroundViewWidth = self.locationInfoBackgroundView.frame.size.width;
-    int locationInfoViewWidth = backgroundViewWidth - 40;
-    
-    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake((backgroundViewWidth / 2) - locationInfoViewWidth/2 , 125,  locationInfoViewWidth, 282)];
-    //    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, self.view.frame.size.width, 300)];
-    locationInfoView.backgroundColor = [UIColor colorWithWhite:.50 alpha:.75];
-    //    locationInfoView.backgroundColor = [UIColor airvolutionRed];
-    [self.locationInfoBackgroundView addSubview:locationInfoView];
-    
-    //    self.tableView = [[UITableView alloc] initWithFrame:locationInfoView.bounds style:UITableViewStyleGrouped];
-    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(10, 10, locationInfoView.frame.size.width-20, locationInfoView.frame.size.height-20)];
-    
-    [locationInfoView addSubview:self.tableView];
-    self.tableView.scrollEnabled = NO;
-    self.datasource = [MapTableViewDataSource new];
-    self.tableView.dataSource = self.datasource;
-    [self.datasource registerTableView:self.tableView];
-    self.tableView.delegate = self;
-}
-
-
-#pragma mark - tableView delegate
--(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    float rowHeight;
-    switch (indexPath.row) {
-        case 0:
-            rowHeight = 60;
-            break;
-            
-        case 1:
-//            UITableViewCell *notesCell = (tableView cell);
-//            if (tableView cellForRowAtIndexPath:indexPath) {
-                rowHeight = 20;
-//            }
-            break;
-            
-        case 2:
-            rowHeight = 90;
-            break;
-        default:// directions, backToMap
-            rowHeight = 40;
-            break;
-    }
-    return rowHeight;
-}
-
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    
-    switch (indexPath.row) {
-        case 2:
-            [self.locationInfoBackgroundView removeFromSuperview];
-            break;
-        case 3: //directions
-            [self directionsButtonPressedWithAnnotation:self.selectedAnnotation];
-            break;
-        case 4: //go back to map
-            [self.locationInfoBackgroundView removeFromSuperview];
-            break;
-        default:
-            break;
-    }
-}
-
--(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    BOOL command;
-    switch (indexPath.row) {
-        case 0:
-            return NO;
-            break;
-            
-        default: return YES;
-            break;
-    }
-    return command;
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
+//#pragma mark - tableView delegate
+//-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    float rowHeight;
+//    switch (indexPath.row) {
+//        case 0:
+//            rowHeight = 60;
+//            break;
+//            
+//        case 1:
+////            UITableViewCell *notesCell = (tableView cell);
+////            if (tableView cellForRowAtIndexPath:indexPath) {
+//                rowHeight = 20;
+////            }
+//            break;
+//            
+//        case 2:
+//            rowHeight = 90;
+//            break;
+//        default:// directions, backToMap
+//            rowHeight = 40;
+//            break;
+//    }
+//    return rowHeight;
+//}
+//
+//-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+//    
+//    switch (indexPath.row) {
+//        case 2:
+//            [self.locationInfoBackgroundView removeFromSuperview];
+//            break;
+//        case 3: //directions
+//            [self directionsButtonPressedWithAnnotation:self.selectedAnnotation];
+//            break;
+//        case 4: //go back to map
+//            [self.locationInfoBackgroundView removeFromSuperview];
+//            break;
+//        default:
+//            break;
+//    }
+//}
+//
+//-(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    BOOL command;
+//    switch (indexPath.row) {
+//        case 0:
+//            return NO;
+//            break;
+//            
+//        default: return YES;
+//            break;
+//    }
+//    return command;
+//}
+//
+//- (void)didReceiveMemoryWarning {
+//    [super didReceiveMemoryWarning];
+//    // Dispose of any resources that can be recreated.
+//}
 
 @end

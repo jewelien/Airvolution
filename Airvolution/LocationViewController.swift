@@ -40,10 +40,15 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
             newNavBar.pushNavigationItem(navItem, animated: true)
             self.view.addSubview(newNavBar)
         } else {
-            self.navigationController?.navigationBar.topItem?.title = "Back to Map"
+//            self.navigationController?.navigationBar.topItem?.title = "Back to Map"
             self.savedLocation = (self.selectedLocation as! Location)
         }
     }
+    
+//    override func viewWillDisappear(animated: Bool) {
+//        self.navigationController?.navigationBar.topItem?.title = "AIRVOLUTION"
+//    }
+
 // MARK: tableView
     func setupTableView() {
         var bounds:CGRect = self.view.bounds;
@@ -189,8 +194,9 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func costNumber() -> NSNumber {
-        if let costString = self.costTextField!.text {
-            let components = costString.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString:"0123456789.").invertedSet)
+        if let costField = self.costTextField {
+            let costString = costField.text
+            let components = costString!.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString:"0123456789.").invertedSet)
             let filtered = components.joinWithSeparator("")
             let formatter = NSNumberFormatter()
             formatter.numberStyle = NSNumberFormatterStyle.DecimalStyle
