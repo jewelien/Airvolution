@@ -9,7 +9,6 @@
 #import "MapViewController.h"
 #import "LocationController.h"
 #import "UserController.h"
-#import "MapTableViewDataSource.h"
 #import "UIColor+Color.h"
 #import "ProfileTableViewDatasource.h"
 #import <Airvolution-Swift.h>
@@ -33,8 +32,6 @@
 @property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
 @property (nonatomic, strong) NSArray *allLocations;
 @property (nonatomic, strong) MKPointAnnotation *selectedAnnotation;
-//@property (nonatomic, strong) UITableView *tableView;
-//@property (nonatomic, strong) MapTableViewDataSource *datasource;
 @property (nonatomic, strong) UIView *locationInfoBackgroundView;
 @property (nonatomic, strong) NSMutableDictionary *locationAnnotationDictionary;
 @property (nonatomic, strong) NSMutableArray *searchedItems;
@@ -104,20 +101,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 }
 
 - (void)navigationBarButtonItems{
-//        self.dropPinButton = [[UIButton alloc] initWithFrame:CGRectMake(260, 400, 45, 55)];
-//    //    self.dropPinButton.backgroundColor = [UIColor grayColor];
-//        [self.dropPinButton setImage:[UIImage imageNamed:@"location"] forState:UIControlStateNormal];
-//        [self.view addSubview:self.dropPinButton];
-//        [self.dropPinButton addTarget:self action:@selector(dropPinAtCurrentLocation) forControlEvents:UIControlEventTouchUpInside];
-    
-//    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
-//    self.dropPinButton = [[UIButton alloc] initWithFrame:view.frame];
-//    [self.dropPinButton setImage:[UIImage imageNamed:@"marker"] forState:UIControlStateNormal];
-//    [self.dropPinButton addTarget:self action:@selector(dropPinAtCenterOfMap) forControlEvents:UIControlEventTouchUpInside];
-//    [view addSubview:self.dropPinButton];
-//    UIBarButtonItem *pinDrop = [[UIBarButtonItem alloc] initWithCustomView:view];
-//    [self.navigationItem setRightBarButtonItem:pinDrop];
-    
     UIBarButtonItem *add = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonTapped)];
     [self.navigationItem setRightBarButtonItem:add];
     
@@ -530,16 +513,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     }
 }
 
-//-(NSString*)saveLocationString {
-//    NSMutableString *string = [NSMutableString stringWithString:@"Address: "];
-//    [string appendString:self.selectedPinAddress[0]];
-//    [string appendString:[@"\n" stringByAppendingString:self.selectedPinAddress[1]]];
-//    if (self.selectedPhoneNumber) {
-//        [string appendString:[NSString stringWithFormat:@"\n Phone: %@", self.selectedPhoneNumber]];
-//    }
-//    return string;
-//}
-
 #pragma mark - add
 -(void) addLocationButtonClickedOn:(BOOL)droppedPin {
     if (droppedPin) {
@@ -570,85 +543,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:searchVC];
     [self presentViewController:nav animated:true completion:nil];
 }
-
-//-(void)saveLocationAlert{
-//    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Enter Location" message:[NSString stringWithFormat:@"%@", [self saveLocationString]]  preferredStyle:UIAlertControllerStyleAlert];
-//    
-//    UIAlertAction *callAction = [UIAlertAction actionWithTitle:@"Call to Confirm" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-//        NSString *cleanedString = [[self.selectedPhoneNumber componentsSeparatedByCharactersInSet:[[NSCharacterSet characterSetWithCharactersInString:@"0123456789-+()"] invertedSet]] componentsJoinedByString:@""];
-//        NSString *escapedPhoneNumber = [cleanedString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-//        NSString *phoneURLString = [NSString stringWithFormat:@"telprompt:%@", escapedPhoneNumber];
-//        NSURL *phoneURL = [NSURL URLWithString:phoneURLString];
-//        
-//        if ([[UIApplication sharedApplication] canOpenURL:phoneURL]) {
-//            [[UIApplication sharedApplication] openURL:phoneURL];
-//        }
-//        
-//    }];
-//    if (self.selectedPhoneNumber) {
-//        [alertController addAction:callAction];
-//    }
-//    
-//    if ([self.selectedAnnotation.title isEqualToString:droppedPinTitle]) {
-//        [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-//            textField.placeholder = @"location name";
-//            textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
-//            textField.textAlignment = NSTextAlignmentCenter;
-//        }];
-//    } else { //searched item being saved
-//        [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-//            textField.text = self.selectedAnnotation.title;
-//            textField.enabled = NO;
-//            textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
-//            textField.textAlignment = NSTextAlignmentCenter;
-//        }];
-//    }
-//    
-//    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-//        textField.placeholder = @"notes (optional)";
-//        textField.textAlignment = NSTextAlignmentCenter;
-//    }];
-//    
-//    
-//    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-//        [self removeFromParentViewController];
-//    }];
-//    [alertController addAction:cancelAction];
-//    
-//    UIAlertAction *saveAction = [UIAlertAction actionWithTitle:@"save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-//        UITextField *locationNameField = alertController.textFields[0];
-//        UITextField *locationNotesField = alertController.textFields[1];
-//        if ([locationNameField.text isEqualToString:@""]) {
-//            NSLog(@"no text no save");
-//        } else {
-//            [self saveButtonPressedWithLocationName:locationNameField.text andLocationNotes:locationNotesField.text];
-//        }
-//    }];
-//    [alertController addAction:saveAction];
-//    
-//    [self presentViewController:alertController animated:YES completion:nil];
-//}
-
-
-//-(void)saveButtonPressedWithLocationName:(NSString *)locationName andLocationNotes:(NSString *)notes {
-//    self.indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-//    self.indicatorView.frame = self.view.bounds;
-//    self.indicatorView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
-//    //                self.indicatorView.center = CGPointMake(160, 240);
-//    [self.indicatorView startAnimating];
-//    [self.view addSubview:self.indicatorView];
-//    
-//    if (![UserController sharedInstance].currentUserRecordID) {
-//        [self notLoggedIniCloudAlert];
-//    } else {
-//        [[LocationController sharedInstance] saveLocationWithName:locationName
-//                                                         location:self.location
-//                                                    streetAddress:self.selectedPinStreet
-//                                                             city:self.selectedPinCity state:self.selectedPinState zip:self.selectedPinZip
-//                                                          country:self.selectedPinCountry
-//                                                            notes:notes];
-//    }
-//}
 
 #pragma mark - directions
 -(void)directionsButtonPressedWithAnnotation:(MKPointAnnotation *)annotation
@@ -686,101 +580,5 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     locationVC.savedLocationPhone = self.selectedPhoneNumber;
     [self showViewController:locationVC sender:nil];
 }
-//
-//-(void)customViewForLocation {
-//
-//    self.locationInfoBackgroundView = [[UIView alloc] initWithFrame:self.view.bounds];
-//    //    UIView *locationInfoBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, locationInfoBackgroundView.frame.size.width, 300)];
-//    self.locationInfoBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
-//    [self.view addSubview:self.locationInfoBackgroundView];
-//    
-//    [UIView animateWithDuration:.25f animations:^{
-//        self.locationInfoBackgroundView.frame = self.view.bounds;
-//    }];
-//    
-//    int backgroundViewWidth = self.locationInfoBackgroundView.frame.size.width;
-//    int locationInfoViewWidth = backgroundViewWidth - 40;
-//    
-//    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake((backgroundViewWidth / 2) - locationInfoViewWidth/2 , 125,  locationInfoViewWidth, 282)];
-//    //    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, self.view.frame.size.width, 300)];
-//    locationInfoView.backgroundColor = [UIColor colorWithWhite:.50 alpha:.75];
-//    //    locationInfoView.backgroundColor = [UIColor airvolutionRed];
-//    [self.locationInfoBackgroundView addSubview:locationInfoView];
-//    
-//    //    self.tableView = [[UITableView alloc] initWithFrame:locationInfoView.bounds style:UITableViewStyleGrouped];
-//    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(10, 10, locationInfoView.frame.size.width-20, locationInfoView.frame.size.height-20)];
-//    
-//    [locationInfoView addSubview:self.tableView];
-//    self.tableView.scrollEnabled = NO;
-//    self.datasource = [MapTableViewDataSource new];
-//    self.tableView.dataSource = self.datasource;
-//    [self.datasource registerTableView:self.tableView];
-//    self.tableView.delegate = self;
-//}
-
-
-//#pragma mark - tableView delegate
-//-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    float rowHeight;
-//    switch (indexPath.row) {
-//        case 0:
-//            rowHeight = 60;
-//            break;
-//            
-//        case 1:
-////            UITableViewCell *notesCell = (tableView cell);
-////            if (tableView cellForRowAtIndexPath:indexPath) {
-//                rowHeight = 20;
-////            }
-//            break;
-//            
-//        case 2:
-//            rowHeight = 90;
-//            break;
-//        default:// directions, backToMap
-//            rowHeight = 40;
-//            break;
-//    }
-//    return rowHeight;
-//}
-//
-//-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    [tableView deselectRowAtIndexPath:indexPath animated:YES];
-//    
-//    switch (indexPath.row) {
-//        case 2:
-//            [self.locationInfoBackgroundView removeFromSuperview];
-//            break;
-//        case 3: //directions
-//            [self directionsButtonPressedWithAnnotation:self.selectedAnnotation];
-//            break;
-//        case 4: //go back to map
-//            [self.locationInfoBackgroundView removeFromSuperview];
-//            break;
-//        default:
-//            break;
-//    }
-//}
-//
-//-(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    BOOL command;
-//    switch (indexPath.row) {
-//        case 0:
-//            return NO;
-//            break;
-//            
-//        default: return YES;
-//            break;
-//    }
-//    return command;
-//}
-//
-//- (void)didReceiveMemoryWarning {
-//    [super didReceiveMemoryWarning];
-//    // Dispose of any resources that can be recreated.
-//}
 
 @end

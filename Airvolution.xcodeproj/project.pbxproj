@@ -24,7 +24,6 @@
 		FCBB5A761ACDF4000059AC3C /* UserController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCBB5A751ACDF4000059AC3C /* UserController.m */; };
 		FCBB5AAB1ACDF5D20059AC3C /* ProfileTableViewDatasource.m in Sources */ = {isa = PBXBuildFile; fileRef = FCBB5AAA1ACDF5D20059AC3C /* ProfileTableViewDatasource.m */; };
 		FCBCA31F1ADDC322000D4F49 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCBCA31E1ADDC322000D4F49 /* AddressBook.framework */; };
-		FCBCA3221ADEC323000D4F49 /* MapTableViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = FCBCA3211ADEC323000D4F49 /* MapTableViewDataSource.m */; };
 		FCBCA3281AE16122000D4F49 /* UIColor+Color.m in Sources */ = {isa = PBXBuildFile; fileRef = FCBCA3271AE16122000D4F49 /* UIColor+Color.m */; };
 		FCE4012E1AC0C9E800DBB19A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FCE4012D1AC0C9E800DBB19A /* main.m */; };
 		FCE401311AC0C9E800DBB19A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FCE401301AC0C9E800DBB19A /* AppDelegate.m */; };
@@ -76,8 +75,6 @@
 		FCBB5AA91ACDF5D20059AC3C /* ProfileTableViewDatasource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileTableViewDatasource.h; sourceTree = "<group>"; };
 		FCBB5AAA1ACDF5D20059AC3C /* ProfileTableViewDatasource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileTableViewDatasource.m; sourceTree = "<group>"; };
 		FCBCA31E1ADDC322000D4F49 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
-		FCBCA3201ADEC323000D4F49 /* MapTableViewDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapTableViewDataSource.h; sourceTree = "<group>"; };
-		FCBCA3211ADEC323000D4F49 /* MapTableViewDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapTableViewDataSource.m; sourceTree = "<group>"; };
 		FCBCA3261AE16122000D4F49 /* UIColor+Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Color.h"; sourceTree = "<group>"; };
 		FCBCA3271AE16122000D4F49 /* UIColor+Color.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Color.m"; sourceTree = "<group>"; };
 		FCE401281AC0C9E800DBB19A /* Airvolution.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Airvolution.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -133,8 +130,6 @@
 			children = (
 				FCE401321AC0C9E800DBB19A /* MapViewController.h */,
 				FCE401331AC0C9E800DBB19A /* MapViewController.m */,
-				FCBCA3201ADEC323000D4F49 /* MapTableViewDataSource.h */,
-				FCBCA3211ADEC323000D4F49 /* MapTableViewDataSource.m */,
 				FCA0ECA51ACC663B006E1B8B /* LeaderboardViewController.h */,
 				FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */,
 				FCA0ECA21ACC662A006E1B8B /* ProfileViewController.h */,
@@ -352,7 +347,6 @@
 				FCBB5AAB1ACDF5D20059AC3C /* ProfileTableViewDatasource.m in Sources */,
 				FCA0ECA71ACC663B006E1B8B /* LeaderboardViewController.m in Sources */,
 				FC0BCBD41AD48F9200EAF9BF /* UserCustomCell.m in Sources */,
-				FCBCA3221ADEC323000D4F49 /* MapTableViewDataSource.m in Sources */,
 				FCE401341AC0C9E800DBB19A /* MapViewController.m in Sources */,
 				FC835FEE1C3DB425006CDC97 /* Model.xcdatamodeld in Sources */,
 				FCA0ECA41ACC662A006E1B8B /* ProfileViewController.m in Sources */,
