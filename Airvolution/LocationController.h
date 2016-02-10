@@ -13,6 +13,7 @@
 #import <CloudKit/CloudKit.h>
 //#import "User.h"
 #import <AddressBook/AddressBook.h>
+@import MapKit;
 
 static NSString *const newLocationSavedNotificationKey = @"new location saved";
 static NSString *const newLocationSaveFailedNotificationKey = @"new location not saved";
@@ -25,7 +26,6 @@ static NSString *const locationDeletedNotificationKey = @"location deleted";
 @property (nonatomic,strong) NSArray *locations;
 @property (nonatomic, strong) Location *selectedLocation;
 + (LocationController *)sharedInstance;
-//- (void)saveLocationWithName:(NSString *)name location:(CLLocation *)location addressArray:(NSArray *)address;
 -(void)saveLocationWithName:(NSString *)name
                    location:(CLLocation *)location
               streetAddress:(NSString *)street
@@ -42,4 +42,8 @@ static NSString *const locationDeletedNotificationKey = @"location deleted";
 -(void)updateUsersSharedLocationsUsernameIfChanged:(NSString *)newUsername;
 -(void)didReceiveNotification:(NSDictionary*)notificationInfo;
 -(void)subscribe;
+
+-(UIAlertController*)alertForDirectionsToPlacemark:(MKPlacemark*)placemark;
+-(void)goToMapsAppForDirectionsToPlacemark:(MKPlacemark*)placemark;
+
 @end

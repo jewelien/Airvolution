@@ -294,13 +294,22 @@
 
 - (NSDictionary *)addressDictionaryForLocationWithCLLocation:(CLLocation *)location {
     Location *selectedLocation = [self findLocationMatchingLocation:location];
-    NSDictionary *dictionary = @{
-             (__bridge NSString *)kABPersonAddressStreetKey : selectedLocation.street,
-             (__bridge NSString *)kABPersonAddressCityKey : selectedLocation.city,
-             (__bridge NSString *)kABPersonAddressStateKey : selectedLocation.state,
-             (__bridge NSString *)kABPersonAddressZIPKey : selectedLocation.zip,
-             (__bridge NSString *)kABPersonAddressCountryKey : selectedLocation.country,
-             };
+    NSMutableDictionary *dictionary = [[NSMutableDictionary alloc]init];
+    if (selectedLocation.street) {
+        [dictionary setValue:selectedLocation.street forKey:(__bridge NSString *)kABPersonAddressStreetKey];
+    }
+    if (selectedLocation.city) {
+        [dictionary setValue:selectedLocation.city forKey:(__bridge NSString *)kABPersonAddressCityKey];
+    }
+    if (selectedLocation.state) {
+        [dictionary setValue:selectedLocation.state forKey:(__bridge NSString *)kABPersonAddressStateKey];
+    }
+    if (selectedLocation.zip) {
+        [dictionary setValue:selectedLocation.zip forKey:(__bridge NSString *)kABPersonAddressZIPKey];
+    }
+    if (selectedLocation.country) {
+        [dictionary setValue:selectedLocation.country forKey:(__bridge NSString *)kABPersonAddressCountryKey];
+    }
     return dictionary;
 }
 
@@ -337,6 +346,28 @@
         }];
     };
     [[LocationController publicDatabase] addOperation:fetchOperation];
+}
+
+//directions alert
+-(UIAlertController*)alertForDirectionsToPlacemark:(MKPlacemark*)placemark {
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Directions" message:@"You will be taken to the maps app for directions." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [controller removeFromParentViewController];
+    }];
+    [controller addAction:cancelAction];
+    
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"Go" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [self goToMapsAppForDirectionsToPlacemark:placemark];
+    }];
+    [controller addAction: action];
+    return controller;
+}
+
+-(void)goToMapsAppForDirectionsToPlacemark:(MKPlacemark*)placemark
+{
+    MKMapItem *mapItem = [[MKMapItem alloc] initWithPlacemark:placemark];
+    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(placemark.coordinate, 10000, 10000);
+    [MKMapItem openMapsWithItems:@[mapItem] launchOptions:[NSDictionary dictionaryWithObjectsAndKeys: [NSValue valueWithMKCoordinate:region.center], MKLaunchOptionsMapCenterKey, [NSValue valueWithMKCoordinateSpan:region.span], MKLaunchOptionsMapSpanKey, nil]];
 }
 
 

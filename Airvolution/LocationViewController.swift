@@ -36,6 +36,9 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         if !isSavedLocation {
             let newNavBar = UINavigationBar(frame: self.navBar.frame)
             let navItem = UINavigationItem()
+            self.view.backgroundColor = UIColor.airvolutionRed()
+            newNavBar.barTintColor = UIColor.airvolutionRed()
+            newNavBar.titleTextAttributes = [NSForegroundColorAttributeName:UIColor.whiteColor()]
             navItem.title = "Add Location"
             newNavBar.pushNavigationItem(navItem, animated: true)
             self.view.addSubview(newNavBar)
@@ -43,8 +46,9 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
 //            self.navigationController?.navigationBar.topItem?.title = "Back to Map"
             self.savedLocation = (self.selectedLocation as! Location)
         }
+        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
     }
-    
+
 //    override func viewWillDisappear(animated: Bool) {
 //        self.navigationController?.navigationBar.topItem?.title = "AIRVOLUTION"
 //    }
@@ -141,6 +145,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.section == 0 {
             switch indexPath.row {
+            case 1: addressTapped()
             case 2 : phoneNumberTapped()
             default : tableView.deselectRowAtIndexPath(indexPath, animated: true)
             }
@@ -155,6 +160,18 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         }
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
+    
+    func tableView(tableView: UITableView, shouldHighlightRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        if indexPath.section == 0 {
+            switch indexPath.row {
+            case 1: return true
+            case 2: return true
+            default: return false
+            }
+        }
+        return true;
+    }
+    
 // MARK: textfield
     func textFieldDidBeginEditing(textField: UITextField) {
         textField.text = "$"
@@ -218,6 +235,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     
     func addSegmentedControl(cellHeight:CGFloat) -> UISegmentedControl {
         let segmentedControl = UISegmentedControl(items: ["free", "paid"])
+        segmentedControl.tintColor = UIColor.airvolutionRed()
         segmentedControl.frame = CGRectMake(self.screenWidth - 175, (cellHeight / 2) - 10, 150, 25)
         segmentedControl .addTarget(self, action: "action:", forControlEvents: UIControlEvents.ValueChanged)
         if self.isPaid && !segmentedControl.selected{
@@ -274,6 +292,19 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
                 UIApplication.sharedApplication().openURL(url)
             }
         }
+    }
+    
+    func addressTapped() {
+        var placemark:MKPlacemark;
+        if let savedLoc = self.savedLocation {
+            let location = CLLocation(latitude: savedLoc.location.coordinate.latitude, longitude: savedLoc.location.coordinate.longitude)
+            let dictionary = LocationController.sharedInstance().addressDictionaryForLocationWithCLLocation(location)
+            placemark = MKPlacemark(coordinate: location.coordinate, addressDictionary: (dictionary as! [String : AnyObject]))
+        } else {
+            placemark = self.selectedMapItem.placemark
+        }
+        let controller = LocationController.sharedInstance().alertForDirectionsToPlacemark(placemark)
+        presentViewController(controller, animated: true, completion: nil)
     }
     
     func niceAddress() -> String {

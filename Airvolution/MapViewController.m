@@ -49,8 +49,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     [self setTitle:@"AIRVOLUTION"];
-    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor],
-                                                                    };
+    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor],};
 //    UIImage *logoImage = [UIImage imageNamed:@"logo"];
 //    UIImageView *logoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 10, 20)];
 //    logoImageView.image = logoImage;
@@ -62,7 +61,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     //    self.view.backgroundColor = [UIColor colorWithWhite:0.96 alpha:5.0];
     self.view.backgroundColor = [UIColor airvolutionRed];
     
-    
     [self setupMap];
     [self navigationBarButtonItems];
     [self registerForNotifications];
@@ -73,7 +71,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 //    [self.navigationItem setLeftBarButtonItem:searchButton];
 
     [self loadingViewAtLaunch];
-
 }
 
 - (void)loadingViewAtLaunch {
@@ -537,7 +534,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 -(void)showSelectLocationViewWithItems:(NSArray*)items{
     LocationSearchViewController *searchVC = [[LocationSearchViewController alloc]init];
-    searchVC.navBar = self.navigationController.navigationBar;
+//    searchVC.navBar = self.navigationController.navigationBar;
     searchVC.mapItems = items;
     
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:searchVC];
@@ -545,31 +542,14 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 }
 
 #pragma mark - directions
--(void)directionsButtonPressedWithAnnotation:(MKPointAnnotation *)annotation
-{
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Directions" message:@"You will be taken to the maps app for directions." preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [controller removeFromParentViewController];
-    }];
-    [controller addAction:cancelAction];
-    
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"Go" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [self goToMapsAppForDirectionsToAnnotation:annotation];
-    }];
-    [controller addAction: action];
-    
-    [self presentViewController:controller animated:YES completion:nil];
-}
 
--(void)goToMapsAppForDirectionsToAnnotation:(MKPointAnnotation *)annotation
+-(void)directionsButtonPressedWithAnnotation:(MKPointAnnotation *)annotation
 {
     CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
     NSDictionary *dictionary = [[LocationController sharedInstance]addressDictionaryForLocationWithCLLocation:location];
     MKPlacemark *placemark = [[MKPlacemark alloc] initWithCoordinate:annotation.coordinate addressDictionary:dictionary];
-    MKMapItem *mapItem = [[MKMapItem alloc] initWithPlacemark:placemark];
-    
-    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(location.coordinate, 10000, 10000);
-    [MKMapItem openMapsWithItems:@[mapItem] launchOptions:[NSDictionary dictionaryWithObjectsAndKeys: [NSValue valueWithMKCoordinate:region.center], MKLaunchOptionsMapCenterKey, [NSValue valueWithMKCoordinateSpan:region.span], MKLaunchOptionsMapSpanKey, nil]];
+    UIAlertController *controller = [[LocationController sharedInstance]alertForDirectionsToPlacemark:placemark];
+    [self presentViewController:controller animated:YES completion:nil];
 }
 
 #pragma mark - location info
