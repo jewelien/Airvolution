@@ -354,22 +354,22 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 }
 
 #pragma mark - drop Pin Action
-- (void)dropPinAtCenterOfMap {
-    
-    self.droppedPinAnnotation = [[MKPointAnnotation alloc] init];
-//    self.droppedPinAnnotation.coordinate = self.mapView.userLocation.coordinate;
-    self.droppedPinAnnotation.coordinate = self.mapView.centerCoordinate;
-    self.droppedPinAnnotation.title = droppedPinTitle;
-    self.location = [[CLLocation alloc] initWithLatitude:self.droppedPinAnnotation.coordinate.latitude longitude:self.droppedPinAnnotation.coordinate.longitude];
-    NSLog(@"DROPPED %@", self.location);
-    
-    for (id annotation in self.mapView.annotations) {
-        if ([[annotation title] isEqualToString:droppedPinTitle]) {
-            [self.mapView removeAnnotation:annotation];
-        }
-    }
-    [self.mapView addAnnotation:self.droppedPinAnnotation];
-}
+//- (void)dropPinAtCenterOfMap {
+//    
+//    self.droppedPinAnnotation = [[MKPointAnnotation alloc] init];
+////    self.droppedPinAnnotation.coordinate = self.mapView.userLocation.coordinate;
+//    self.droppedPinAnnotation.coordinate = self.mapView.centerCoordinate;
+//    self.droppedPinAnnotation.title = droppedPinTitle;
+//    self.location = [[CLLocation alloc] initWithLatitude:self.droppedPinAnnotation.coordinate.latitude longitude:self.droppedPinAnnotation.coordinate.longitude];
+//    NSLog(@"DROPPED %@", self.location);
+//    
+//    for (id annotation in self.mapView.annotations) {
+//        if ([[annotation title] isEqualToString:droppedPinTitle]) {
+//            [self.mapView removeAnnotation:annotation];
+//        }
+//    }
+//    [self.mapView addAnnotation:self.droppedPinAnnotation];
+//}
 
 - (void)addPinWithGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
 {
@@ -404,15 +404,14 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     if ([annotation isKindOfClass:[MKUserLocation class]]) {
         return nil;
     }
-    
-    MKPinAnnotationView *pinView;
+    MKAnnotationView *pinView;
+//    MKPinAnnotationView *pinView;
 //    pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"pin"];
     
 //    if ([annotation isKindOfClass:[MKPlacemark class] ]) {
     if ([self.searchedAnnotations containsObject:annotation]) {
         pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"searchedPin"];
-        
-        pinView.pinColor = MKPinAnnotationColorGreen;
+//        pinView.pinColor = MKPinAnnotationColorGreen;
         pinView.canShowCallout = YES;
         
         UIButton *addLocationButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
@@ -424,8 +423,8 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
             pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"droppedPin"];
             pinView.draggable = YES;
             pinView.canShowCallout = YES;
-            pinView.animatesDrop = YES;
-            pinView.pinColor = MKPinAnnotationColorPurple;
+//            pinView.animatesDrop = YES;
+//            pinView.pinColor = MKPinAnnotationColorPurple;
             
             UIButton *addLocationButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
             addLocationButton.tag = 2;
@@ -440,10 +439,25 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         }     else {
             pinView.annotation = annotation;
         }
-    } else { //pinview for saved/shared locations
-        pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"sharedPin"];
+    } else { //pinview for saved/shared locations]
+        pinView = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"sharedPin"];
+//        pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"sharedPin"];
         pinView.canShowCallout = YES;
-    
+        
+        CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
+        Location *locationToCheck = [[LocationController sharedInstance]findLocationMatchingLocation:location];
+        NSString *costString = locationToCheck.costString;
+        if ([costString isEqualToString:@"FREE"]) {
+            pinView.image = [UIImage imageNamed:@"freeFlag"];
+        } else {
+            pinView.image = [UIImage imageNamed:@"paidFlag"];
+            UIImage *img = [self drawText:[NSString stringWithFormat:@"%@",costString]
+                                  inImage:[UIImage imageNamed:@"paidFlag"]
+                                  atPoint:CGPointMake(15, 25)];
+            pinView.image = img;
+
+        }
+        
         UIImage *directionsImage = [UIImage imageNamed:@"rightFilled"];
         UIButton *directionsButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, directionsImage.size.width, directionsImage.size.height)];
         [directionsButton setImage:directionsImage forState:UIControlStateNormal];
@@ -459,6 +473,34 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     }
     
     return pinView;
+}
+
+-(UIImage*) drawText:(NSString*) text
+             inImage:(UIImage*)  image
+             atPoint:(CGPoint)   point
+{
+    
+    NSMutableAttributedString *textStyle = [[NSMutableParagraphStyle defaultParagraphStyle] mutableCopy];
+    textStyle = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@",text]];
+    
+    // text color
+    [textStyle addAttribute:NSForegroundColorAttributeName value:[UIColor whiteColor] range:NSMakeRange(0, textStyle.length)];
+    
+    // text font
+    [textStyle addAttribute:NSFontAttributeName  value:[UIFont systemFontOfSize:8.0] range:NSMakeRange(0, textStyle.length)];
+    
+    UIGraphicsBeginImageContext(image.size);
+    [image drawInRect:CGRectMake(0,0,image.size.width,image.size.height)];
+    CGRect rect = CGRectMake(point.x - 8, point.y - 15, image.size.width, image.size.height);
+    [[UIColor whiteColor] set];
+    
+    // add text onto the image
+    [textStyle drawInRect:CGRectIntegral(rect)];
+    
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return newImage;
 }
 
 -(void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views {

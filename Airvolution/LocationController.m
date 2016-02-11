@@ -268,7 +268,8 @@
     [[LocationController publicDatabase]addOperation:operation];
 }
 -(void)deleteLocationInCoreData:(Location*)location {
-    [[Stack sharedInstance].managedObjectContext deleteObject:location];
+    NSManagedObject *object = [[Stack sharedInstance].managedObjectContext objectWithID:location.objectID];
+    [[Stack sharedInstance].managedObjectContext deleteObject:object];
     [self saveToCoreData];
 }
 
