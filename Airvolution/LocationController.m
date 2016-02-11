@@ -289,7 +289,7 @@
 -(NSArray *)locations {
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Location"];
     NSArray *array = [[Stack sharedInstance].managedObjectContext executeFetchRequest:fetchRequest error:NULL];
-    NSLog(@"ALL LOCATIONS COUNT = %ld", array.count);
+    NSLog(@"ALL LOCATIONS COUNT = %lu", array.count);
     return array;
 }
 

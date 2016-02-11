@@ -212,7 +212,7 @@
 - (NSArray *)allUsers {
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"User"];
     NSArray *array = [[Stack sharedInstance].managedObjectContext executeFetchRequest:fetchRequest error:NULL];
-    NSLog(@"USERS COUNT = %ld", array.count);
+    NSLog(@"USERS COUNT = %lu", array.count);
     return array;
 }
 
