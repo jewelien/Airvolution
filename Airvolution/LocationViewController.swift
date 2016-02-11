@@ -12,7 +12,6 @@ import CoreData
 
 class LocationViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     var tableView:UITableView!
-    var navBar: UINavigationBar = UINavigationBar()
     var isSavedLocation:Bool = true
     var selectedMapItem: MKMapItem = MKMapItem()
     var selectedLocation:NSManagedObject?
@@ -161,22 +160,32 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     
 // MARK: textfield
     func textFieldDidBeginEditing(textField: UITextField) {
-        textField.text = "$"
+        if textField == costTextField {
+            textField.text = "$"
+        }
     }
     
     func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
-        //don't allow $ sign to be deleted
-        if string.characters.count == 0 && textField.text == "$"{
-            return false;
+        if textField == costTextField {
+            //don't allow $ sign to be deleted
+            if string.characters.count == 0 && textField.text == "$"{
+                return false;
+            }
+            //allow backspace everytime. add a max character count 5.
+            if string.characters.count > 0 && textField.text?.characters.count > 5 {
+                return false
+            }
+            //return only numbers
+            let components = string.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString:"0123456789.").invertedSet)
+            let filtered = components.joinWithSeparator("")
+            return string == filtered
         }
-        //allow backspace everytime. add a max character count 5.
-        if string.characters.count > 0 && textField.text?.characters.count > 5 {
-            return false
-        }
-        //return only numbers
-        let components = string.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString:"0123456789.").invertedSet)
-        let filtered = components.joinWithSeparator("")
-        return string == filtered
+        return true
+    }
+    
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 
 // MARK: cell subviews
@@ -184,12 +193,20 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         let textField = UITextField(frame: CGRect(x: self.screenWidth / 2 - 100, y:cellHeight / 2 - 12, width: self.screenWidth - 115, height: 25))
         textField.placeholder = "optional"
         textField.textAlignment = NSTextAlignment.Right
+        textField.delegate = self
         self.notesTextField = textField;
         return textField;
     }
     
     func addCostTextField(cellHeight:CGFloat) -> UITextField {
         let textField = UITextField(frame: CGRect(x: self.screenWidth - 75 - 15, y:cellHeight / 2 - 12, width: 75, height: 25))
+        textField.keyboardType = UIKeyboardType.DecimalPad
+        let doneButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Done, target: self, action: "dismissKeyboard:")
+        let spaceButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
+        let toolbar = UIToolbar()
+        toolbar.backgroundColor = UIColor.lightGrayColor()
+        toolbar.items = [spaceButton, doneButton]
+        textField.inputAccessoryView = toolbar
         textField.delegate = self
         textField.textAlignment = NSTextAlignment.Right
         textField.text = "$0.00"
@@ -271,9 +288,8 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     func phoneNumberTapped() {
         let characterSet = NSCharacterSet(charactersInString: "0123456789-+()").invertedSet
         let cleanNumber = phoneNumber().componentsSeparatedByCharactersInSet(characterSet).joinWithSeparator("")
-        let escapedNumber = cleanNumber.stringByAddingPercentEncodingWithAllowedCharacters(characterSet)
-        let numberURLSting = "telprompt:\(escapedNumber)"
-        let phoneURL = NSURL(string: numberURLSting)
+        let numberURLString = "telprompt://\(cleanNumber)" //obj-C "telprompt:\(escapedNumber)"
+        let phoneURL = NSURL(string: numberURLString)
         if let url = phoneURL {
             if UIApplication .sharedApplication() .canOpenURL(url) {
                 UIApplication.sharedApplication().openURL(url)

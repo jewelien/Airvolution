@@ -569,7 +569,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     } else { //add button clicked on searched item
         LocationViewController *locationVC = [[LocationViewController alloc]init];
         locationVC.isSavedLocation = false;
-        locationVC.navBar = self.navigationController.navigationBar;
         locationVC.selectedMapItem = [self findMapItemFromSearchedList:self.selectedAnnotation];
         
         UINavigationController *nav = [self navControllerWithTitle:@"Add Location" andRootVC:locationVC];
