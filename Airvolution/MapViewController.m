@@ -73,6 +73,15 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     [self loadingViewAtLaunch];
 }
 
+-(UINavigationController*)navControllerWithTitle:(NSString*)title andRootVC:(UIViewController*)rootVC {
+    UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:rootVC];
+    nav.navigationBar.barTintColor = [UIColor airvolutionRed];
+    nav.navigationBar.tintColor = [UIColor whiteColor];
+    nav.navigationBar.topItem.title = title;
+    nav.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor],};
+    return nav;
+}
+
 - (void)loadingViewAtLaunch {
     self.initialLoadingIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     self.initialLoadingIndicatorView.frame = self.view.bounds;
@@ -441,7 +450,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         }
     } else { //pinview for saved/shared locations]
         pinView = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"sharedPin"];
-//        pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"sharedPin"];
         pinView.canShowCallout = YES;
         
         CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
@@ -558,16 +566,18 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         [self searchForGasNear:self.droppedPinAnnotation.coordinate withCompletion:^(NSArray *mapItems) {
             [self showSelectLocationViewWithItems:mapItems];
         }];
-    } else {
+    } else { //add button clicked on searched item
         LocationViewController *locationVC = [[LocationViewController alloc]init];
         locationVC.isSavedLocation = false;
         locationVC.navBar = self.navigationController.navigationBar;
         locationVC.selectedMapItem = [self findMapItemFromSearchedList:self.selectedAnnotation];
-        [self presentViewController:locationVC animated:YES completion:nil];
+        
+        UINavigationController *nav = [self navControllerWithTitle:@"Add Location" andRootVC:locationVC];
+        [self presentViewController:nav animated:YES completion:nil];
     }
 }
 
-
+//add button in navigation bar
 -(void)addButtonTapped {
     [self searchForGasNear:self.mapView.userLocation.coordinate withCompletion:^(NSArray *mapItems) {
         [self showSelectLocationViewWithItems:mapItems];
@@ -576,10 +586,9 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 -(void)showSelectLocationViewWithItems:(NSArray*)items{
     LocationSearchViewController *searchVC = [[LocationSearchViewController alloc]init];
-//    searchVC.navBar = self.navigationController.navigationBar;
     searchVC.mapItems = items;
     
-    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:searchVC];
+    UINavigationController *nav = [self navControllerWithTitle:@"Select Location" andRootVC:searchVC];
     [self presentViewController:nav animated:true completion:nil];
 }
 
@@ -600,7 +609,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     locationVC.isSavedLocation = true;
     locationVC.selectedLocation = location;
     locationVC.savedLocationPhone = self.selectedPhoneNumber;
-    [self showViewController:locationVC sender:nil];
+    [self.navigationController pushViewController:locationVC animated:true];
 }
 
 @end

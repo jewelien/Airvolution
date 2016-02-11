@@ -33,20 +33,9 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         super.viewDidLoad()
         self.screenWidth = UIScreen.mainScreen().bounds.width
         setupTableView()
-        if !isSavedLocation {
-            let newNavBar = UINavigationBar(frame: self.navBar.frame)
-            let navItem = UINavigationItem()
-            self.view.backgroundColor = UIColor.airvolutionRed()
-            newNavBar.barTintColor = UIColor.airvolutionRed()
-            newNavBar.titleTextAttributes = [NSForegroundColorAttributeName:UIColor.whiteColor()]
-            navItem.title = "Add Location"
-            newNavBar.pushNavigationItem(navItem, animated: true)
-            self.view.addSubview(newNavBar)
-        } else {
-//            self.navigationController?.navigationBar.topItem?.title = "Back to Map"
-            self.savedLocation = (self.selectedLocation as! Location)
+        if let savedLoc = self.selectedLocation {
+            self.savedLocation = (savedLoc as! Location)
         }
-        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
     }
 
 //    override func viewWillDisappear(animated: Bool) {
@@ -55,9 +44,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
 
 // MARK: tableView
     func setupTableView() {
-        var bounds:CGRect = self.view.bounds;
-        bounds.origin.y = bounds.origin.y + self.navBar.frame.height
-        self.tableView = UITableView(frame: bounds, style: UITableViewStyle.Grouped)
+        self.tableView = UITableView(frame: self.view.bounds, style: UITableViewStyle.Grouped)
         self.view.addSubview(self.tableView)
         self.tableView.dataSource = self
         self.tableView.delegate = self

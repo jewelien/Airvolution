@@ -11,16 +11,11 @@ import MapKit
 
 class LocationSearchViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     var tableView:UITableView!
-//    var navBar: UINavigationBar = UINavigationBar()
     var mapItems = [MKMapItem]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpTableView()
-        self.navigationController?.navigationBar.topItem?.title = "Select Location"
-        self.navigationController?.navigationBar.barTintColor = UIColor.airvolutionRed()
-        let titleDict: Dictionary = [NSForegroundColorAttributeName: UIColor.whiteColor()]
-        self.navigationController?.navigationBar.titleTextAttributes = titleDict
     }
     
     func setUpTableView() {
