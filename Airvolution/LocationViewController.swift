@@ -28,6 +28,12 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     var zip:String?
     var country:String?
     
+    let cancelString = "Cancel"
+    let saveString = "Save and Share"
+    let deleteString = "Delete Location"
+    let reportString = "Report Location"
+    let alreadyReportedString = "Already Reported"
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.screenWidth = UIScreen.mainScreen().bounds.width
@@ -49,16 +55,23 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        if self.isSavedLocation {
-            return 1
-        }
         return 2
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
-        case 0 : if self.isPaid{return 6} else{return 5}
-        default : return 2
+        case 0 :
+            if self.isPaid {
+                return 6
+            } else {
+                return 5
+            }
+        default :
+            if self.isSavedLocation {
+                return 1
+            } else {
+                return 2
+            }
         }
     }
     
@@ -83,7 +96,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
             case 2: cell!.textLabel?.text = "Phone: \(phoneNumber())"
             case 3: cell!.textLabel?.text = "Air Pump"
             if let location = self.savedLocation {
-                cell?.addSubview(addCellLabel(cellHeight!, text: location.costString))
+                cell?.addSubview(addCellLabel(cell!, text: location.costString))
             } else {
                 cell?.addSubview(addSegmentedControl(cellHeight!))
                 }
@@ -94,14 +107,14 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
                 } else {
                     cell!.textLabel?.text = "Notes"
                     if let location = self.savedLocation {
-                        cell?.addSubview(addCellLabel(cellHeight!, text: location.locationNotes))
+                        cell?.addSubview(addCellLabel(cell!, text: location.locationNotes))
                     } else {
                         cell?.addSubview(addNotesTextField(cellHeight!))
                     }
                 }
             case 5: cell!.textLabel?.text = "Notes"
                 if let location = self.savedLocation {
-                    cell?.addSubview(addCellLabel(cellHeight!, text: location.locationNotes))
+                    cell?.addSubview(addCellLabel(cell!, text: location.locationNotes))
                 } else {
                     cell?.addSubview(addNotesTextField(cellHeight!))
                 }
@@ -113,12 +126,34 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
             cell?.backgroundColor = UIColor.airvolutionRed()
             cell?.textLabel?.textColor = UIColor.whiteColor()
             switch indexPath.row {
-            case 0: cell!.textLabel?.text = "Cancel"
-            default: cell!.textLabel?.text = "Save"
+            case 0:
+                if !self.isSavedLocation {
+                    cell!.textLabel?.text = self.cancelString
+                } else if (self.savedLocation?.userRecordName == UserController.sharedInstance().currentUserRecordName) {
+                    cell!.textLabel?.text = self.deleteString
+                } else {
+                    if userAlreadyReportedLocation() {
+                        cell?.textLabel?.text = self.alreadyReportedString
+                        cell?.backgroundColor = UIColor.lightGrayColor()
+                    } else {
+                        cell?.textLabel?.text = self.reportString
+                    }
+                }
+            default: cell!.textLabel?.text = self.saveString
             }
         }
         
         return cell!
+    }
+    
+    func userAlreadyReportedLocation() -> Bool {
+        if let reportsArray = self.savedLocation?.reports {
+            let array = reportsArray as! Array<String>
+            if array.contains(UserController.sharedInstance().currentUserRecordName){
+                return true
+            }
+        }
+        return false
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -133,6 +168,9 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let cell = self.tableView.cellForRowAtIndexPath(indexPath)
+        let cellLabelText = cell?.textLabel?.text
+        print(cell?.textLabel?.text)
         if indexPath.section == 0 {
             switch indexPath.row {
             case 1: addressTapped()
@@ -141,17 +179,23 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
             }
         }
         if indexPath.section == 1 {
-            switch indexPath.row {
-            case 1 :
+            switch cellLabelText! {
+            case self.saveString:
                 saveLocation()
                 self.dismissViewControllerAnimated(true, completion: nil)
-            default : self.dismissViewControllerAnimated(true, completion: nil)
+            case self.deleteString:
+                LocationController.sharedInstance().deleteLocationWithRecordName(self.savedLocation?.recordName)
+                self.navigationController?.popViewControllerAnimated(true)
+            case self.reportString:
+                reportLocationAlert()
+            default: self.dismissViewControllerAnimated(true, completion: nil)
             }
         }
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
     func tableView(tableView: UITableView, shouldHighlightRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        let cell = tableView.cellForRowAtIndexPath(indexPath)
         if indexPath.section == 0 {
             switch indexPath.row {
             case 1: return true
@@ -159,7 +203,52 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
             default: return false
             }
         }
+        if cell?.textLabel?.text == alreadyReportedString {
+            return false
+        }
         return true;
+    }
+    
+    func reportLocationAlert() {
+        let alert = UIAlertController(title: "Report", message: "You are reporting this location as inacurrate information", preferredStyle: UIAlertControllerStyle.Alert)
+        let confirm = UIAlertAction(title: "Confirm", style: UIAlertActionStyle.Default) { (action) -> Void in
+            LocationController.sharedInstance().reportLocation(self.savedLocation, withCompletion: { (success) -> Void in
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    if success {
+                        self.successReportAlert()
+                    } else {
+                        self.failedReportAlert()
+                    }
+                })
+            })
+            alert.removeFromParentViewController()
+        }
+        let cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { (action) -> Void in
+            alert.removeFromParentViewController()
+        }
+        alert.addAction(confirm)
+        alert.addAction(cancel)
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func successReportAlert() {
+        let alert = UIAlertController(title: "Success", message: "Thank you for reporting this location.", preferredStyle: UIAlertControllerStyle.Alert)
+        let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default) { (action) -> Void in
+            alert.removeFromParentViewController()
+            self.navigationController?.popViewControllerAnimated(true)
+        }
+        alert.addAction(ok)
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func failedReportAlert() {
+        let alert = UIAlertController(title: "Failed to Report", message: "Location report failed. Please try again later.", preferredStyle: UIAlertControllerStyle.Alert)
+        let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default) { (action) -> Void in
+            alert.removeFromParentViewController()
+            self.navigationController?.popViewControllerAnimated(true)
+        }
+        alert.addAction(ok)
+        self.presentViewController(alert, animated: true, completion: nil)
     }
     
 // MARK: textfield
@@ -238,8 +327,10 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         return 0.00
     }
     
-    func addCellLabel(cellHeight:CGFloat, text:String) -> UILabel {
-        let label = UILabel(frame: CGRect(x: self.screenWidth / 2 - 100, y:cellHeight / 2 - 12, width: self.screenWidth - 115, height: 25))
+    func addCellLabel(cell:UITableViewCell, text:String)-> UILabel {
+        let cellHeight = cell.frame.size.height
+        let label = UILabel(frame: CGRect(x:self.screenWidth * 0.27, y:cellHeight / 2 - 12, width: self.screenWidth - 115, height: 25))
+//        label.backgroundColor = UIColor .redColor()
         label.textAlignment = NSTextAlignment.Right
         if text.characters.count > 0 {
             label.text = text

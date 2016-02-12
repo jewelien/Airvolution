@@ -46,13 +46,13 @@
     profileViewController.tabBarItem = profileTabBar;
     UINavigationController *profileNav = [[UINavigationController alloc] initWithRootViewController:profileViewController];
     
-    LeaderboardViewController *leaderboardViewController = [LeaderboardViewController new];
-    UIImage *leaderboardImage = [UIImage imageNamed:@"people"];
-    UITabBarItem *leaderboardTabBar = [[UITabBarItem alloc] initWithTitle:@"Leaderboard" image:leaderboardImage selectedImage:nil];
-    leaderboardViewController.tabBarItem = leaderboardTabBar;
-    UINavigationController *leaderboardNav = [[UINavigationController alloc] initWithRootViewController:leaderboardViewController];
+//    LeaderboardViewController *leaderboardViewController = [LeaderboardViewController new];
+//    UIImage *leaderboardImage = [UIImage imageNamed:@"people"];
+//    UITabBarItem *leaderboardTabBar = [[UITabBarItem alloc] initWithTitle:@"Leaderboard" image:leaderboardImage selectedImage:nil];
+//    leaderboardViewController.tabBarItem = leaderboardTabBar;
+//    UINavigationController *leaderboardNav = [[UINavigationController alloc] initWithRootViewController:leaderboardViewController];
     
-    NSArray *controllers = [NSArray arrayWithObjects:profileNav, navigationController, leaderboardNav, nil];
+    NSArray *controllers = [NSArray arrayWithObjects: navigationController,profileNav,nil];
     
     self.tabBarController = [[UITabBarController alloc] init];
     self.tabBarController.viewControllers = controllers;
@@ -64,7 +64,7 @@
     [self.window makeKeyAndVisible];
     
     UITabBarController *tabBar = (UITabBarController *)self.window.rootViewController;
-    tabBar.selectedIndex = 1;
+    tabBar.selectedIndex = 0;
     
     return YES;
 }

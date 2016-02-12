@@ -118,7 +118,7 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     Location *selectedLocation =[[UserController sharedInstance].currentUser sortedLocations][indexPath.row];
     AppDelegate *delegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    MapViewController *mapVC = delegate.tabBarController.viewControllers[1];
+    MapViewController *mapVC = delegate.tabBarController.viewControllers[0];
     delegate.tabBarController.selectedViewController = mapVC;
     [[NSNotificationCenter defaultCenter]postNotificationName:goToLocationNotificationKey object:selectedLocation];
     [tableView deselectRowAtIndexPath:indexPath animated:YES];

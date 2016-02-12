@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="15C50" minimumToolsVersion="Xcode 7.0">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="15D21" minimumToolsVersion="Xcode 7.0">
     <entity name="Location" representedClassName="Location" syncable="YES">
         <attribute name="city" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="cost" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
@@ -10,6 +10,7 @@
         <attribute name="locationName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="locationNotes" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="recordName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="reports" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="state" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="street" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="userRecordName" optional="YES" attributeType="String" syncable="YES"/>
@@ -26,7 +27,7 @@
         <relationship name="locations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Location" inverseName="user" inverseEntity="Location" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Location" positionX="1386" positionY="-121" width="207" height="255"/>
+        <element name="Location" positionX="1386" positionY="-121" width="207" height="270"/>
         <element name="User" positionX="1069" positionY="-90" width="128" height="150"/>
     </elements>
 </model>

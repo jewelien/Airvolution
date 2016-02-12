@@ -62,7 +62,7 @@ class LocationSearchViewController: UIViewController, UITableViewDelegate, UITab
         if isDroppedPin {
             return "gas stations near dropped pin"
         }
-        return "gas stations near current location"
+        return "gas stations near you"
     }
 
     func niceAddress(mapItem:MKMapItem) -> String {

@@ -28,6 +28,7 @@ static NSString * const usernameKey = @"username";
 static NSString * const userRecordIDRefKey = @"userRecordID";
 static NSString * const notesKey = @"notes";
 static NSString * const costKey = @"cost";
+static NSString * const reportsKey = @"reports";
 
 @interface Location : NSManagedObject
 
@@ -45,6 +46,7 @@ static NSString * const costKey = @"cost";
 @property (nonatomic, retain) NSString *recordName;
 @property (nonatomic) double cost;
 @property (nonatomic, retain) User *user; //relationship
+@property (nonatomic, retain) NSArray *reports;
 
 @property (nonatomic, retain) NSString *creationDateString;
 @property (nonatomic, retain) NSString *costString;

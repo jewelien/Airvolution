@@ -466,11 +466,11 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         Location *locationToCheck = [[LocationController sharedInstance]findLocationMatchingLocation:location];
         NSString *costString = locationToCheck.costString;
         if ([costString isEqualToString:@"FREE"]) {
-            pinView.image = [UIImage imageNamed:@"freeFlag"];
+            UIImage *img = [self drawText:[NSString stringWithFormat:@"%@ \n FREE", locationToCheck.locationName] inImage:[UIImage imageNamed:@"commentsRed"] atPoint:CGPointMake(15, 25)];
+            pinView.image = img;
         } else {
-            pinView.image = [UIImage imageNamed:@"paidFlag"];
-            UIImage *img = [self drawText:[NSString stringWithFormat:@"%@",costString]
-                                  inImage:[UIImage imageNamed:@"paidFlag"]
+            UIImage *img = [self drawText:[NSString stringWithFormat:@"%@ %@",locationToCheck.locationName, costString]
+                                  inImage:[UIImage imageNamed:@"commentsGreen"]
                                   atPoint:CGPointMake(15, 25)];
             pinView.image = img;
         }
@@ -506,7 +506,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     
     UIGraphicsBeginImageContext(image.size);
     [image drawInRect:CGRectMake(0,0,image.size.width,image.size.height)];
-    CGRect rect = CGRectMake(point.x - 8, point.y - 15, image.size.width, image.size.height);
+    CGRect rect = CGRectMake(point.x - 8, point.y - 18, image.size.width, image.size.height);
     [[UIColor whiteColor] set];
     
     // add text onto the image

@@ -25,6 +25,7 @@
 @dynamic recordName;
 @dynamic user;
 @dynamic cost;
+@dynamic reports;
 
 @synthesize creationDateString;
 @synthesize costString;

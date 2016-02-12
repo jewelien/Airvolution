@@ -42,6 +42,7 @@ static NSString *const locationDeletedNotificationKey = @"location deleted";
 -(void)updateUsersSharedLocationsUsernameIfChanged:(NSString *)newUsername;
 -(void)didReceiveNotification:(NSDictionary*)notificationInfo;
 -(void)subscribe;
+- (void)reportLocation:(Location*)location withCompletion:(void(^)(BOOL success))completion;
 
 -(UIAlertController*)alertForDirectionsToPlacemark:(MKPlacemark*)placemark;
 -(void)goToMapsAppForDirectionsToPlacemark:(MKPlacemark*)placemark;
