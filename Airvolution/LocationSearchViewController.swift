@@ -12,10 +12,21 @@ import MapKit
 class LocationSearchViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     var tableView:UITableView!
     var mapItems = [MKMapItem]()
+    var isDroppedPin:Bool = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpTableView()
+        let cancel = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Cancel, target: self, action: Selector("cancelAction"))
+        self.navigationItem.rightBarButtonItem = cancel
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        self.title = "Select Location"
+    }
+    
+    func cancelAction() {
+        self.dismissViewControllerAnimated(false, completion: nil)
     }
     
     func setUpTableView() {
@@ -42,12 +53,16 @@ class LocationSearchViewController: UIViewController, UITableViewDelegate, UITab
         let addLocationVC = LocationViewController()
         addLocationVC.isSavedLocation = false
         addLocationVC.selectedMapItem = self.mapItems[indexPath.row]
+        self.title = ""
         self.navigationController?.pushViewController(addLocationVC, animated: true)
         self.tableView .deselectRowAtIndexPath(indexPath, animated: true)
     }
     
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "nearby gas stations"
+        if isDroppedPin {
+            return "gas stations near dropped pin"
+        }
+        return "gas stations near current location"
     }
 
     func niceAddress(mapItem:MKMapItem) -> String {

@@ -34,12 +34,11 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         setupTableView()
         if let savedLoc = self.selectedLocation {
             self.savedLocation = (savedLoc as! Location)
+        } else {
+            self.navigationItem.title = "Add Location"
         }
     }
 
-//    override func viewWillDisappear(animated: Bool) {
-//        self.navigationController?.navigationBar.topItem?.title = "AIRVOLUTION"
-//    }
 
 // MARK: tableView
     func setupTableView() {
@@ -72,14 +71,19 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         let cellHeight = cell?.frame.size.height
         if indexPath.section == 0 {
             switch indexPath.row {
-            case 0: cell!.textLabel?.text = "\(locationName())"
-            cell?.textLabel?.font = UIFont(name: (cell?.textLabel?.font?.fontName)!, size: 25.0)
+            case 0:
+                if let location = self.savedLocation {
+                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "subtitleCell")
+                    cell?.detailTextLabel?.text = "Added: \(location.creationDateString)"
+                }
+                cell!.textLabel?.text = "\(locationName())"
+                cell?.textLabel?.font = UIFont(name: (cell?.textLabel?.font?.fontName)!, size: 25.0)
             case 1: cell!.textLabel?.text = "Address:" + "\n" + "\(niceAddress())"
             cell?.textLabel?.numberOfLines = 3
             case 2: cell!.textLabel?.text = "Phone: \(phoneNumber())"
             case 3: cell!.textLabel?.text = "Air Pump"
             if let location = self.savedLocation {
-                 cell?.addSubview(addCellLabel(cellHeight!, text: location.costString))
+                cell?.addSubview(addCellLabel(cellHeight!, text: location.costString))
             } else {
                 cell?.addSubview(addSegmentedControl(cellHeight!))
                 }
@@ -160,11 +164,25 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     
 // MARK: textfield
     func textFieldDidBeginEditing(textField: UITextField) {
+        self.tableView.frame.origin.y = -90
+        let tap = UITapGestureRecognizer(target: self, action: Selector("dismissKeyboard:"))
+        view.addGestureRecognizer(tap)
         if textField == costTextField {
             textField.text = "$"
         }
     }
     
+    func textFieldDidEndEditing(textField: UITextField) {
+        self.tableView.frame.origin.y = self.view.frame.origin.y
+    }
+    
+    func dismissKeyboard(sender: AnyObject) {
+        let tap = sender as! UITapGestureRecognizer
+        costTextField?.resignFirstResponder()
+        notesTextField.resignFirstResponder()
+        view.removeGestureRecognizer(tap)
+    }
+
     func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
         if textField == costTextField {
             //don't allow $ sign to be deleted
@@ -201,12 +219,6 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     func addCostTextField(cellHeight:CGFloat) -> UITextField {
         let textField = UITextField(frame: CGRect(x: self.screenWidth - 75 - 15, y:cellHeight / 2 - 12, width: 75, height: 25))
         textField.keyboardType = UIKeyboardType.DecimalPad
-        let doneButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Done, target: self, action: "dismissKeyboard:")
-        let spaceButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let toolbar = UIToolbar()
-        toolbar.backgroundColor = UIColor.lightGrayColor()
-        toolbar.items = [spaceButton, doneButton]
-        textField.inputAccessoryView = toolbar
         textField.delegate = self
         textField.textAlignment = NSTextAlignment.Right
         textField.text = "$0.00"

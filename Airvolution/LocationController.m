@@ -239,9 +239,11 @@
     CKRecordID *recordID = [queryNotification recordID];
     Location *location = [self findLocationInCoreDataWithLocationIdentifier:recordID.recordName];
     [self deleteLocationInCoreData:location];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:nil];
-    });
+    if ([location.userRecordName isEqualToString:[UserController sharedInstance].currentUserRecordName]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:nil];
+        });
+    }
     [self updateUI];
 }
 
@@ -289,7 +291,7 @@
 -(NSArray *)locations {
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Location"];
     NSArray *array = [[Stack sharedInstance].managedObjectContext executeFetchRequest:fetchRequest error:NULL];
-    NSLog(@"ALL LOCATIONS COUNT = %lu", array.count);
+    NSLog(@"ALL LOCATIONS COUNT = %lu", (unsigned long)array.count);
     return array;
 }
 

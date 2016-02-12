@@ -48,7 +48,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    [self setTitle:@"AIRVOLUTION"];
     self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor],};
 //    UIImage *logoImage = [UIImage imageNamed:@"logo"];
 //    UIImageView *logoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 10, 20)];
@@ -71,6 +70,10 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 //    [self.navigationItem setLeftBarButtonItem:searchButton];
 
     [self loadingViewAtLaunch];
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    self.title = @"AIRVOLUTION";
 }
 
 -(UINavigationController*)navControllerWithTitle:(NSString*)title andRootVC:(UIViewController*)rootVC {
@@ -134,18 +137,21 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         self.searchBar.backgroundColor = [UIColor whiteColor];
             self.searchBar.barTintColor = [UIColor lightGrayColor];
         self.searchBar.delegate = self;
-        self.searchBar.showsCancelButton = YES;
         [self.view addSubview:self.searchBar];
     }];
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapAction)];
+    [self.view addGestureRecognizer:tap];
 }
 
--(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
-    [searchBar resignFirstResponder];
-    [self.mapView removeAnnotations:self.searchedAnnotations];
-//    [UIView animateWithDuration:1.0 animations:^{
-//        self.searchBar.frame = CGRectMake(20, -30, 285, 30);
-//        self.searchBar.text = @"";
-//    }];
+-(void)tapAction {
+    [self.searchBar resignFirstResponder];
+}
+
+-(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText{
+    if (!searchText.length){
+        [self.mapView removeAnnotations:self.searchedAnnotations];
+    }
 }
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
@@ -427,6 +433,11 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         addLocationButton.tag = 2;
         pinView.rightCalloutAccessoryView = addLocationButton;
         
+        UIImage *directionsImage = [UIImage imageNamed:@"rightFilled"];
+        UIButton *directionsButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, directionsImage.size.width, directionsImage.size.height)];
+        [directionsButton setImage:directionsImage forState:UIControlStateNormal];
+        directionsButton.tag = 3;
+        pinView.leftCalloutAccessoryView = directionsButton;
     } else if ([[annotation title] isEqualToString:droppedPinTitle]) {
         if (pinView == nil) {
             pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"droppedPin"];
@@ -444,7 +455,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
             [removePinButton setImage:removePinImage forState:UIControlStateNormal];
             removePinButton.tag = 1;
             pinView.leftCalloutAccessoryView = removePinButton;
-            
         }     else {
             pinView.annotation = annotation;
         }
@@ -463,9 +473,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
                                   inImage:[UIImage imageNamed:@"paidFlag"]
                                   atPoint:CGPointMake(15, 25)];
             pinView.image = img;
-
         }
-        
         UIImage *directionsImage = [UIImage imageNamed:@"rightFilled"];
         UIButton *directionsButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, directionsImage.size.width, directionsImage.size.height)];
         [directionsButton setImage:directionsImage forState:UIControlStateNormal];
@@ -479,7 +487,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         moreInfoButton.tag = 4;
         pinView.rightCalloutAccessoryView = moreInfoButton;
     }
-    
     return pinView;
 }
 
@@ -531,7 +538,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 -(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
 {
     self.selectedAnnotation = view.annotation;
-    
     if ([control tag] == 2) {
         //add
         if ([self.selectedAnnotation.title isEqualToString:droppedPinTitle]) {
@@ -541,14 +547,12 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
             [self addLocationButtonClickedOn:false];
         }
     } else if ([control tag] == 1) {
-        //cancel
+        //cancel dropped pin
         [self.mapView removeAnnotation:self.droppedPinAnnotation];
         self.droppedPinAnnotation = nil;
-        
     } else if ([control tag] == 3) {
-        //directions, saved location
+        //directions, saved location and searched item
         [self directionsButtonPressedWithAnnotation:self.selectedAnnotation];
-        
     } else if ([control tag] == 4) {
         //more info, saved location
         CLLocation *location = [[CLLocation alloc] initWithLatitude:self.selectedAnnotation.coordinate.latitude longitude:self.selectedAnnotation.coordinate.longitude];
@@ -564,13 +568,12 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 -(void) addLocationButtonClickedOn:(BOOL)droppedPin {
     if (droppedPin) {
         [self searchForGasNear:self.droppedPinAnnotation.coordinate withCompletion:^(NSArray *mapItems) {
-            [self showSelectLocationViewWithItems:mapItems];
+            [self showSelectLocationViewWithItems:mapItems forDroppedPin:true];
         }];
     } else { //add button clicked on searched item
         LocationViewController *locationVC = [[LocationViewController alloc]init];
         locationVC.isSavedLocation = false;
         locationVC.selectedMapItem = [self findMapItemFromSearchedList:self.selectedAnnotation];
-        
         UINavigationController *nav = [self navControllerWithTitle:@"Add Location" andRootVC:locationVC];
         [self presentViewController:nav animated:YES completion:nil];
     }
@@ -579,13 +582,14 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 //add button in navigation bar
 -(void)addButtonTapped {
     [self searchForGasNear:self.mapView.userLocation.coordinate withCompletion:^(NSArray *mapItems) {
-        [self showSelectLocationViewWithItems:mapItems];
+        [self showSelectLocationViewWithItems:mapItems forDroppedPin:false];
     }];
 }
 
--(void)showSelectLocationViewWithItems:(NSArray*)items{
+-(void)showSelectLocationViewWithItems:(NSArray*)items forDroppedPin:(BOOL)droppedPin{
     LocationSearchViewController *searchVC = [[LocationSearchViewController alloc]init];
     searchVC.mapItems = items;
+    searchVC.isDroppedPin = droppedPin;
     
     UINavigationController *nav = [self navControllerWithTitle:@"Select Location" andRootVC:searchVC];
     [self presentViewController:nav animated:true completion:nil];
@@ -608,6 +612,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     locationVC.isSavedLocation = true;
     locationVC.selectedLocation = location;
     locationVC.savedLocationPhone = self.selectedPhoneNumber;
+    self.title = @"Map";
     [self.navigationController pushViewController:locationVC animated:true];
 }
 

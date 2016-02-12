@@ -43,7 +43,7 @@
     return [NSSet setWithArray: array];
 }
 -(NSString *)points{
-    return [NSString stringWithFormat:@"%lu", self.locations.count];
+    return [NSString stringWithFormat:@"%lu", (unsigned long)self.locations.count];
 }
 
 
