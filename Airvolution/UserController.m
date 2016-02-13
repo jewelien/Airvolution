@@ -88,7 +88,7 @@
     CKFetchRecordsOperation *fetchOperation = [[CKFetchRecordsOperation alloc] initWithRecordIDs:recordIDs];
     
     fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
-        if (!operationError) {
+        if (recordsByRecordID) {
             for (CKRecordID *recordID in recordsByRecordID) {
                 NSDictionary *userDictionary = recordsByRecordID[recordID];
                 User *existingUser = [self findUserInCoreDataWithUserUserRecordName:recordID.recordName];
@@ -222,6 +222,9 @@
         if (![recordNamesSet containsObject:location.userRecordName]) {
             [recordNamesSet addObject:location.userRecordName];
         }
+    }
+    if (self.currentUserRecordName && ![recordNamesSet containsObject:self.currentUserRecordName]) {
+        [recordNamesSet addObject:self.currentUserRecordName];
     }
     return [recordNamesSet allObjects];
 }
