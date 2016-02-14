@@ -42,7 +42,7 @@
     
     ProfileViewController *profileViewController = [ProfileViewController new];
     UIImage *profileImage = [UIImage imageNamed:@"profileBlue"];
-    UITabBarItem *profileTabBar = [[UITabBarItem alloc] initWithTitle:@"Profile" image:profileImage selectedImage:nil];
+    UITabBarItem *profileTabBar = [[UITabBarItem alloc] initWithTitle:@"SHARED" image:profileImage selectedImage:nil];
     profileViewController.tabBarItem = profileTabBar;
     UINavigationController *profileNav = [[UINavigationController alloc] initWithRootViewController:profileViewController];
     
