@@ -156,43 +156,7 @@
             NSLog(@"looking for user in all Users array");
         }
     }
-//    NSLog(@"self.currentUser == %@", self.currentUser);
-//    [self checkUsername];
 }
-
-//-(void)checkUsername {
-//    //if user saved a blank username a default username will be assigned.
-//    if (!self.currentUser.username) {
-//        //    if ([self.currentUser.username isEqualToString:@""]) {
-//        
-//        NSString *defaultUsername = [self.currentUserRecordName substringFromIndex:[self.currentUserRecordName length] - 12];
-//        
-//        CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
-//        fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
-//            
-//            CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
-//            cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
-//            cloudKitUser[usernameKey] = defaultUsername;
-//            
-//            [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
-//                if (!error) {
-//                    NSLog(@"saved defaultUsername %@", record);
-//                    [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
-//                        dispatch_async(dispatch_get_main_queue(), ^{
-//                            [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
-//                        });
-//                        
-//                    }];
-//                } else {
-//                    NSLog(@"error updating username %@", error);
-//                }
-//            }];
-//        };
-//        [[UserController publicDatabase] addOperation:fetchOperation];
-//    } else {
-//        //        NSLog(@"User has a username");
-//    }
-//}
 
 #pragma mark fetch CoreData
 - (User *)findUserInCoreDataWithUserUserRecordName:(NSString*)recordName {
@@ -228,71 +192,6 @@
     }
     return [recordNamesSet allObjects];
 }
-//#pragma mark update Profile
-//-(void)updateUsernameWith:(NSString *)newUsername
-//{
-//    self.currentUser.username = newUsername;
-//    [self saveToCoreData];
-//    CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
-//    fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
-//        
-//        CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
-//        cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
-//        cloudKitUser[UsernameKey] = newUsername;
-//        
-//        [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
-//            if (!error) {
-//                NSLog(@"saved new username %@", record);
-//                dispatch_async(dispatch_get_main_queue(), ^{
-//                    [[NSNotificationCenter defaultCenter] postNotificationName:UsernameSavedNotificationKey object:nil];
-//                    [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
-//                });
-//                [[LocationController sharedInstance]updateUsersSharedLocationsUsernameIfChanged:newUsername];
-//            } else {
-//                NSLog(@"Update username error, %@", error);
-//            }
-//        }];
-//    };
-//    [[UserController publicDatabase] addOperation:fetchOperation];
-//}
-//
-//-(void)updateUserImageWithData:(NSData *)imageData
-//{
-//    self.currentUser.profileImage = [UIImage imageWithData:imageData];
-//    [self saveToCoreData];
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        [[NSNotificationCenter defaultCenter] postNotificationName:UserImageNotificationKey object:nil];
-//        [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
-//    });
-//    
-//    NSURL *cachesDirectory =[[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
-//    NSString *tempName = [[NSUUID UUID].UUIDString stringByAppendingString:@"jpeg"];
-//    
-//    NSURL *localURL = [cachesDirectory URLByAppendingPathComponent:tempName];
-//    [imageData writeToURL:localURL atomically:YES];
-//    NSLog(@"localURL %@", localURL);
-//    
-//    CKAsset *asset = [[CKAsset alloc] initWithFileURL:localURL];
-//    NSLog(@"asset %@", asset);
-//
-//    CKFetchRecordsOperation *fetchOperation = [CKFetchRecordsOperation fetchCurrentUserRecordOperation];
-//    fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
-//        
-//        CKRecord *cloudKitUser = recordsByRecordID[[recordsByRecordID allKeys].firstObject];
-//        
-//        cloudKitUser[IdentifierKey] = [[NSUUID UUID] UUIDString];
-//        cloudKitUser[ImageKey] = asset;
-//        
-//        [[UserController publicDatabase] saveRecord:cloudKitUser completionHandler:^(CKRecord *record, NSError *error) {
-//            if (!error) {
-//                NSLog(@"saved new profile image %@", record);
-//            } else {
-//                NSLog(@"Update image error: %@", error);
-//            }
-//        }];
-//    };
-//    [[UserController publicDatabase] addOperation:fetchOperation];
-//}
 
 - (void)saveLocationFilter:(NSString*)filter {
     if ([filter isEqualToString:AscendingSort]) {

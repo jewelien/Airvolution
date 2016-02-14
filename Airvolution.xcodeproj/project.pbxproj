@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FC0BCBD41AD48F9200EAF9BF /* UserCustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FC0BCBD31AD48F9200EAF9BF /* UserCustomCell.m */; };
 		FC0BCBDA1AD59DA600EAF9BF /* LocationCustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FC0BCBD91AD59DA600EAF9BF /* LocationCustomCell.m */; };
 		FC1F21CD1AC342AB00A8DCD8 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */; };
 		FC1F21CF1AC3563300A8DCD8 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC1F21CE1AC3563300A8DCD8 /* CoreLocation.framework */; };
@@ -19,7 +18,6 @@
 		FC835FEE1C3DB425006CDC97 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FC835FEC1C3DB425006CDC97 /* Model.xcdatamodeld */; };
 		FC8B18F61AC4B7E000051693 /* LocationController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8B18F51AC4B7E000051693 /* LocationController.m */; };
 		FCA0ECA41ACC662A006E1B8B /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCA0ECA31ACC662A006E1B8B /* ProfileViewController.m */; };
-		FCA0ECA71ACC663B006E1B8B /* LeaderboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */; };
 		FCB3E4061C6138DE000F20CD /* LocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB3E4051C6138DE000F20CD /* LocationViewController.swift */; };
 		FCBB5A761ACDF4000059AC3C /* UserController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCBB5A751ACDF4000059AC3C /* UserController.m */; };
 		FCBB5AAB1ACDF5D20059AC3C /* ProfileTableViewDatasource.m in Sources */ = {isa = PBXBuildFile; fileRef = FCBB5AAA1ACDF5D20059AC3C /* ProfileTableViewDatasource.m */; };
@@ -45,8 +43,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		FC0BCBD21AD48F9200EAF9BF /* UserCustomCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserCustomCell.h; sourceTree = "<group>"; };
-		FC0BCBD31AD48F9200EAF9BF /* UserCustomCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserCustomCell.m; sourceTree = "<group>"; };
 		FC0BCBD81AD59DA600EAF9BF /* LocationCustomCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationCustomCell.h; sourceTree = "<group>"; };
 		FC0BCBD91AD59DA600EAF9BF /* LocationCustomCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationCustomCell.m; sourceTree = "<group>"; };
 		FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
@@ -66,8 +62,6 @@
 		FC8B18F51AC4B7E000051693 /* LocationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationController.m; sourceTree = "<group>"; };
 		FCA0ECA21ACC662A006E1B8B /* ProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileViewController.h; sourceTree = "<group>"; };
 		FCA0ECA31ACC662A006E1B8B /* ProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileViewController.m; sourceTree = "<group>"; };
-		FCA0ECA51ACC663B006E1B8B /* LeaderboardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LeaderboardViewController.h; sourceTree = "<group>"; };
-		FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LeaderboardViewController.m; sourceTree = "<group>"; };
 		FCB3E4041C6138DE000F20CD /* Airvolution-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Airvolution-Bridging-Header.h"; sourceTree = "<group>"; };
 		FCB3E4051C6138DE000F20CD /* LocationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationViewController.swift; sourceTree = "<group>"; };
 		FCBB5A741ACDF4000059AC3C /* UserController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserController.h; sourceTree = "<group>"; };
@@ -130,14 +124,10 @@
 			children = (
 				FCE401321AC0C9E800DBB19A /* MapViewController.h */,
 				FCE401331AC0C9E800DBB19A /* MapViewController.m */,
-				FCA0ECA51ACC663B006E1B8B /* LeaderboardViewController.h */,
-				FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */,
 				FCA0ECA21ACC662A006E1B8B /* ProfileViewController.h */,
 				FCA0ECA31ACC662A006E1B8B /* ProfileViewController.m */,
 				FCBB5AA91ACDF5D20059AC3C /* ProfileTableViewDatasource.h */,
 				FCBB5AAA1ACDF5D20059AC3C /* ProfileTableViewDatasource.m */,
-				FC0BCBD21AD48F9200EAF9BF /* UserCustomCell.h */,
-				FC0BCBD31AD48F9200EAF9BF /* UserCustomCell.m */,
 				FC0BCBD81AD59DA600EAF9BF /* LocationCustomCell.h */,
 				FC0BCBD91AD59DA600EAF9BF /* LocationCustomCell.m */,
 				FCEAA3461C651B08003B659C /* LocationSearchViewController.swift */,
@@ -345,8 +335,6 @@
 				FC58E8FF1ACDE33B00CF6A0C /* User.m in Sources */,
 				FCEAA3471C651B08003B659C /* LocationSearchViewController.swift in Sources */,
 				FCBB5AAB1ACDF5D20059AC3C /* ProfileTableViewDatasource.m in Sources */,
-				FCA0ECA71ACC663B006E1B8B /* LeaderboardViewController.m in Sources */,
-				FC0BCBD41AD48F9200EAF9BF /* UserCustomCell.m in Sources */,
 				FCE401341AC0C9E800DBB19A /* MapViewController.m in Sources */,
 				FC835FEE1C3DB425006CDC97 /* Model.xcdatamodeld in Sources */,
 				FCA0ECA41ACC662A006E1B8B /* ProfileViewController.m in Sources */,

@@ -343,30 +343,6 @@
     return self.selectedLocation;
 }
 
-
--(void)updateUsersSharedLocationsUsernameIfChanged:(NSString *)newUsername {
-    
-    NSMutableArray *usersLocationsRecordId = [[NSMutableArray alloc] init];
-    for (Location *location in [UserController sharedInstance].currentUser.locations) {
-        CKRecordID *recordID = [[CKRecordID alloc]initWithRecordName:location.recordName];
-        [usersLocationsRecordId addObject:recordID];
-    }
-    CKFetchRecordsOperation *fetchOperation = [[CKFetchRecordsOperation alloc] initWithRecordIDs:usersLocationsRecordId];
-    fetchOperation.perRecordCompletionBlock = ^(CKRecord *record, CKRecordID *recordID, NSError *error) {
-        CKRecord *cloudKitLocation = record;
-        cloudKitLocation[usernameKey] = newUsername;
-        
-        [[LocationController publicDatabase] saveRecord:cloudKitLocation completionHandler:^(CKRecord *record, NSError *error) {
-            if (error) {
-                NSLog(@"error saving locations with new username, %@", error);
-            } else {
-                NSLog(@"successfully saved user's locations with new username, %@", record);
-            }
-        }];
-    };
-    [[LocationController publicDatabase] addOperation:fetchOperation];
-}
-
 #pragma mark Report
 
 - (void)reportLocation:(Location*)location withCompletion:(void(^)(BOOL success))completion  {

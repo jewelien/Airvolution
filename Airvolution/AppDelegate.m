@@ -10,7 +10,6 @@
 #import "MapViewController.h"
 #import "LocationController.h"
 #import "ProfileViewController.h"
-#import "LeaderboardViewController.h"
 #import "UserController.h"
 #import <MapKit/MapKit.h>
 #import "UIColor+Color.h"
@@ -45,12 +44,6 @@
     UITabBarItem *profileTabBar = [[UITabBarItem alloc] initWithTitle:@"SHARED" image:profileImage selectedImage:nil];
     profileViewController.tabBarItem = profileTabBar;
     UINavigationController *profileNav = [[UINavigationController alloc] initWithRootViewController:profileViewController];
-    
-//    LeaderboardViewController *leaderboardViewController = [LeaderboardViewController new];
-//    UIImage *leaderboardImage = [UIImage imageNamed:@"people"];
-//    UITabBarItem *leaderboardTabBar = [[UITabBarItem alloc] initWithTitle:@"Leaderboard" image:leaderboardImage selectedImage:nil];
-//    leaderboardViewController.tabBarItem = leaderboardTabBar;
-//    UINavigationController *leaderboardNav = [[UINavigationController alloc] initWithRootViewController:leaderboardViewController];
     
     NSArray *controllers = [NSArray arrayWithObjects: navigationController,profileNav,nil];
     

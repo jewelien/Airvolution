@@ -9,7 +9,6 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-//static NSString * const editProfileNotificationKey = @"edit profile tapped";
 static NSString * const deleteLocationNotificationKey = @"delete location tapped";
 static NSString * const editSortNotificationKey = @"edit sort tapped";
 static NSString * const goToLocationNotificationKey = @"goToLocation";
