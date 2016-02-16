@@ -13,7 +13,6 @@
 static NSString * const removeLoadingLaunchScreenNotification = @"remove launch screen";
 static NSString * const updateProfileKey = @"users shared locations updated";
 static NSString * const NotLoggedIniCloudNotificationKey = @"iCloud user not found";
-static NSString * const AllUsersFetchNotificationKey = @"all users fetched";
 static NSString * const UsernameSavedNotificationKey = @"new username saved";
 static NSString * const UserImageNotificationKey = @"profile image saved";
 
@@ -31,14 +30,11 @@ static NSString * const AlphabeticalSort = @"alphabetical";
 @property (nonatomic, strong) CKRecordID *currentUserRecordID; //User Record Type
 @property (nonatomic, strong) NSString *currentUserRecordName; //User Record Type
 
-
 + (UserController *)sharedInstance;
 - (void)initialLoad:(BOOL)isInitialLoad;
-- (void)findCurrentUser;
-
 - (void)fetchUserRecordIDWithCompletion:(void (^)(NSString *userRecordName))completion;
 - (User *)findUserInCoreDataWithUserUserRecordName:(NSString*)recordName;
 - (NSArray*)fetchLocationsForUser:(User*)user;
 - (void)saveLocationFilter:(NSString*)filter;
-
+- (void)retrieveUserWithRecordName:(NSString*)recordName;
 @end

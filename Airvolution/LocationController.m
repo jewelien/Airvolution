@@ -76,13 +76,14 @@
 }
 
 #pragma mark load
-- (void)loadLocationsFromCloudKitWithCompletion:(void (^)(NSArray *array))completion
-{
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"TRUEPREDICATE"];
+//locations from location
+- (void)loadLocationsFromLocation:(CLLocation*)location completion:(void (^)(NSArray *locations))completion {
+    CGFloat radius = 50000; //meters
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"distanceToLocation:fromLocation:(coordinates, %@) < %f", location, radius];
     CKQuery *query = [[CKQuery alloc] initWithRecordType:locationRecordKey predicate:predicate];
-    [[LocationController publicDatabase] performQuery:query inZoneWithID:nil completionHandler:^(NSArray *results, NSError *error) {
+    [[LocationController publicDatabase] performQuery:query inZoneWithID:nil completionHandler:^(NSArray<CKRecord *> * _Nullable results, NSError * _Nullable error) {
         if (error) {
-            NSLog(@"fetch locations failed");
+            NSLog(@"error fetching locations %@", error);
         } else {
             NSLog(@"fetched locations successfully");
             for (NSDictionary *record in results) {
@@ -97,7 +98,6 @@
 }
 
 - (void)saveLocationToCoreData:(NSDictionary*)record {
-    
     Location *location = [NSEntityDescription insertNewObjectForEntityForName:@"Location" inManagedObjectContext:[Stack sharedInstance].managedObjectContext];
     location.locationName = [record objectForKey:nameKey];
     location.street =  [record objectForKey:streetKey];
@@ -116,7 +116,7 @@
     location.userRecordName = reference.recordID.recordName;
     location.cost = [[record objectForKey:costKey] doubleValue];
     location.reports = [record objectForKey:reportsKey];
-    
+        
     if (![location isInserted]) {
         [[Stack sharedInstance].managedObjectContext insertObject:location];
     }
@@ -126,36 +126,8 @@
 
 
 -(void)saveToCoreData {
-    //    [[Stack sharedInstance].managedObjectContext refreshAllObjects];
     [[Stack sharedInstance].managedObjectContext save:nil];
-    //    NSError *error = nil;
-    //    if(![[Stack sharedInstance].managedObjectContext save:&error]) {
-    //        NSLog(@"Failed to save to data store: %@", [error localizedDescription]);
-    //        NSArray* detailedErrors = [[error userInfo] objectForKey:NSDetailedErrorsKey];
-    //        if(detailedErrors != nil && [detailedErrors count] > 0) {
-    //            for(NSError* detailedError in detailedErrors) {
-    //                NSLog(@"  DetailedError: %@", [detailedError userInfo]);
-    //            }
-    //        }
-    //        else {
-    //            NSLog(@"  %@", [error userInfo]);
-    //        }
-    //    }
-    //    [[Stack sharedInstance].managedObjectContext performBlock:^{
-    //        NSError *error = nil;
-    //        BOOL success = [[Stack sharedInstance].managedObjectContext save:&error];
-    //        if (!success) {
-    //            NSLog(@"Core Data save ERROR %@", error);
-    //        }
-    //    }];
-    //    if (![[NSThread currentThread] isMainThread]) {
-    //        dispatch_async(dispatch_get_main_queue(), ^{
-    //            [[Stack sharedInstance].managedObjectContext save:NULL];
-    //        });
-    //        return;
-    //    }
 }
-
 
 - (void)updateUI{
     dispatch_async(dispatch_get_main_queue(), ^{

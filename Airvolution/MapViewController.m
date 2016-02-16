@@ -44,11 +44,10 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 @implementation MapViewController
 
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor],};
+    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor], };
 //    UIImage *logoImage = [UIImage imageNamed:@"logo"];
 //    UIImageView *logoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 10, 20)];
 //    logoImageView.image = logoImage;
@@ -71,6 +70,25 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
     [self loadingViewAtLaunch];
 }
+
+-(void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated {
+    CLLocation *location = [[CLLocation alloc]initWithLatitude:mapView.region.center.latitude longitude:mapView.region.center.longitude];
+    [[LocationController sharedInstance]loadLocationsFromLocation:location completion:^(NSArray *locations) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateMapWithSavedLocations];
+        });
+    }];
+}
+
+//-(void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation{
+//    NSLog(@"did update user loc %f %f", userLocation.coordinate.latitude, userLocation.coordinate.longitude);
+//    [[LocationController sharedInstance]loadLocationsFromLocation:userLocation.location completion:^(NSArray *locations) {
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            [self updateMapWithSavedLocations];
+//        });
+//    }];
+//}
+
 
 -(void)viewWillAppear:(BOOL)animated {
     self.title = @"AIRVOLUTION";
@@ -107,6 +125,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     [self.view addSubview:self.mapView];
     self.mapView.showsUserLocation = YES;
     self.mapView.userTrackingMode = MKUserTrackingModeFollow;
+    NSLog(@"user loc = %@", self.mapView.userLocation.location);
 }
 
 - (void)navigationBarButtonItems{
@@ -466,13 +485,9 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         Location *locationToCheck = [[LocationController sharedInstance]findLocationMatchingLocation:location];
         NSString *costString = locationToCheck.costString;
         if ([costString isEqualToString:@"FREE"]) {
-            UIImage *img = [self drawText:[NSString stringWithFormat:@"%@ \n FREE", locationToCheck.locationName] inImage:[UIImage imageNamed:@"commentsRed"] atPoint:CGPointMake(15, 25)];
-            pinView.image = img;
+            pinView.image = [UIImage imageNamed:@"redMarker"];
         } else {
-            UIImage *img = [self drawText:[NSString stringWithFormat:@"%@ %@",locationToCheck.locationName, costString]
-                                  inImage:[UIImage imageNamed:@"commentsGreen"]
-                                  atPoint:CGPointMake(15, 25)];
-            pinView.image = img;
+            pinView.image = [UIImage imageNamed:@"greenMarker"];
         }
         UIImage *directionsImage = [UIImage imageNamed:@"rightFilled"];
         UIButton *directionsButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, directionsImage.size.width, directionsImage.size.height)];
@@ -488,34 +503,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         pinView.rightCalloutAccessoryView = moreInfoButton;
     }
     return pinView;
-}
-
--(UIImage*) drawText:(NSString*) text
-             inImage:(UIImage*)  image
-             atPoint:(CGPoint)   point
-{
-    
-    NSMutableAttributedString *textStyle = [[NSMutableParagraphStyle defaultParagraphStyle] mutableCopy];
-    textStyle = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@",text]];
-    
-    // text color
-    [textStyle addAttribute:NSForegroundColorAttributeName value:[UIColor whiteColor] range:NSMakeRange(0, textStyle.length)];
-    
-    // text font
-    [textStyle addAttribute:NSFontAttributeName  value:[UIFont systemFontOfSize:8.0] range:NSMakeRange(0, textStyle.length)];
-    
-    UIGraphicsBeginImageContext(image.size);
-    [image drawInRect:CGRectMake(0,0,image.size.width,image.size.height)];
-    CGRect rect = CGRectMake(point.x - 8, point.y - 18, image.size.width, image.size.height);
-    [[UIColor whiteColor] set];
-    
-    // add text onto the image
-    [textStyle drawInRect:CGRectIntegral(rect)];
-    
-    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    return newImage;
 }
 
 -(void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views {

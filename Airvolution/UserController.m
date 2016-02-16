@@ -33,81 +33,67 @@
 }
 
 - (void)initialLoad:(BOOL)isInitialLoad {
-    if (isInitialLoad || (!isInitialLoad && [LocationController sharedInstance].locations.count == 0)) {
-        [self fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
-            [[LocationController sharedInstance]loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
-                [self retrieveAllUsersWithCompletion:^(NSArray *allUsers) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [[NSNotificationCenter defaultCenter] postNotificationName:updateMapKey object:nil];
-                        [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
-                    });
-                }];
-            }];
+    [self fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
+        [self findCurrentUserWithCompletion:^(BOOL currentUserFound) {
+            [self updateUI];
         }];
-    } else {
-        [[UserController sharedInstance]fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
-            [[UserController sharedInstance]findCurrentUser];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:updateMapKey object:nil];
-                [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
-            });
-        }];
-    }
+    }];
+}
+
+-(void)updateUI {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:updateMapKey object:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
+    });
 }
 
 #pragma mark - Finding User's iCloud
 - (void)fetchUserRecordIDWithCompletion:(void (^)(NSString *userRecordName))completion {
     [[CKContainer defaultContainer]
-//    [[CKContainer containerWithIdentifier:@"iCloud.com.julienguanzon.Airvolution"]
+     //    [[CKContainer containerWithIdentifier:@"iCloud.com.julienguanzon.Airvolution"]
      fetchUserRecordIDWithCompletionHandler:^(CKRecordID *recordID, NSError *error) {
-        if (recordID) {
-            [[LocationController sharedInstance] subscribe];
-            self.currentUserRecordID = recordID;
-            self.currentUserRecordName = recordID.recordName;
-            NSLog(@"USER RECORD NAME Fetched %@", self.currentUserRecordName);
-            completion(self.currentUserRecordName);
-        } else {
-            NSLog(@"User not logged in to iCloud");
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:NotLoggedIniCloudNotificationKey object:nil];
-            });
-        }
-    }];
+         if (recordID) {
+             [[LocationController sharedInstance] subscribe];
+             self.currentUserRecordID = recordID;
+             self.currentUserRecordName = recordID.recordName;
+             NSLog(@"USER RECORD NAME Fetched %@", self.currentUserRecordName);
+             completion(self.currentUserRecordName);
+         } else {
+             NSLog(@"User not logged in to iCloud");
+             dispatch_async(dispatch_get_main_queue(), ^{
+                 [[NSNotificationCenter defaultCenter] postNotificationName:NotLoggedIniCloudNotificationKey object:nil];
+             });
+         }
+     }];
 }
 
-- (void)retrieveAllUsersWithCompletion:(void (^)(NSArray *allUsers))completion
-{
-    //"Can't query system types", CloudKit doesn't let you query User records ("Users" record type in CKDashboard). Can only pull user info with recordID. 
-    NSMutableArray *recordIDs = [[NSMutableArray alloc] init];
-    for (NSString *recordName in self.allUsersRecordNames) {
-        CKRecordID *recordID = [[CKRecordID alloc] initWithRecordName:recordName];
-        [recordIDs addObject:recordID];
-    }
-    
-    NSLog(@"retrieving all users ");
-    CKFetchRecordsOperation *fetchOperation = [[CKFetchRecordsOperation alloc] initWithRecordIDs:recordIDs];
-    
+- (void)findCurrentUserWithCompletion:(void(^)(BOOL currentUserFound))completion {
+    [self retrieveUserWithRecordName:self.currentUserRecordName];
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"User"];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"recordName == %@", self.currentUserRecordName]];
+    NSArray *array = [[Stack sharedInstance].managedObjectContext executeFetchRequest:fetchRequest error:NULL];
+    User *userFound = array.firstObject;
+    self.currentUser = userFound;
+    completion(true);
+}
+
+-(void)retrieveUserWithRecordName:(NSString*)recordName {
+    CKRecordID *recordID = [[CKRecordID alloc]initWithRecordName:recordName];
+    CKFetchRecordsOperation *fetchOperation = [[CKFetchRecordsOperation alloc]initWithRecordIDs:@[recordID]];
     fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
         if (recordsByRecordID) {
-            for (CKRecordID *recordID in recordsByRecordID) {
-                NSDictionary *userDictionary = recordsByRecordID[recordID];
+            for (CKRecordID *fetchedRecordID in recordsByRecordID) {
+                NSDictionary *userDictionary = recordsByRecordID[fetchedRecordID];
                 User *existingUser = [self findUserInCoreDataWithUserUserRecordName:recordID.recordName];
                 if (!existingUser) {
                     [self saveUserToCoreData:userDictionary];
                 }
             }
-
-//            NSLog(@"RETRIEVED ALL USERS %@", self.allUsers);
-            [self findCurrentUser];
-            [[NSNotificationCenter defaultCenter] postNotificationName:AllUsersFetchNotificationKey object:nil];
-            completion(self.allUsers);
         } else {
-            NSLog(@"error retrieving all users, %@", operationError);
+            NSLog(@"Error retrieving user, %@",operationError);
         }
-
     };
-    
-    [[UserController publicDatabase] addOperation:fetchOperation];
+    [[UserController publicDatabase]addOperation:fetchOperation];
 }
 
 -(void)saveUserToCoreData:(NSDictionary*)userInfo {
@@ -123,39 +109,13 @@
     if (![user isInserted]) {
         [[Stack sharedInstance].managedObjectContext insertObject:user];
     }
-    [user.managedObjectContext refreshObject:user mergeChanges:YES];
+//    [user.managedObjectContext refreshObject:user mergeChanges:YES];
     [self saveToCoreData];
 }
 
 
 -(void)saveToCoreData {
-    //    [[Stack sharedInstance].managedObjectContext refreshAllObjects];
     [[Stack sharedInstance].managedObjectContext save:nil];
-    //    [[Stack sharedInstance].managedObjectContext performBlock:^{
-    //        NSError *error = nil;
-    //        BOOL success = [[Stack sharedInstance].managedObjectContext save:&error];
-    //        if (!success) {
-    //            NSLog(@"Core Data save ERROR %@", error);
-    //        }
-    //    }];
-    
-    //    if (![[NSThread currentThread] isMainThread]) {
-    //        dispatch_async(dispatch_get_main_queue(), ^{
-    //            [[Stack sharedInstance].managedObjectContext save:NULL];
-    //        });
-    //        return;
-    //    }
-}
-
-
-- (void)findCurrentUser {
-    for (User *user in self.allUsers) {
-        if ([user.recordName isEqualToString:self.currentUserRecordName]) {
-            self.currentUser = user;
-        } else {
-            NSLog(@"looking for user in all Users array");
-        }
-    }
 }
 
 #pragma mark fetch CoreData

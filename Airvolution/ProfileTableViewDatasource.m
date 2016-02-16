@@ -10,7 +10,6 @@
 #import "UserController.h"
 #import "User.h"
 #import "Location.h"
-#import "UserCustomCell.h"
 #import "LocationCustomCell.h"
 #import "LocationController.h"
 #import "ProfileViewController.h"
@@ -33,9 +32,8 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return [NSString stringWithFormat:@"total shared: %lu", [UserController sharedInstance].currentUser.locations.count];
+    return [NSString stringWithFormat:@"total shared: %lu", (unsigned long)[UserController sharedInstance].currentUser.locations.count];
 }
-
 
 - (void)filterSharedLocationsTapped {
     [[NSNotificationCenter defaultCenter] postNotificationName:editSortNotificationKey object:nil];

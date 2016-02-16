@@ -9,9 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 #import "Location.h"
-//#import "MapViewController.h"
 #import <CloudKit/CloudKit.h>
-//#import "User.h"
 #import <AddressBook/AddressBook.h>
 @import MapKit;
 
@@ -35,14 +33,13 @@ static NSString *const locationDeletedNotificationKey = @"location deleted";
                     country:(NSString *)country
                       notes:(NSString *)notes cost:(NSNumber*)cost;
 - (void)saveLocationToCoreData:(NSDictionary*)record;
-- (void)loadLocationsFromCloudKitWithCompletion:(void (^)(NSArray *array))completion;
+- (void)loadLocationsFromLocation:(CLLocation*)location completion:(void (^)(NSArray *locations))completion;
 - (void)deleteLocationWithRecordName:(NSString*)recordName;
 - (NSDictionary *)addressDictionaryForLocationWithCLLocation:(CLLocation *)location;
 - (Location *)findLocationMatchingLocation:(CLLocation *)location;
 -(void)didReceiveNotification:(NSDictionary*)notificationInfo;
 -(void)subscribe;
 - (void)reportLocation:(Location*)location withCompletion:(void(^)(BOOL success))completion;
-
 -(UIAlertController*)alertForDirectionsToPlacemark:(MKPlacemark*)placemark;
 -(void)goToMapsAppForDirectionsToPlacemark:(MKPlacemark*)placemark;
 
