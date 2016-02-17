@@ -31,12 +31,8 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
     return 1;
 }
 
--(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return [NSString stringWithFormat:@"total shared: %lu", (unsigned long)[UserController sharedInstance].currentUser.locations.count];
-}
-
-- (void)filterSharedLocationsTapped {
-    [[NSNotificationCenter defaultCenter] postNotificationName:editSortNotificationKey object:nil];
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    return 0.3;
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -58,6 +54,7 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     LocationCustomCell *locationCell = [tableView dequeueReusableCellWithIdentifier:LocationCellKey];
+    
     NSArray *usersSharedLocations = [[UserController sharedInstance].currentUser sortedLocations];
     if (usersSharedLocations.count > indexPath.row) {
         Location *location = usersSharedLocations[indexPath.row];
@@ -83,7 +80,6 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         NSLog(@"destructive");
-
         Location *location = [UserController sharedInstance].currentUser.sortedLocations[indexPath.row];
         [[NSNotificationCenter defaultCenter] postNotificationName:deleteLocationNotificationKey object:location.recordName];
     }

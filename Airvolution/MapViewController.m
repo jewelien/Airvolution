@@ -53,10 +53,9 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 //    logoImageView.image = logoImage;
 //    self.navigationItem.titleView = [[UIImageView alloc] initWithImage:logoImage];
 //    self.navigationItem.titleView.frame = CGRectMake(0, 0, 0, 15);
-    
     self.navigationController.navigationBar.barTintColor = [UIColor airvolutionRed];
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
-    //    self.view.backgroundColor = [UIColor colorWithWhite:0.96 alpha:5.0];
+//        self.view.backgroundColor = [UIColor colorWithWhite:0.96 alpha:5.0];
     self.view.backgroundColor = [UIColor airvolutionRed];
     
     [self setupMap];
@@ -91,7 +90,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 
 -(void)viewWillAppear:(BOOL)animated {
-    self.title = @"AIRVOLUTION";
+    self.navigationController.navigationBar.topItem.title = @"AIRVOLUTION";
 }
 
 -(UINavigationController*)navControllerWithTitle:(NSString*)title andRootVC:(UIViewController*)rootVC {
@@ -156,6 +155,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         self.searchBar.backgroundColor = [UIColor whiteColor];
             self.searchBar.barTintColor = [UIColor lightGrayColor];
         self.searchBar.delegate = self;
+        self.searchBar.placeholder = @"Search for place to add.";
         [self.view addSubview:self.searchBar];
     }];
     

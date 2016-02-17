@@ -20,24 +20,25 @@
 @property (nonatomic, strong) UIView *backgroundView;
 @property (nonatomic, strong) UIActivityIndicatorView *deletingLocationView;
 
-
 @end
 
 @implementation ProfileViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.navigationController.navigationBar.topItem.title = @"MY SHARED LOCATIONS";
-    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor airvolutionRed]};
-
+    self.navigationController.navigationBar.topItem.title = [NSString stringWithFormat:@"MY SHARED LOCATIONS (%lu)", (unsigned long)[UserController sharedInstance].currentUser.locations.count];
+    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor]};
+    self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+    self.navigationController.navigationBar.barTintColor = [UIColor airvolutionRed];
+    UIBarButtonItem *sort = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"sort"] style:UIBarButtonItemStylePlain target:self action:@selector(sortSharedLocationsAlert)];
+    self.navigationController.navigationBar.topItem.rightBarButtonItem = sort;
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
     self.dataSource = [ProfileTableViewDatasource new];
     [self.dataSource registerTableView:self.tableView];
     self.tableView.dataSource = self.dataSource;
     [self.view addSubview:self.tableView];
-
-    [self registerForNotifications];
     
+    [self registerForNotifications];
 }
 
 - (void)registerForNotifications
@@ -45,11 +46,11 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfile) name:updateProfileKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deleteLocationCheckAlert:) name:deleteLocationNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(locationDeletedAlert) name:locationDeletedNotificationKey object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sortSharedLocationsAlert) name:editSortNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfile) name:SortSavedKey object:nil];
 }
 
 - (void)updateProfile {
+    self.navigationController.navigationBar.topItem.title = [NSString stringWithFormat:@"MY SHARED LOCATIONS (%lu)", (unsigned long)[UserController sharedInstance].currentUser.locations.count];
     [self.tableView reloadData];
 }
 
