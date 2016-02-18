@@ -14,6 +14,7 @@
 #import <Airvolution-Swift.h>
 #import "Airvolution-Swift.h"
 
+    
 @interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate, UITableViewDelegate>
 
 @property (nonatomic, strong) UIActivityIndicatorView *initialLoadingIndicatorView;
@@ -529,7 +530,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
             [self addLocationButtonClickedOn:false];
         }
     } else if ([control tag] == 1) {
-        //cancel dropped pin
+        //remove
         [self.mapView removeAnnotation:self.selectedAnnotation];
         self.droppedPinAnnotation = nil;
     } else if ([control tag] == 3) {
@@ -548,17 +549,35 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 #pragma mark - add
 -(void) addLocationButtonClickedOn:(BOOL)droppedPin {
-    if (droppedPin) {
+    if (droppedPin) { //add button on dropped pin
         [self searchForGasNear:self.droppedPinAnnotation.coordinate withCompletion:^(NSArray *mapItems) {
             [self showSelectLocationViewWithItems:mapItems forDroppedPin:true];
         }];
-    } else { //add button clicked on searched item
-        LocationViewController *locationVC = [[LocationViewController alloc]init];
-        locationVC.isSavedLocation = false;
-        locationVC.selectedMapItem = [self findMapItemFromSearchedList:self.selectedAnnotation];
-        UINavigationController *nav = [self navControllerWithTitle:@"Add Location" andRootVC:locationVC];
-        [self presentViewController:nav animated:YES completion:nil];
+    } else { //add button on searched item
+        if ([self isAlreadyASavedLocation:self.selectedAnnotation]) {
+            [self locationAlreadySavedAlert];
+        } else {
+            LocationViewController *locationVC = [[LocationViewController alloc]init];
+            locationVC.isSavedLocation = false;
+            locationVC.selectedMapItem = [self findMapItemFromSearchedList:self.selectedAnnotation];
+            UINavigationController *nav = [self navControllerWithTitle:@"Add Location" andRootVC:locationVC];
+            [self presentViewController:nav animated:YES completion:nil];
+        }
     }
+}
+
+-(BOOL)isAlreadyASavedLocation:(MKPointAnnotation*)annotation{
+    CLLocation *location = [[CLLocation alloc]initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
+    return [[LocationController sharedInstance]findLocationMatchingLocation:location];
+}
+
+-(void)locationAlreadySavedAlert{
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Error." message:@"The location you are trying to add has already been saved." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *ok = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        [controller removeFromParentViewController];
+    }];
+    [controller addAction:ok];
+    [self presentViewController:controller animated:true completion:nil];
 }
 
 //add button in navigation bar
