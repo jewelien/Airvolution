@@ -10,8 +10,7 @@
 #import <UIKit/UIKit.h>
 
 static NSString * const deleteLocationNotificationKey = @"delete location tapped";
-static NSString * const goToLocationNotificationKey = @"goToLocation";
-
+static NSString * const goToSavedLocationNotificationKey = @"goToSavedLocation";
 
 @interface ProfileTableViewDatasource : NSObject <UITableViewDataSource, UITableViewDelegate>
 

@@ -50,12 +50,8 @@ class LocationSearchViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let addLocationVC = LocationViewController()
-        addLocationVC.isSavedLocation = false
-        addLocationVC.selectedMapItem = self.mapItems[indexPath.row]
-        self.title = ""
-        self.navigationController?.pushViewController(addLocationVC, animated: true)
-        self.tableView .deselectRowAtIndexPath(indexPath, animated: true)
+        self.dismissViewControllerAnimated(false, completion: nil)
+        NSNotificationCenter.defaultCenter().postNotificationName("goToSearchedLocation", object: self.mapItems[indexPath.row])
     }
     
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {

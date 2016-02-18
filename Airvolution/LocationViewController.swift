@@ -45,7 +45,6 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         }
     }
 
-
 // MARK: tableView
     func setupTableView() {
         self.tableView = UITableView(frame: self.view.bounds, style: UITableViewStyle.Grouped)
@@ -149,8 +148,11 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     func userAlreadyReportedLocation() -> Bool {
         if let reportsArray = self.savedLocation?.reports {
             let array = reportsArray as! Array<String>
-            if array.contains(UserController.sharedInstance().currentUserRecordName){
-                return true
+            let currentUserRecordName = UserController.sharedInstance().currentUserRecordName
+            if let userRecordName = currentUserRecordName {
+                if array.contains(userRecordName){
+                    return true;
+                }
             }
         }
         return false
