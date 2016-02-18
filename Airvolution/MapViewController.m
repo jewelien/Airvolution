@@ -466,15 +466,8 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     } else { //pinview for saved/shared locations]
         pinView = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
         pinView.canShowCallout = YES;
-        
-        CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
-        Location *locationToCheck = [[LocationController sharedInstance]findLocationMatchingLocation:location];
-        NSString *costString = locationToCheck.costString;
-        if ([costString isEqualToString:@"FREE"]) {
-            pinView.image = [UIImage imageNamed:@"redMarker"];
-        } else {
-            pinView.image = [UIImage imageNamed:@"greenMarker"];
-        }
+        pinView.image = [UIImage imageNamed:@"redMarker"];
+
         UIImage *directionsImage = [UIImage imageNamed:@"rightFilled"];
         UIButton *directionsButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, directionsImage.size.width, directionsImage.size.height)];
         [directionsButton setImage:directionsImage forState:UIControlStateNormal];

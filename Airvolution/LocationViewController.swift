@@ -17,9 +17,6 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     var selectedLocation:NSManagedObject?
     var savedLocation:Location?
     var savedLocationPhone:NSString = ""
-    var isPaid:Bool = false
-    var notesTextField:UITextField!
-    var costTextField:UITextField?
     var screenWidth:CGFloat!
     
     var street:String?
@@ -59,19 +56,16 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
-        case 0 :
-            if self.isPaid {
-                return 6
-            } else {
-                return 5
-            }
-        default :
+        case 0: return 3
+        case 1:
             if self.isSavedLocation {
                 return 1
             } else {
                 return 2
             }
+        default: break
         }
+        return 1
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -80,7 +74,6 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         cell?.preservesSuperviewLayoutMargins = false
         cell?.separatorInset = UIEdgeInsetsZero
         cell?.layoutMargins = UIEdgeInsetsZero
-        let cellHeight = cell?.frame.size.height
         if indexPath.section == 0 {
             switch indexPath.row {
             case 0:
@@ -93,31 +86,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
             case 1: cell!.textLabel?.text = "Address:" + "\n" + "\(niceAddress())"
             cell?.textLabel?.numberOfLines = 3
             case 2: cell!.textLabel?.text = "Phone: \(phoneNumber())"
-            case 3: cell!.textLabel?.text = "Air Pump"
-            if let location = self.savedLocation {
-                cell?.addSubview(addCellLabel(cell!, text: location.costString))
-            } else {
-                cell?.addSubview(addSegmentedControl(cellHeight!))
-                }
-            case 4:
-                if self.isPaid {
-                    cell!.textLabel?.text = "Cost"
-                    cell?.addSubview(addCostTextField(cellHeight!))
-                } else {
-                    cell!.textLabel?.text = "Notes"
-                    if let location = self.savedLocation {
-                        cell?.addSubview(addCellLabel(cell!, text: location.locationNotes))
-                    } else {
-                        cell?.addSubview(addNotesTextField(cellHeight!))
-                    }
-                }
-            case 5: cell!.textLabel?.text = "Notes"
-                if let location = self.savedLocation {
-                    cell?.addSubview(addCellLabel(cell!, text: location.locationNotes))
-                } else {
-                    cell?.addSubview(addNotesTextField(cellHeight!))
-                }
-            default: break
+              default: break
             }
         }
         if indexPath.section == 1 {
@@ -253,119 +222,6 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
-// MARK: textfield
-    func textFieldDidBeginEditing(textField: UITextField) {
-        self.tableView.frame.origin.y = -90
-        let tap = UITapGestureRecognizer(target: self, action: Selector("dismissKeyboard:"))
-        view.addGestureRecognizer(tap)
-        if textField == costTextField {
-            textField.text = "$"
-        }
-    }
-    
-    func textFieldDidEndEditing(textField: UITextField) {
-        self.tableView.frame.origin.y = self.view.frame.origin.y
-    }
-    
-    func dismissKeyboard(sender: AnyObject) {
-        let tap = sender as! UITapGestureRecognizer
-        costTextField?.resignFirstResponder()
-        notesTextField.resignFirstResponder()
-        view.removeGestureRecognizer(tap)
-    }
-
-    func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
-        if textField == costTextField {
-            //don't allow $ sign to be deleted
-            if string.characters.count == 0 && textField.text == "$"{
-                return false;
-            }
-            //allow backspace everytime. add a max character count 5.
-            if string.characters.count > 0 && textField.text?.characters.count > 5 {
-                return false
-            }
-            //return only numbers
-            let components = string.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString:"0123456789.").invertedSet)
-            let filtered = components.joinWithSeparator("")
-            return string == filtered
-        }
-        return true
-    }
-    
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
-    }
-
-// MARK: cell subviews
-    func addNotesTextField(cellHeight:CGFloat) -> UITextField {
-        let textField = UITextField(frame: CGRect(x: self.screenWidth / 2 - 100, y:cellHeight / 2 - 12, width: self.screenWidth - 115, height: 25))
-        textField.placeholder = "optional"
-        textField.textAlignment = NSTextAlignment.Right
-        textField.delegate = self
-        self.notesTextField = textField;
-        return textField;
-    }
-    
-    func addCostTextField(cellHeight:CGFloat) -> UITextField {
-        let textField = UITextField(frame: CGRect(x: self.screenWidth - 75 - 15, y:cellHeight / 2 - 12, width: 75, height: 25))
-        textField.keyboardType = UIKeyboardType.DecimalPad
-        textField.delegate = self
-        textField.textAlignment = NSTextAlignment.Right
-        textField.text = "$0.00"
-        self.costTextField = textField
-        return textField;
-    }
-    
-    func costNumber() -> NSNumber {
-        if let costField = self.costTextField {
-            let costString = costField.text
-            let components = costString!.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString:"0123456789.").invertedSet)
-            let filtered = components.joinWithSeparator("")
-            let formatter = NSNumberFormatter()
-            formatter.numberStyle = NSNumberFormatterStyle.DecimalStyle
-            return formatter.numberFromString(filtered)!
-        }
-        return 0.00
-    }
-    
-    func addCellLabel(cell:UITableViewCell, text:String)-> UILabel {
-        let cellHeight = cell.frame.size.height
-        let label = UILabel(frame: CGRect(x:self.screenWidth * 0.27, y:cellHeight / 2 - 12, width: self.screenWidth - 115, height: 25))
-//        label.backgroundColor = UIColor .redColor()
-        label.textAlignment = NSTextAlignment.Right
-        if text.characters.count > 0 {
-            label.text = text
-        } else {
-            label.text = "none"
-        }
-        return label
-    }
-    
-    func addSegmentedControl(cellHeight:CGFloat) -> UISegmentedControl {
-        let segmentedControl = UISegmentedControl(items: ["free", "paid"])
-        segmentedControl.tintColor = UIColor.airvolutionRed()
-        segmentedControl.frame = CGRectMake(self.screenWidth - 175, (cellHeight / 2) - 10, 150, 25)
-        segmentedControl .addTarget(self, action: "action:", forControlEvents: UIControlEvents.ValueChanged)
-        if self.isPaid && !segmentedControl.selected{
-            segmentedControl.selectedSegmentIndex = 1
-        } else {
-            segmentedControl.selectedSegmentIndex = 0
-        }
-        return segmentedControl
-    }
-    
-    func action(segment:UISegmentedControl) {
-        let selectedIndex = segment.selectedSegmentIndex
-        switch selectedIndex {
-        case 1 : //print("\(selectedIndex)")
-            self.isPaid = true
-            self.tableView.reloadData()
-        default : //print("\(selectedIndex)")
-            self.isPaid = false
-            self.tableView.reloadData()
-        }
-    }
 // MARK: Data
     func locationName() -> String {
         if let name = self.selectedMapItem.name{
@@ -452,7 +308,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
 // MARK: SaveLocation
     func saveLocation() {
-        LocationController.sharedInstance().saveLocationWithName(locationName(), location: self.selectedMapItem.placemark.location, streetAddress: self.street, city: self.city, state: self.state, zip: self.zip, country: self.country, notes: self.notesTextField.text, cost: costNumber())
+        LocationController.sharedInstance().saveLocationWithName(locationName(), location: self.selectedMapItem.placemark.location, streetAddress: self.street, city: self.city, state: self.state, zip: self.zip, country: self.country)
     }
     
     override func didReceiveMemoryWarning() {

@@ -33,7 +33,6 @@
               streetAddress:(NSString *)street
                        city:(NSString *)city state:(NSString *)state zip:(NSString *)zip
                     country:(NSString *)country
-                      notes:(NSString *)notes cost:(NSNumber*)cost
 {
     CKReference *userReference = [[CKReference alloc] initWithRecordID:[UserController sharedInstance].currentUserRecordID action:CKReferenceActionNone];
     CKRecord *cloudKitLocation = [[CKRecord alloc] initWithRecordType:locationRecordKey];
@@ -46,8 +45,6 @@
     cloudKitLocation[zipKey] = zip;
     cloudKitLocation[countryKey] = country;
     cloudKitLocation[userRecordIDRefKey] = userReference;
-    cloudKitLocation[notesKey] = notes;
-    cloudKitLocation[costKey] = cost;
     
     if (![UserController sharedInstance].currentUser.username) {
         NSLog(@"currentUser.username %@", [UserController sharedInstance].currentUser.username);
@@ -108,13 +105,11 @@
     NSDate *date =  [record objectForKey:creationDateKey];
     location.creationDate = date;
     location.identifier =  [record objectForKey:identifierKey];
-    location.locationNotes =  [record objectForKey:notesKey];
     location.location = [record objectForKey:locationKey];
     CKRecordID *recordID = [record objectForKey:recordIDKey];
     location.recordName = recordID.recordName;
     CKReference *reference = [record objectForKey:userRecordIDRefKey];
     location.userRecordName = reference.recordID.recordName;
-    location.cost = [[record objectForKey:costKey] doubleValue];
     location.reports = [record objectForKey:reportsKey];
         
     if (![location isInserted]) {
