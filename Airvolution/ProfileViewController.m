@@ -37,7 +37,6 @@
     [self.dataSource registerTableView:self.tableView];
     self.tableView.dataSource = self.dataSource;
     [self.view addSubview:self.tableView];
-    
     [self registerForNotifications];
 }
 

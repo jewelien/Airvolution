@@ -14,11 +14,15 @@
 #import "LocationController.h"
 #import "ProfileViewController.h"
 #import "MapViewController.h"
-
+#import "UIColor+Color.h"
 #import "AppDelegate.h"
+@import GoogleMobileAds;
 
 static NSString *const LocationCellKey = @"locationCell";
 static NSString *const UserInfoCellKey = @"userInfoCell";
+
+NSString *adUnitIDtest = @"ca-app-pub-3940256099942544/2934735716";
+NSString *adUnitIDBannerAdOnShared = @"ca-app-pub-3012240931853239/1747853102";
 
 @implementation ProfileTableViewDatasource
 
@@ -28,7 +32,7 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
+    return 2;
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -36,11 +40,21 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [UserController sharedInstance].currentUser.locations.count;
+    switch (section) {
+        case 0:
+            return [UserController sharedInstance].currentUser.locations.count;
+            break;
+            
+        default: return 1;
+            break;
+    }
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 60;
+    if (indexPath.section == 0) {
+        return 60;
+    }
+    return 50;
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -51,18 +65,39 @@ static NSString *const UserInfoCellKey = @"userInfoCell";
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    LocationCustomCell *locationCell = [tableView dequeueReusableCellWithIdentifier:LocationCellKey];
-    
-    NSArray *usersSharedLocations = [[UserController sharedInstance].currentUser sortedLocations];
-    if (usersSharedLocations.count > indexPath.row) {
-        Location *location = usersSharedLocations[indexPath.row];
-        locationCell.nameLabel.text = location.locationName;
-        locationCell.dateLabel.text = [NSString stringWithFormat:@"added: %@",location.creationDateString];
-        locationCell.addressLabel.text = [NSString stringWithFormat:@"%@ %@ %@ %@", location.street, location.city, location.state, location.zip];
-        //locationCell.addressLabel.text = [NSString stringWithFormat:@"%@, %@", location.street, location.cityStateZip];
+-(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == 0) {
+        return true;
     }
-    return locationCell;
+    return false;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == 0) {
+        LocationCustomCell *locationCell = [tableView dequeueReusableCellWithIdentifier:LocationCellKey];
+        NSArray *usersSharedLocations = [[UserController sharedInstance].currentUser sortedLocations];
+        if (usersSharedLocations.count > indexPath.row) {
+            Location *location = usersSharedLocations[indexPath.row];
+            locationCell.nameLabel.text = location.locationName;
+            locationCell.dateLabel.text = [NSString stringWithFormat:@"added: %@",location.creationDateString];
+            locationCell.addressLabel.text = [NSString stringWithFormat:@"%@ %@ %@ %@", location.street, location.city, location.state, location.zip];
+            return locationCell;
+        }
+    }
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
+    cell.backgroundColor = [UIColor lightGrayColor];
+    CGRect rect = CGRectMake(0, 0, 320, 50);
+    GADBannerView *bannerView = [[GADBannerView alloc]initWithFrame:rect];
+    bannerView.backgroundColor = [UIColor blackColor];
+    NSInteger screenWidth = [UIScreen mainScreen].bounds.size.width;
+    bannerView.center = CGPointMake(screenWidth/2, bannerView.center.y);
+    ProfileViewController *profileVC = [[ProfileViewController alloc]init];
+    bannerView.adUnitID = adUnitIDtest;
+    bannerView.rootViewController = profileVC;
+    [bannerView loadRequest:[GADRequest request]];
+    [cell addSubview:bannerView];
+    return cell;
 }
 
 - (NSSortDescriptor*)sortLocationsAscending {
