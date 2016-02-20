@@ -305,9 +305,10 @@
         if (findLocation.location.coordinate.latitude == location.coordinate.latitude
             && findLocation.location.coordinate.longitude == location.coordinate.longitude) {
             self.selectedLocation = findLocation;
+            return self.selectedLocation;
         }
     }
-    return self.selectedLocation;
+    return nil;
 }
 
 #pragma mark Report

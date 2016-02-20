@@ -568,7 +568,11 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 -(BOOL)isAlreadyASavedLocation:(MKPointAnnotation*)annotation{
     CLLocation *location = [[CLLocation alloc]initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
-    return [[LocationController sharedInstance]findLocationMatchingLocation:location];
+    Location *savedLocation = [[LocationController sharedInstance]findLocationMatchingLocation:location];
+    if (savedLocation) {
+        return true;
+    }
+    return false;
 }
 
 -(void)locationAlreadySavedAlert{
