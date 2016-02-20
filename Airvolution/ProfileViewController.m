@@ -12,7 +12,7 @@
 #import "Location.h"
 #import "LocationController.h"
 #import "UIColor+Color.h"
-
+@import GoogleMobileAds;
 
 @interface ProfileViewController () <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
@@ -21,6 +21,9 @@
 @property (nonatomic, strong) UIActivityIndicatorView *deletingLocationView;
 
 @end
+
+NSString *adUnitIDtest = @"ca-app-pub-3940256099942544/2934735716";
+NSString *adUnitIDBannerAdOnShared = @"ca-app-pub-3012240931853239/1747853102";
 
 @implementation ProfileViewController
 
@@ -32,12 +35,15 @@
     self.navigationController.navigationBar.barTintColor = [UIColor airvolutionRed];
     UIBarButtonItem *sort = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"sort"] style:UIBarButtonItemStylePlain target:self action:@selector(sortSharedLocationsAlert)];
     self.navigationController.navigationBar.topItem.rightBarButtonItem = sort;
-    self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
+    CGRect tableViewRect = self.view.bounds;
+    tableViewRect.size.height = tableViewRect.size.height - 100;
+    self.tableView = [[UITableView alloc] initWithFrame:tableViewRect style:UITableViewStyleGrouped];
     self.dataSource = [ProfileTableViewDatasource new];
     [self.dataSource registerTableView:self.tableView];
     self.tableView.dataSource = self.dataSource;
     [self.view addSubview:self.tableView];
     [self registerForNotifications];
+    [self addAdView];
 }
 
 - (void)registerForNotifications
@@ -56,6 +62,16 @@
 -(void)dealloc
 {
     [[NSNotificationCenter defaultCenter]removeObserver:self];
+}
+
+-(void)addAdView{
+    NSInteger screenHeight = [[UIScreen mainScreen]bounds].size.height;
+    CGRect viewFrame = CGRectMake(0, screenHeight - 100, 380, 50);
+    GADBannerView *bannerView = [[GADBannerView alloc]initWithFrame:viewFrame];
+    bannerView.adUnitID = adUnitIDtest;
+    bannerView.rootViewController = self;
+    [bannerView loadRequest:[GADRequest request]];
+    [self.view addSubview:bannerView];
 }
 
 #pragma mark deleteLocation
