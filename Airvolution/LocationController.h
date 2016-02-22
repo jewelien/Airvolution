@@ -39,6 +39,7 @@ static NSString *const locationDeletedNotificationKey = @"location deleted";
 -(void)didReceiveNotification:(NSDictionary*)notificationInfo;
 -(void)subscribe;
 - (void)reportLocation:(Location*)location withCompletion:(void(^)(BOOL success))completion;
+- (void)cancelReportOnLocation:(Location*)location withCompletion:(void(^)(BOOL success))completion;
 -(UIAlertController*)alertForDirectionsToPlacemark:(MKPlacemark*)placemark;
 -(void)goToMapsAppForDirectionsToPlacemark:(MKPlacemark*)placemark;
 

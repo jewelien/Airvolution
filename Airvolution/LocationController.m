@@ -312,7 +312,6 @@
 }
 
 #pragma mark Report
-
 - (void)reportLocation:(Location*)location withCompletion:(void(^)(BOOL success))completion  {
     if (location.reports.count >= 2) {
         //this will be the 3rd report so we will delete location
@@ -340,6 +339,33 @@
                 [self updateUI];
                 completion(true);
                 NSLog(@"successfully saved user's repor, %@", record);
+            }
+        }];
+    };
+    [[LocationController publicDatabase] addOperation:fetchOperation];
+}
+
+- (void)cancelReportOnLocation:(Location*)location withCompletion:(void(^)(BOOL success))completion  {
+    //add user to report list and save
+    NSMutableArray *mutableReports = [[NSMutableArray alloc]initWithArray:location.reports];
+    [mutableReports removeObject:[UserController sharedInstance].currentUserRecordName];
+    CKRecordID *recordID = [[CKRecordID alloc]initWithRecordName:location.recordName];
+    CKFetchRecordsOperation *fetchOperation = [[CKFetchRecordsOperation alloc] initWithRecordIDs:@[recordID]];
+    fetchOperation.perRecordCompletionBlock = ^(CKRecord *record, CKRecordID *recordID, NSError *error) {
+        CKRecord *cloudKitLocation = record;
+        cloudKitLocation[reportsKey] = mutableReports;
+        
+        [[LocationController publicDatabase] saveRecord:cloudKitLocation completionHandler:^(CKRecord *record, NSError *error) {
+            if (error) {
+                completion(false);
+                NSLog(@"error cancelling report for location, %@", error);
+            } else {
+                Location *location = [self findLocationInCoreDataWithLocationIdentifier:record.recordID.recordName];
+                location.reports = record[reportsKey];
+                [self saveToCoreData];
+                [self updateUI];
+                completion(true);
+                NSLog(@"successfully cancelled user's reported location, %@", record);
             }
         }];
     };

@@ -184,6 +184,8 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
                 self.navigationController?.popViewControllerAnimated(true)
             case self.reportString:
                 reportLocationAlert()
+            case self.alreadyReportedString:
+                cancelReportedLocationAlert()
             default: self.dismissViewControllerAnimated(true, completion: nil)
             }
         }
@@ -191,7 +193,6 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(tableView: UITableView, shouldHighlightRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        let cell = tableView.cellForRowAtIndexPath(indexPath)
         if indexPath.section == 0 {
             switch indexPath.row {
             case 1: return true
@@ -199,16 +200,14 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
             default: return false
             }
         }
-        if cell?.textLabel?.text == alreadyReportedString {
-            return false
-        }
         return true;
     }
     
     func reportLocationAlert() {
-        let alert = UIAlertController(title: "Report", message: "You are reporting this location as inacurrate information", preferredStyle: UIAlertControllerStyle.Alert)
-        let confirm = UIAlertAction(title: "Confirm", style: UIAlertActionStyle.Default) { (action) -> Void in
-            LocationController.sharedInstance().reportLocation(self.savedLocation, withCompletion: { (success) -> Void in
+        let alert = UIAlertController(title: "Are you sure?", message: "By reporting this location you are requesting it to be removed. \n Please report the following: \n -Location does not exist. \n -Location does not have a FREE air pump.", preferredStyle: UIAlertControllerStyle.Alert)
+        
+        let confirm = UIAlertAction(title: "Report", style: UIAlertActionStyle.Default) { (action) -> Void in
+            LocationController.sharedInstance().reportLocation(self.savedLocation, withCompletion: { (success:Bool) -> Void in
                 dispatch_async(dispatch_get_main_queue(), { () -> Void in
                     if success {
                         self.successReportAlert()
@@ -227,8 +226,30 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
+    func cancelReportedLocationAlert() {
+        let alert = UIAlertController(title: "", message: "You have already reported this location.", preferredStyle: UIAlertControllerStyle.Alert)
+        let confirm = UIAlertAction(title: "Cancel Report", style: UIAlertActionStyle.Default) { (action) -> Void in
+            LocationController.sharedInstance().cancelReportOnLocation(self.savedLocation, withCompletion: { (success:Bool) -> Void in
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    if success {
+                        self.cancelReportSuccessAlert()
+                    } else {
+                        self.cancelReportFailedAlert()
+                    }
+                })
+            })
+            alert.removeFromParentViewController()
+        }
+        let cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { (action) -> Void in
+            alert.removeFromParentViewController()
+        }
+        alert.addAction(confirm)
+        alert.addAction(cancel)
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
     func successReportAlert() {
-        let alert = UIAlertController(title: "Success", message: "Thank you for reporting this location.", preferredStyle: UIAlertControllerStyle.Alert)
+        let alert = UIAlertController(title: "Report Sent", message: "Thank you for reporting this location.", preferredStyle: UIAlertControllerStyle.Alert)
         let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default) { (action) -> Void in
             alert.removeFromParentViewController()
             self.navigationController?.popViewControllerAnimated(true)
@@ -239,6 +260,26 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     
     func failedReportAlert() {
         let alert = UIAlertController(title: "Failed to Report", message: "Location report failed. Please try again later.", preferredStyle: UIAlertControllerStyle.Alert)
+        let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default) { (action) -> Void in
+            alert.removeFromParentViewController()
+            self.navigationController?.popViewControllerAnimated(true)
+        }
+        alert.addAction(ok)
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func cancelReportSuccessAlert () {
+        let alert = UIAlertController(title: "Report cancelled", message: "Your report has been cancelled. Thank you. ", preferredStyle: UIAlertControllerStyle.Alert)
+        let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default) { (action) -> Void in
+            alert.removeFromParentViewController()
+            self.navigationController?.popViewControllerAnimated(true)
+        }
+        alert.addAction(ok)
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func cancelReportFailedAlert() {
+        let alert = UIAlertController(title: "Cancel Report failed", message: "Failed to cancel your report. Please try again later.", preferredStyle: UIAlertControllerStyle.Alert)
         let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default) { (action) -> Void in
             alert.removeFromParentViewController()
             self.navigationController?.popViewControllerAnimated(true)
