@@ -162,7 +162,7 @@
         self.currentUser.filter = AlphabeticalSort;
     }
     [self saveToCoreData];
-    [[NSNotificationCenter defaultCenter]postNotificationName:SortSavedKey object:nil];
+    [[NSNotificationCenter defaultCenter]postNotificationName:updateProfileKey object:nil];
 }
 
 

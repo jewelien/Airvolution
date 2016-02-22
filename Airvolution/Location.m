@@ -24,6 +24,7 @@
 @dynamic recordName;
 @dynamic user;
 @dynamic reports;
+@dynamic isForBike;
 
 @synthesize creationDateString;
 

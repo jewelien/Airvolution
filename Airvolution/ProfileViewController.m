@@ -32,6 +32,7 @@
     self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor]};
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
     self.navigationController.navigationBar.barTintColor = [UIColor airvolutionRed];
+    self.navigationController.navigationBar.backgroundColor = [UIColor airvolutionRed];
     UIBarButtonItem *sort = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"sort"] style:UIBarButtonItemStylePlain target:self action:@selector(sortSharedLocationsAlert)];
     self.navigationController.navigationBar.topItem.rightBarButtonItem = sort;
     CGRect tableViewRect = self.view.bounds;
@@ -53,7 +54,6 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfile) name:updateProfileKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deleteLocationCheckAlert:) name:deleteLocationNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(locationDeletedAlert) name:locationDeletedNotificationKey object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProfile) name:SortSavedKey object:nil];
 }
 
 - (void)updateProfile {

@@ -27,6 +27,8 @@ static NSString * const userKey = @"creatorUserRecordID";
 static NSString * const usernameKey = @"username";
 static NSString * const userRecordIDRefKey = @"userRecordID";
 static NSString * const reportsKey = @"reports";
+static NSString * const bikeKey = @"isForBike";
+
 
 @interface Location : NSManagedObject
 
@@ -43,6 +45,7 @@ static NSString * const reportsKey = @"reports";
 @property (nonatomic, retain) NSString *recordName;
 @property (nonatomic, retain) User *user; //relationship
 @property (nonatomic, retain) NSArray *reports;
+@property (nonatomic) BOOL isForBike;
 
 @property (nonatomic, retain) NSString *creationDateString;
 

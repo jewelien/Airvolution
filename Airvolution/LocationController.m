@@ -32,7 +32,7 @@
                    location:(CLLocation *)location
               streetAddress:(NSString *)street
                        city:(NSString *)city state:(NSString *)state zip:(NSString *)zip
-                    country:(NSString *)country
+                    country:(NSString *)country forBike:(BOOL)forBike
 {
     CKReference *userReference = [[CKReference alloc] initWithRecordID:[UserController sharedInstance].currentUserRecordID action:CKReferenceActionNone];
     CKRecord *cloudKitLocation = [[CKRecord alloc] initWithRecordType:locationRecordKey];
@@ -45,6 +45,7 @@
     cloudKitLocation[zipKey] = zip;
     cloudKitLocation[countryKey] = country;
     cloudKitLocation[userRecordIDRefKey] = userReference;
+    cloudKitLocation[bikeKey] = [NSNumber numberWithBool:forBike];
     
     if (![UserController sharedInstance].currentUser.username) {
         NSLog(@"currentUser.username %@", [UserController sharedInstance].currentUser.username);
@@ -111,6 +112,7 @@
     CKReference *reference = [record objectForKey:userRecordIDRefKey];
     location.userRecordName = reference.recordID.recordName;
     location.reports = [record objectForKey:reportsKey];
+    location.isForBike = [record objectForKey:bikeKey];
         
     if (![location isInserted]) {
         [[Stack sharedInstance].managedObjectContext insertObject:location];

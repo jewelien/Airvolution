@@ -32,6 +32,8 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     let deleteString = "Delete Location"
     let reportString = "Report Location"
     let alreadyReportedString = "Already Reported"
+    var forBicycleLabel:UILabel?;
+    var isForBike = false;
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,6 +43,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         if let savedLoc = self.selectedLocation {
             self.savedLocation = (savedLoc as! Location)
             self.tableView.frame.size.height = self.tableView.frame.size.height - 100
+            self.navigationController?.navigationBar.backgroundColor = UIColor.airvolutionRed()
         } else {
             self.navigationItem.title = "Add Location"
             self.tableView.frame.size.height = self.tableView.frame.size.height - 50
@@ -69,7 +72,12 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
-        case 0: return 3
+        case 0:
+            if self.isSavedLocation {
+                return 3
+            } else {
+                return 4
+            }
         case 1:
             if self.isSavedLocation {
                 return 1
@@ -95,22 +103,23 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
                     cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "cell")
                     cell?.detailTextLabel?.text = "Added: \(location.creationDateString)"
                 }
-//                cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "cell")
                 cell!.textLabel?.text = "\(locationName())"
                 cell?.textLabel?.font = UIFont(name: (cell?.textLabel?.font?.fontName)!, size: 25.0)
+                cell?.addSubview(rightImageViewForCell(cell!))
             case 1: cell!.textLabel?.text = "\(niceAddress())"
                     cell?.textLabel?.numberOfLines = 3
                     let locationImg = UIImage(imageLiteral: "redMarker")
                     cell?.imageView?.image = locationImg
-                    let widthScale = 25 / locationImg.size.width;
-                    let heightScale = 25 / locationImg.size.height;
-                    cell?.imageView?.transform = CGAffineTransformMakeScale(widthScale, heightScale)
+                    cell?.imageView?.transform = makeScaleForImage(locationImg)
             case 2: cell!.textLabel?.text = "\(phoneNumber())"
                     let phoneImg = UIImage(imageLiteral: "phone")
                     cell?.imageView?.image = phoneImg
-                    let widthScale = 25 / phoneImg.size.width;
-                    let heightScale = 25 / phoneImg.size.height;
-                    cell?.imageView?.transform = CGAffineTransformMakeScale(widthScale, heightScale)
+                    cell?.imageView?.transform = makeScaleForImage(phoneImg)
+            case 3: cell?.textLabel?.text = "For Bicycles"
+                    cell?.addSubview(self.addLabelToCell(cell!))
+                    let bikeImg = UIImage(imageLiteral: "bike")
+                    cell?.imageView?.image = bikeImg
+                    cell?.imageView?.transform = makeScaleForImage(bikeImg)
             default: break
             }
         }
@@ -137,6 +146,36 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         }
         
         return cell!
+    }
+    
+    func makeScaleForImage(image:UIImage) -> CGAffineTransform {
+        let widthScale = 25 / image.size.width;
+        let heightScale = 25 / image.size.height;
+        return CGAffineTransformMakeScale(widthScale, heightScale)
+    }
+    
+    func addLabelToCell(cell:UITableViewCell) -> UILabel {
+        let cellHeight = cell.frame.size.height
+        let label = UILabel(frame: CGRect(x: self.screenWidth - 75 - 15, y:cellHeight / 2 - 12, width: 75, height: 25))
+        label.textAlignment = NSTextAlignment.Right
+        label.textColor = UIColor.airvolutionRed()
+        label.text = "NO"
+        self.forBicycleLabel = label
+        return label;
+    }
+    
+    func rightImageViewForCell(cell:UITableViewCell)->UIImageView {
+        
+        var image:UIImage!
+        if self.savedLocation?.isForBike.boolValue == true  {
+            image = UIImage(imageLiteral: "bike")
+        } else {
+            image = UIImage(imageLiteral: "car")
+        }
+        let imageView = UIImageView(image: image)
+        imageView.frame = CGRect(x: self.screenWidth - 60, y:cell.frame.size.height / 2 - 12, width: 50, height: 50)
+        imageView.transform = makeScaleForImage(image)
+        return imageView;
     }
     
     func userAlreadyReportedLocation() -> Bool {
@@ -171,14 +210,14 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
             switch indexPath.row {
             case 1: addressTapped()
             case 2 : phoneNumberTapped()
+            case 3: forBicyclesTapped()
             default : tableView.deselectRowAtIndexPath(indexPath, animated: true)
             }
         }
         if indexPath.section == 1 {
             switch cellLabelText! {
             case self.saveString:
-                saveLocation()
-                self.dismissViewControllerAnimated(true, completion: nil)
+                confirmSaveAlert()
             case self.deleteString:
                 LocationController.sharedInstance().deleteLocationWithRecordName(self.savedLocation?.recordName)
                 self.navigationController?.popViewControllerAnimated(true)
@@ -195,9 +234,8 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     func tableView(tableView: UITableView, shouldHighlightRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         if indexPath.section == 0 {
             switch indexPath.row {
-            case 1: return true
-            case 2: return true
-            default: return false
+            case 0: return false
+            default: return true
             }
         }
         return true;
@@ -302,6 +340,16 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         return "no name";
     }
     
+    func forBicyclesTapped() {
+        if self.forBicycleLabel?.text == "NO" {
+            self.forBicycleLabel?.text = "YES"
+            self.isForBike = true
+        } else {
+            self.forBicycleLabel?.text = "NO"
+            self.isForBike = false
+        }
+    }
+    
     func phoneNumber() -> String {
         if let number = self.selectedMapItem.phoneNumber {
             return number
@@ -373,8 +421,21 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         return addressString
     }
 // MARK: SaveLocation
+    func confirmSaveAlert() {
+        let saveAlert = UIAlertController(title: "Confirm Save", message: "Please only save locations with FREE air pump", preferredStyle: UIAlertControllerStyle.Alert)
+        let cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { (action) -> Void in
+            saveAlert.removeFromParentViewController()
+        }
+        let save = UIAlertAction(title: "Save", style: UIAlertActionStyle.Default) { (action) -> Void in
+            self.saveLocation()
+            self.dismissViewControllerAnimated(true, completion: nil)
+        }
+        saveAlert .addAction(cancel)
+        saveAlert.addAction(save)
+        self.presentViewController(saveAlert, animated: true, completion: nil)
+    }
     func saveLocation() {
-        LocationController.sharedInstance().saveLocationWithName(locationName(), location: self.selectedMapItem.placemark.location, streetAddress: self.street, city: self.city, state: self.state, zip: self.zip, country: self.country)
+        LocationController.sharedInstance().saveLocationWithName(locationName(), location: self.selectedMapItem.placemark.location, streetAddress: self.street, city: self.city, state: self.state, zip: self.zip, country: self.country, forBike:self.isForBike)
     }
     
     override func didReceiveMemoryWarning() {
