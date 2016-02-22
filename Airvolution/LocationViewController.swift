@@ -74,19 +74,31 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         cell?.preservesSuperviewLayoutMargins = false
         cell?.separatorInset = UIEdgeInsetsZero
         cell?.layoutMargins = UIEdgeInsetsZero
+
         if indexPath.section == 0 {
             switch indexPath.row {
             case 0:
                 if let location = self.savedLocation {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "subtitleCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "cell")
                     cell?.detailTextLabel?.text = "Added: \(location.creationDateString)"
                 }
+//                cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "cell")
                 cell!.textLabel?.text = "\(locationName())"
                 cell?.textLabel?.font = UIFont(name: (cell?.textLabel?.font?.fontName)!, size: 25.0)
-            case 1: cell!.textLabel?.text = "Address:" + "\n" + "\(niceAddress())"
-            cell?.textLabel?.numberOfLines = 3
-            case 2: cell!.textLabel?.text = "Phone: \(phoneNumber())"
-              default: break
+            case 1: cell!.textLabel?.text = "\(niceAddress())"
+                    cell?.textLabel?.numberOfLines = 3
+                    let locationImg = UIImage(imageLiteral: "redMarker")
+                    cell?.imageView?.image = locationImg
+                    let widthScale = 25 / locationImg.size.width;
+                    let heightScale = 25 / locationImg.size.height;
+                    cell?.imageView?.transform = CGAffineTransformMakeScale(widthScale, heightScale)
+            case 2: cell!.textLabel?.text = "\(phoneNumber())"
+                    let phoneImg = UIImage(imageLiteral: "phone")
+                    cell?.imageView?.image = phoneImg
+                    let widthScale = 25 / phoneImg.size.width;
+                    let heightScale = 25 / phoneImg.size.height;
+                    cell?.imageView?.transform = CGAffineTransformMakeScale(widthScale, heightScale)
+            default: break
             }
         }
         if indexPath.section == 1 {
@@ -243,7 +255,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         if self.savedLocationPhone.length > 0 {
             return self.savedLocationPhone as String
         }
-        return "not available"
+        return "phone not available"
     }
     
     func phoneNumberTapped() {
