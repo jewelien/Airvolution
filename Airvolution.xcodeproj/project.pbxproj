@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		525BB170B59F3A7F354BF3D5 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C7B7E3CBB7D48C12B9FDB5E /* libPods.a */; };
 		FC0BCBDA1AD59DA600EAF9BF /* LocationCustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FC0BCBD91AD59DA600EAF9BF /* LocationCustomCell.m */; };
+		FC1D2DDD1C7B8C960037FB8C /* StyleController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1D2DDC1C7B8C960037FB8C /* StyleController.swift */; };
 		FC1F21CD1AC342AB00A8DCD8 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */; };
 		FC1F21CF1AC3563300A8DCD8 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC1F21CE1AC3563300A8DCD8 /* CoreLocation.framework */; };
 		FC366CB51AE4753A00B28D68 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC366CB41AE4753A00B28D68 /* CloudKit.framework */; };
@@ -49,6 +50,7 @@
 		D841105802BD502782618C14 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		FC0BCBD81AD59DA600EAF9BF /* LocationCustomCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationCustomCell.h; sourceTree = "<group>"; };
 		FC0BCBD91AD59DA600EAF9BF /* LocationCustomCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationCustomCell.m; sourceTree = "<group>"; };
+		FC1D2DDC1C7B8C960037FB8C /* StyleController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StyleController.swift; sourceTree = "<group>"; };
 		FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		FC1F21CE1AC3563300A8DCD8 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		FC366CB41AE4753A00B28D68 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
@@ -157,6 +159,7 @@
 				FC8B18F51AC4B7E000051693 /* LocationController.m */,
 				FCBB5A741ACDF4000059AC3C /* UserController.h */,
 				FCBB5A751ACDF4000059AC3C /* UserController.m */,
+				FC1D2DDC1C7B8C960037FB8C /* StyleController.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -392,6 +395,7 @@
 				FCB3E4061C6138DE000F20CD /* LocationViewController.swift in Sources */,
 				FCBB5A761ACDF4000059AC3C /* UserController.m in Sources */,
 				FC58E8FF1ACDE33B00CF6A0C /* User.m in Sources */,
+				FC1D2DDD1C7B8C960037FB8C /* StyleController.swift in Sources */,
 				FCEAA3471C651B08003B659C /* LocationSearchViewController.swift in Sources */,
 				FCBB5AAB1ACDF5D20059AC3C /* ProfileTableViewDatasource.m in Sources */,
 				FCE401341AC0C9E800DBB19A /* MapViewController.m in Sources */,

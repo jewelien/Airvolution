@@ -8,6 +8,7 @@
 
 import UIKit
 import MapKit
+import GoogleMobileAds
 
 class LocationSearchViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     var tableView:UITableView!
@@ -17,6 +18,7 @@ class LocationSearchViewController: UIViewController, UITableViewDelegate, UITab
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpTableView()
+        addAdView()
         let cancel = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Cancel, target: self, action: Selector("cancelAction"))
         self.navigationItem.rightBarButtonItem = cancel
     }
@@ -30,10 +32,20 @@ class LocationSearchViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func setUpTableView() {
-        self.tableView = UITableView(frame: self.view.bounds, style: UITableViewStyle.Grouped)
+        var tableViewRect = self.view.bounds;
+        tableViewRect.size.height = tableViewRect.size.height - 50;
+        self.tableView = UITableView(frame: tableViewRect, style: UITableViewStyle.Grouped)
         self.view.addSubview(self.tableView)
         self.tableView.dataSource = self
         self.tableView.delegate = self
+    }
+    
+    func addAdView() {
+        let bannerView = StyleController.sharedInstance.bannerView
+        bannerView.rootViewController = self
+        bannerView.loadRequest(GADRequest())
+        bannerView.frame.origin.y = bannerView.frame.origin.y + 50
+        self.view.addSubview(bannerView)
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

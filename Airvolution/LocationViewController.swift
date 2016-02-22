@@ -9,6 +9,7 @@
 import UIKit
 import MapKit
 import CoreData
+import GoogleMobileAds
 
 class LocationViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     var tableView:UITableView!
@@ -18,6 +19,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     var savedLocation:Location?
     var savedLocationPhone:NSString = ""
     var screenWidth:CGFloat!
+    var bannerView:GADBannerView!
     
     var street:String?
     var city:String?
@@ -35,10 +37,14 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         super.viewDidLoad()
         self.screenWidth = UIScreen.mainScreen().bounds.width
         setupTableView()
+        addAdView()
         if let savedLoc = self.selectedLocation {
             self.savedLocation = (savedLoc as! Location)
+            self.tableView.frame.size.height = self.tableView.frame.size.height - 100
         } else {
             self.navigationItem.title = "Add Location"
+            self.tableView.frame.size.height = self.tableView.frame.size.height - 50
+            bannerView.frame.origin.y = bannerView.frame.origin.y + 50
         }
     }
 
@@ -48,6 +54,13 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         self.view.addSubview(self.tableView)
         self.tableView.dataSource = self
         self.tableView.delegate = self
+    }
+    
+    func addAdView() {
+        bannerView = StyleController.sharedInstance.bannerView
+        bannerView.rootViewController = self
+        bannerView.loadRequest(GADRequest())
+        self.view.addSubview(bannerView)
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {

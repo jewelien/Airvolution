@@ -12,6 +12,8 @@
 #import "Location.h"
 #import "LocationController.h"
 #import "UIColor+Color.h"
+#import <Airvolution-Swift.h>
+#import "Airvolution-Swift.h"
 @import GoogleMobileAds;
 
 @interface ProfileViewController () <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
@@ -21,9 +23,6 @@
 @property (nonatomic, strong) UIActivityIndicatorView *deletingLocationView;
 
 @end
-
-NSString *adUnitIDtest = @"ca-app-pub-3940256099942544/2934735716";
-NSString *adUnitIDBannerAdOnShared = @"ca-app-pub-3012240931853239/1747853102";
 
 @implementation ProfileViewController
 
@@ -43,6 +42,9 @@ NSString *adUnitIDBannerAdOnShared = @"ca-app-pub-3012240931853239/1747853102";
     self.tableView.dataSource = self.dataSource;
     [self.view addSubview:self.tableView];
     [self registerForNotifications];
+}
+
+-(void)viewWillAppear:(BOOL)animated {
     [self addAdView];
 }
 
@@ -64,11 +66,8 @@ NSString *adUnitIDBannerAdOnShared = @"ca-app-pub-3012240931853239/1747853102";
     [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
--(void)addAdView{
-    NSInteger screenHeight = [[UIScreen mainScreen]bounds].size.height;
-    CGRect viewFrame = CGRectMake(0, screenHeight - 100, 380, 50);
-    GADBannerView *bannerView = [[GADBannerView alloc]initWithFrame:viewFrame];
-    bannerView.adUnitID = adUnitIDtest;
+-(void)addAdView {
+    GADBannerView *bannerView = [StyleController sharedInstance].bannerView;
     bannerView.rootViewController = self;
     [bannerView loadRequest:[GADRequest request]];
     [self.view addSubview:bannerView];
