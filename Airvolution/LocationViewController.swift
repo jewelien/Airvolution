@@ -102,10 +102,10 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
                 if let location = self.savedLocation {
                     cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "cell")
                     cell?.detailTextLabel?.text = "Added: \(location.creationDateString)"
+                    cell?.addSubview(rightImageViewForCell(cell!))
                 }
                 cell!.textLabel?.text = "\(locationName())"
                 cell?.textLabel?.font = UIFont(name: (cell?.textLabel?.font?.fontName)!, size: 25.0)
-                cell?.addSubview(rightImageViewForCell(cell!))
             case 1: cell!.textLabel?.text = "\(niceAddress())"
                     cell?.textLabel?.numberOfLines = 3
                     let locationImg = UIImage(imageLiteral: "redMarker")
