@@ -102,6 +102,28 @@
     }];
 }
 
+-(void)fetchCurrentUserSavedLocationsWithCompletion:(void (^)(BOOL success))completion {
+    CKRecordID *recordID = [[CKRecordID alloc]initWithRecordName:[UserController sharedInstance].currentUserRecordName];
+    CKReference *reference = [[CKReference alloc]initWithRecordID:recordID action:CKReferenceActionNone];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userRecordID == %@",reference];
+    CKQuery *query = [[CKQuery alloc] initWithRecordType:locationRecordKey predicate:predicate];
+    [[LocationController publicDatabase] performQuery:query inZoneWithID:nil completionHandler:^(NSArray<CKRecord *> * _Nullable results, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"error fetching user's saved locations %@", error);
+            completion(false);
+        } else {
+            NSLog(@"fetched user's saved locations successfully");
+            for (NSDictionary *record in results) {
+                Location *existingLocation = [self findLocationInCoreDataWithLocationIdentifier:[record objectForKey:identifierKey]];
+                if (!existingLocation) {
+                    [self saveLocationToCoreData:record];
+                }
+            }
+            completion(true);
+        }
+    }];
+}
+
 - (void)saveLocationToCoreData:(NSDictionary*)record {
     Location *location = [NSEntityDescription insertNewObjectForEntityForName:@"Location" inManagedObjectContext:[Stack sharedInstance].managedObjectContext];
     location.locationName = [record objectForKey:nameKey];

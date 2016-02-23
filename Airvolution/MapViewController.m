@@ -300,6 +300,8 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     [self.mapView reloadInputViews];
 }
 
+
+
 -(NSArray*)findAnnotationsWithCoordinate:(CLLocationCoordinate2D)coordinate {
     NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
         id<MKAnnotation> annotation = evaluatedObject;

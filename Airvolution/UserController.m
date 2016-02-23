@@ -35,7 +35,9 @@
 - (void)initialLoad:(BOOL)isInitialLoad {
     [self fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
         [self findCurrentUserWithCompletion:^(BOOL currentUserFound) {
-            [self updateUI];
+            [[LocationController sharedInstance]fetchCurrentUserSavedLocationsWithCompletion:^(BOOL success) {
+                [self updateUI];
+            }];
         }];
     }];
 }
@@ -74,7 +76,6 @@
     NSArray *array = [[Stack sharedInstance].managedObjectContext executeFetchRequest:fetchRequest error:NULL];
     User *userFound = array.firstObject;
     self.currentUser = userFound;
-    completion(true);
 }
 
 -(void)retrieveUserWithRecordName:(NSString*)recordName {

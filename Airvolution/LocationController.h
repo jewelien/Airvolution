@@ -33,6 +33,7 @@ static NSString *const locationDeletedNotificationKey = @"location deleted";
                     country:(NSString *)country forBike:(BOOL)forBike;
 - (void)saveLocationToCoreData:(NSDictionary*)record;
 - (void)loadLocationsFromLocation:(CLLocation*)location completion:(void (^)(NSArray *locations))completion;
+-(void)fetchCurrentUserSavedLocationsWithCompletion:(void (^)(BOOL success))completion;
 - (void)deleteLocationWithRecordName:(NSString*)recordName;
 - (NSDictionary *)addressDictionaryForLocationWithCLLocation:(CLLocation *)location;
 - (Location *)findLocationMatchingLocation:(CLLocation *)location;
