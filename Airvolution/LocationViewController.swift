@@ -422,7 +422,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
 // MARK: SaveLocation
     func confirmSaveAlert() {
-        let saveAlert = UIAlertController(title: "Confirm Save", message: "Please only save locations with FREE air pump", preferredStyle: UIAlertControllerStyle.Alert)
+        let saveAlert = UIAlertController(title: "Confirm Save", message: "Please only save locations with a FREE air pump", preferredStyle: UIAlertControllerStyle.Alert)
         let cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { (action) -> Void in
             saveAlert.removeFromParentViewController()
         }

@@ -34,7 +34,6 @@
 @property (nonatomic, strong) NSArray *allLocations;
 @property (nonatomic, strong) MKPointAnnotation *selectedAnnotation;
 @property (nonatomic, strong) UIView *locationInfoBackgroundView;
-@property (nonatomic, strong) NSMutableDictionary *locationAnnotationDictionary;
 @property (nonatomic, strong) NSMutableArray *searchedItems;
 @property (nonatomic, strong) NSString *selectedPhoneNumber;
 
@@ -47,7 +46,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
     self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor], };
 //    UIImage *logoImage = [UIImage imageNamed:@"logo"];
 //    UIImageView *logoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 10, 20)];
@@ -72,7 +70,16 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 }
 
 -(void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated {
-    CLLocation *location = [[CLLocation alloc]initWithLatitude:mapView.region.center.latitude longitude:mapView.region.center.longitude];
+//    CLLocation *location = [[CLLocation alloc]initWithLatitude:mapView.region.center.latitude longitude:mapView.region.center.longitude];
+//    [[LocationController sharedInstance]loadLocationsFromLocation:location completion:^(NSArray *locations) {
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            [self updateMapWithSavedLocations];
+//        });
+//    }];
+}
+
+-(void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation{
+    CLLocation *location = [[CLLocation alloc]initWithLatitude:userLocation.location.coordinate.latitude longitude:userLocation.location.coordinate.longitude];
     [[LocationController sharedInstance]loadLocationsFromLocation:location completion:^(NSArray *locations) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self updateMapWithSavedLocations];
@@ -256,7 +263,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateMapWithSavedLocations) name:updateMapKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitFailedAlert) name:newLocationSaveFailedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitSuccess) name:newLocationSavedNotificationKey object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeMapAnnotations) name:locationDeletedNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeAnnotationForDeletedLocation:) name:locationDeletedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(goToSavedLocation:) name:goToSavedLocationNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(goToSearchedMapItem:) name:@"goToSearchedLocation" object:nil];
 }
@@ -286,10 +293,24 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     [self presentViewController:alert animated:YES completion:nil];
 }
 
--(void)removeMapAnnotations {
-    [self.locationAnnotationDictionary removeAllObjects];
-    [self.mapView removeAnnotations:self.mapView.annotations];
-    [self updateMapWithSavedLocations];
+-(void)removeAnnotationForDeletedLocation:(NSNotification*)notification {
+    Location *deletedLocation = notification.object;
+    NSArray *queriedAnnotations = [self findAnnotationsWithCoordinate:deletedLocation.location.coordinate];
+    [self.mapView removeAnnotations:queriedAnnotations];
+    [self.mapView reloadInputViews];
+}
+
+-(NSArray*)findAnnotationsWithCoordinate:(CLLocationCoordinate2D)coordinate {
+    NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+        id<MKAnnotation> annotation = evaluatedObject;
+        if ([annotation coordinate].latitude == coordinate.latitude
+            && [annotation coordinate].longitude == coordinate.longitude) {
+            return YES;
+        } else {
+            return NO;
+        }
+    }];
+    return [self.mapView.annotations filteredArrayUsingPredicate:predicate];
 }
 
 - (void)updateMapWithSavedLocations
@@ -300,26 +321,14 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         savedAnnotation.coordinate = CLLocationCoordinate2DMake(location.location.coordinate.latitude, location.location.coordinate.longitude);
         savedAnnotation.title = location.locationName;
         [locationsArray addObject:savedAnnotation];
-        [self setDictionaryForLocation:location andAnnotation:savedAnnotation];
     }
     self.allLocations = locationsArray;
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self.mapView removeAnnotations:self.mapView.annotations];
         [self.mapView addAnnotations:locationsArray];
         [self.mapView reloadInputViews];
         [self removeLaunchScreen];
     });
-}
-
--(void)setDictionaryForLocation:(Location*)location andAnnotation:(MKPointAnnotation*)annotation{
-    if (!self.locationAnnotationDictionary) {
-        self.locationAnnotationDictionary = [[NSMutableDictionary alloc]init];
-    }
-    if (!location.recordName) {
-        location.recordName = @"none";
-    }
-    if (![[self.locationAnnotationDictionary allKeys] containsObject:location.recordName]){
-        [self.locationAnnotationDictionary setValue:annotation forKey:location.recordName];
-    }
 }
 
 - (void)savedToCloudKitFailedAlert {
@@ -427,8 +436,8 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 - (void)goToSavedLocation:(NSNotification*)notification {
     Location *profileSelectedLocation = notification.object;
     [self.mapView setCenterCoordinate:profileSelectedLocation.location.coordinate];
-    MKPointAnnotation *selectedAnnotation = [self.locationAnnotationDictionary valueForKey:profileSelectedLocation.recordName];
-    [self.mapView selectAnnotation:selectedAnnotation animated:YES];
+    NSArray *array = [self findAnnotationsWithCoordinate:profileSelectedLocation.location.coordinate];
+    [self.mapView selectAnnotation:array.firstObject animated:YES];
 }
 
 -(void)goToSearchedMapItem:(NSNotification*)notification {
@@ -471,8 +480,10 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         Location *locationToCheck = [[LocationController sharedInstance]findLocationMatchingLocation:location];
         if (locationToCheck.isForBike) {
             pinView.image = [UIImage imageNamed:@"bike"];
+            pinView.frame =  CGRectMake(pinView.frame.origin.x, pinView.frame.origin.y, 25, 25);
         } else {
             pinView.image = [UIImage imageNamed:@"redMarker"];
+            pinView.frame =  CGRectMake(pinView.frame.origin.x, pinView.frame.origin.y, 30, 30);
         }
 
         UIImage *directionsImage = [UIImage imageNamed:@"rightFilled"];

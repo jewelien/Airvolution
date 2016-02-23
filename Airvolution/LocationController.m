@@ -34,7 +34,6 @@
                        city:(NSString *)city state:(NSString *)state zip:(NSString *)zip
                     country:(NSString *)country forBike:(BOOL)forBike
 {
-    CKReference *userReference = [[CKReference alloc] initWithRecordID:[UserController sharedInstance].currentUserRecordID action:CKReferenceActionNone];
     CKRecord *cloudKitLocation = [[CKRecord alloc] initWithRecordType:locationRecordKey];
     cloudKitLocation[identifierKey] = [[NSUUID UUID] UUIDString];
     cloudKitLocation[nameKey] = name;
@@ -44,8 +43,16 @@
     cloudKitLocation[stateKey] = state;
     cloudKitLocation[zipKey] = zip;
     cloudKitLocation[countryKey] = country;
-    cloudKitLocation[userRecordIDRefKey] = userReference;
     cloudKitLocation[bikeKey] = [NSNumber numberWithBool:forBike];
+    if (![UserController sharedInstance].currentUserRecordID) {
+        [[UserController sharedInstance]fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
+            CKReference *userReference = [[CKReference alloc] initWithRecordID:[UserController sharedInstance].currentUserRecordID action:CKReferenceActionNone];
+            cloudKitLocation[userRecordIDRefKey] = userReference;
+        }];
+    } else{
+        CKReference *userReference = [[CKReference alloc] initWithRecordID:[UserController sharedInstance].currentUserRecordID action:CKReferenceActionNone];
+        cloudKitLocation[userRecordIDRefKey] = userReference;
+    }
     
     if (![UserController sharedInstance].currentUser.username) {
         NSLog(@"currentUser.username %@", [UserController sharedInstance].currentUser.username);
@@ -76,7 +83,7 @@
 #pragma mark load
 //locations from location
 - (void)loadLocationsFromLocation:(CLLocation*)location completion:(void (^)(NSArray *locations))completion {
-    CGFloat radius = 50000; //meters
+    CGFloat radius = 25000; //25K meters = 15 miles
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"distanceToLocation:fromLocation:(coordinates, %@) < %f", location, radius];
     CKQuery *query = [[CKQuery alloc] initWithRecordType:locationRecordKey predicate:predicate];
     [[LocationController publicDatabase] performQuery:query inZoneWithID:nil completionHandler:^(NSArray<CKRecord *> * _Nullable results, NSError * _Nullable error) {
@@ -243,11 +250,11 @@
         if (!error) {
             //delete in CoreData
             Location *locationToDelete = [self findLocationInCoreDataWithLocationIdentifier:recordName];
-            [self deleteLocationInCoreData:locationToDelete];
             dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:locationToDelete];
                 [self updateUI];
             });
+            [self deleteLocationInCoreData:locationToDelete];
         } else {
             NSLog(@"Error: %@",error);
         }
