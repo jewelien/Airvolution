@@ -71,6 +71,7 @@
             [self saveLocationToCoreData:(NSDictionary*)record];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:newLocationSavedNotificationKey object:nil];
+                //fetch all locations in background thread
                 [self updateUI];
             });
         } else {
@@ -122,6 +123,10 @@
             completion(true);
         }
     }];
+}
+
+-(void)fetchAllLocationsIfNecessary {
+    
 }
 
 - (void)saveLocationToCoreData:(NSDictionary*)record {

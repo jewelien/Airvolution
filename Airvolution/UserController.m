@@ -34,7 +34,8 @@
 
 - (void)initialLoad:(BOOL)isInitialLoad {
     [self fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
-        [self findCurrentUserWithCompletion:^(BOOL currentUserFound) {
+        [self retrieveUserWithRecordName:userRecordName withCompletion:^(BOOL currentUserFetched) {
+            self.currentUser = [self findUserInCoreDataWithUserUserRecordName:userRecordName];
             [[LocationController sharedInstance]fetchCurrentUserSavedLocationsWithCompletion:^(BOOL success) {
                 [self updateUI];
             }];
@@ -69,16 +70,7 @@
      }];
 }
 
-- (void)findCurrentUserWithCompletion:(void(^)(BOOL currentUserFound))completion {
-    [self retrieveUserWithRecordName:self.currentUserRecordName];
-    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"User"];
-    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"recordName == %@", self.currentUserRecordName]];
-    NSArray *array = [[Stack sharedInstance].managedObjectContext executeFetchRequest:fetchRequest error:NULL];
-    User *userFound = array.firstObject;
-    self.currentUser = userFound;
-}
-
--(void)retrieveUserWithRecordName:(NSString*)recordName {
+-(void)retrieveUserWithRecordName:(NSString*)recordName withCompletion:(void (^)(BOOL))completion {
     CKRecordID *recordID = [[CKRecordID alloc]initWithRecordName:recordName];
     CKFetchRecordsOperation *fetchOperation = [[CKFetchRecordsOperation alloc]initWithRecordIDs:@[recordID]];
     fetchOperation.fetchRecordsCompletionBlock = ^(NSDictionary /* CKRecordID * -> CKRecord */ *recordsByRecordID, NSError *operationError) {
@@ -90,8 +82,10 @@
                     [self saveUserToCoreData:userDictionary];
                 }
             }
+            completion(true);
         } else {
             NSLog(@"Error retrieving user, %@",operationError);
+            completion(false);
         }
     };
     [[UserController publicDatabase]addOperation:fetchOperation];

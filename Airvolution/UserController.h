@@ -33,5 +33,4 @@ static NSString * const AlphabeticalSort = @"alphabetical";
 - (User *)findUserInCoreDataWithUserUserRecordName:(NSString*)recordName;
 - (NSArray*)fetchLocationsForUser:(User*)user;
 - (void)saveLocationFilter:(NSString*)filter;
-- (void)retrieveUserWithRecordName:(NSString*)recordName;
 @end
