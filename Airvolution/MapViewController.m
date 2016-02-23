@@ -81,6 +81,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 }
 
 -(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:true];
     self.navigationController.navigationBar.topItem.title = @"AIRVOLUTION";
 }
 
@@ -456,16 +457,14 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     if ([annotation isKindOfClass:[MKUserLocation class]]) {
         return nil;
     }
-    MKAnnotationView *pinView;
-    pinView = (MKAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"pin"];
-    
     if ([self.searchedAnnotations containsObject:annotation]) {
-        pinView = [self cancelAddViewWithAnnotation:annotation];
+        return [self cancelAddViewWithAnnotation:annotation];
     } else if ([[annotation title] isEqualToString:droppedPinTitle]) {
-        pinView = [self cancelAddViewWithAnnotation:annotation];
+        MKAnnotationView *pinView = [self cancelAddViewWithAnnotation:annotation];
         pinView.draggable = YES;
+        return pinView;
     } else { //pinview for saved/shared locations]
-        pinView = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
+        MKAnnotationView *pinView = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
         pinView.canShowCallout = YES;
         
         CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
@@ -488,8 +487,8 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 //        UIButton *moreInfoButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
         moreInfoButton.tag = 4;
         pinView.rightCalloutAccessoryView = moreInfoButton;
+        return pinView;
     }
-    return pinView;
 }
 
 -(MKPinAnnotationView*)cancelAddViewWithAnnotation:(id<MKAnnotation>)annotation {

@@ -46,6 +46,7 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:true];
     [self addAdView];
 }
 

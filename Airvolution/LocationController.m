@@ -112,7 +112,7 @@
     CKReference *reference = [record objectForKey:userRecordIDRefKey];
     location.userRecordName = reference.recordID.recordName;
     location.reports = [record objectForKey:reportsKey];
-    location.isForBike = [record objectForKey:bikeKey];
+    location.isForBike = [[record objectForKey:bikeKey] boolValue];
         
     if (![location isInserted]) {
         [[Stack sharedInstance].managedObjectContext insertObject:location];
