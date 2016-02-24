@@ -23,9 +23,9 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
     if ([self isFirstTimeOpening] == true) {
-        [[UserController sharedInstance]initialLoad:YES];
+        [[UserController sharedInstance]load:YES];
     } else {
-        [[UserController sharedInstance]initialLoad:NO];
+        [[UserController sharedInstance]load:NO];
     }
     
     [application registerForRemoteNotifications];

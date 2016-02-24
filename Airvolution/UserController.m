@@ -32,21 +32,31 @@
     return database;
 }
 
-- (void)initialLoad:(BOOL)isInitialLoad {
+- (void)load:(BOOL)isInitialLoad {
     [self fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
         [self retrieveUserWithRecordName:userRecordName withCompletion:^(BOOL currentUserFetched) {
             self.currentUser = [self findUserInCoreDataWithUserUserRecordName:userRecordName];
-            [[LocationController sharedInstance]fetchCurrentUserSavedLocationsWithCompletion:^(BOOL success) {
-                [self updateUI];
-            }];
+            if (isInitialLoad) {
+                [[LocationController sharedInstance]fetchCurrentUserSavedLocationsWithCompletion:^(BOOL success) {
+                    
+                }];
+            }else {
+                [self reloadMapWithSavedLocations];
+            }
+            [self updateProfile];
+            [[LocationController sharedInstance]fetchAllLocationsIfNecessaryInBackground];
         }];
     }];
 }
 
--(void)updateUI {
+-(void)updateProfile {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
+    });
+}
+-(void)reloadMapWithSavedLocations{
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:updateMapKey object:nil];
-        [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
     });
 }
 
@@ -60,13 +70,13 @@
              self.currentUserRecordID = recordID;
              self.currentUserRecordName = recordID.recordName;
              NSLog(@"USER RECORD NAME Fetched %@", self.currentUserRecordName);
-             completion(self.currentUserRecordName);
          } else {
              NSLog(@"User not logged in to iCloud");
              dispatch_async(dispatch_get_main_queue(), ^{
                  [[NSNotificationCenter defaultCenter] postNotificationName:NotLoggedIniCloudNotificationKey object:nil];
              });
          }
+         completion(self.currentUserRecordName);
      }];
 }
 

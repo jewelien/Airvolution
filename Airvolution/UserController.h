@@ -28,7 +28,7 @@ static NSString * const AlphabeticalSort = @"alphabetical";
 @property (nonatomic, strong) NSString *currentUserRecordName; //User Record Type
 
 + (UserController *)sharedInstance;
-- (void)initialLoad:(BOOL)isInitialLoad;
+- (void)load:(BOOL)isInitialLoad;
 - (void)fetchUserRecordIDWithCompletion:(void (^)(NSString *userRecordName))completion;
 - (User *)findUserInCoreDataWithUserUserRecordName:(NSString*)recordName;
 - (NSArray*)fetchLocationsForUser:(User*)user;

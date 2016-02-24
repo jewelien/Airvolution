@@ -17,6 +17,7 @@ static NSString *const newLocationSavedNotificationKey = @"new location saved";
 static NSString *const newLocationSaveFailedNotificationKey = @"new location not saved";
 static NSString *const updateMapKey = @"all locations fetched";
 static NSString *const locationDeletedNotificationKey = @"location deleted";
+static NSString *const locationAddedNotificationKey = @"location added";
 
 
 @interface LocationController : NSObject
@@ -32,7 +33,7 @@ static NSString *const locationDeletedNotificationKey = @"location deleted";
                         zip:(NSString *)zip
                     country:(NSString *)country forBike:(BOOL)forBike;
 - (void)saveLocationToCoreData:(NSDictionary*)record;
-- (void)loadLocationsFromLocation:(CLLocation*)location completion:(void (^)(NSArray *locations))completion;
+- (void)fetchLocationsnearLocation:(CLLocation*)location completion:(void (^)(NSArray *locations))completion;
 -(void)fetchCurrentUserSavedLocationsWithCompletion:(void (^)(BOOL success))completion;
 - (void)deleteLocationWithRecordName:(NSString*)recordName;
 - (NSDictionary *)addressDictionaryForLocationWithCLLocation:(CLLocation *)location;
@@ -43,5 +44,6 @@ static NSString *const locationDeletedNotificationKey = @"location deleted";
 - (void)cancelReportOnLocation:(Location*)location withCompletion:(void(^)(BOOL success))completion;
 -(UIAlertController*)alertForDirectionsToPlacemark:(MKPlacemark*)placemark;
 -(void)goToMapsAppForDirectionsToPlacemark:(MKPlacemark*)placemark;
-
+-(void)fetchAllLocationsIfNecessaryInBackground;
+- (Location *)findLocationInCoreDataWithLocationIdentifierOrRecordName:(NSString*)string;
 @end

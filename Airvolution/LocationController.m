@@ -72,7 +72,7 @@
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:newLocationSavedNotificationKey object:nil];
                 //fetch all locations in background thread
-                [self updateUI];
+                [self updateProfile];
             });
         } else {
             NSLog(@"NOT saved to CloudKit");
@@ -83,7 +83,7 @@
 
 #pragma mark load
 //locations from location
-- (void)loadLocationsFromLocation:(CLLocation*)location completion:(void (^)(NSArray *locations))completion {
+- (void)fetchLocationsnearLocation:(CLLocation*)location completion:(void (^)(NSArray *locations))completion {
     CGFloat radius = 25000; //25K meters = 15 miles
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"distanceToLocation:fromLocation:(coordinates, %@) < %f", location, radius];
     CKQuery *query = [[CKQuery alloc] initWithRecordType:locationRecordKey predicate:predicate];
@@ -93,7 +93,7 @@
         } else {
             NSLog(@"fetched locations successfully");
             for (NSDictionary *record in results) {
-                Location *existingLocation = [self findLocationInCoreDataWithLocationIdentifier:[record objectForKey:identifierKey]];
+                Location *existingLocation = [self findLocationInCoreDataWithLocationIdentifierOrRecordName:[record objectForKey:identifierKey]];
                 if (!existingLocation) {
                     [self saveLocationToCoreData:record];
                 }
@@ -115,7 +115,7 @@
         } else {
             NSLog(@"fetched user's saved locations successfully");
             for (NSDictionary *record in results) {
-                Location *existingLocation = [self findLocationInCoreDataWithLocationIdentifier:[record objectForKey:identifierKey]];
+                Location *existingLocation = [self findLocationInCoreDataWithLocationIdentifierOrRecordName:[record objectForKey:identifierKey]];
                 if (!existingLocation) {
                     [self saveLocationToCoreData:record];
                 }
@@ -125,8 +125,24 @@
     }];
 }
 
--(void)fetchAllLocationsIfNecessary {
-    
+-(void)fetchAllLocationsIfNecessaryInBackground {
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"TRUEPREDICATE"];
+    CKQuery *query = [[CKQuery alloc] initWithRecordType:locationRecordKey predicate:predicate];
+    [[LocationController publicDatabase] performQuery:query inZoneWithID:nil completionHandler:^(NSArray<CKRecord *> * _Nullable results, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"error fetching locations %@", error);
+        } else {
+            if (self.locations.count != results.count){
+                NSLog(@"fetched locations successfully");
+                for (NSDictionary *record in results) {
+                    Location *existingLocation = [self findLocationInCoreDataWithLocationIdentifierOrRecordName:[record objectForKey:identifierKey]];
+                    if (!existingLocation) {
+                        [self saveLocationToCoreData:record];
+                    }
+                }
+            }
+        }
+    }];
 }
 
 - (void)saveLocationToCoreData:(NSDictionary*)record {
@@ -152,7 +168,11 @@
         [[Stack sharedInstance].managedObjectContext insertObject:location];
     }
     [[Stack sharedInstance].managedObjectContext refreshObject:location mergeChanges:YES];
-    [self saveToCoreData];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self saveToCoreData];
+        [[NSNotificationCenter defaultCenter]postNotificationName:locationAddedNotificationKey object:location.recordName];
+    });
 }
 
 
@@ -160,9 +180,8 @@
     [[Stack sharedInstance].managedObjectContext save:nil];
 }
 
-- (void)updateUI{
+- (void)updateProfile {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:updateMapKey object:nil];
         [[NSNotificationCenter defaultCenter] postNotificationName:updateProfileKey object:nil];
     });
 }
@@ -234,7 +253,7 @@
     [[LocationController publicDatabase]fetchRecordWithID:queryNotification.recordID completionHandler:^(CKRecord * _Nullable record, NSError * _Nullable error) {
         if (!error) {
             [self saveLocationToCoreData:(NSDictionary*)record];
-            [self updateUI];
+            [self updateProfile];
         } else {
             NSLog(@"Error with remote notification: %@",error);
         }
@@ -243,14 +262,14 @@
 
 -(void)deleteLocationFromNotification:(CKQueryNotification*)queryNotification{
     CKRecordID *recordID = [queryNotification recordID];
-    Location *location = [self findLocationInCoreDataWithLocationIdentifier:recordID.recordName];
+    Location *location = [self findLocationInCoreDataWithLocationIdentifierOrRecordName:recordID.recordName];
     [self deleteLocationInCoreData:location];
     if ([location.userRecordName isEqualToString:[UserController sharedInstance].currentUserRecordName]) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:nil];
         });
     }
-    [self updateUI];
+    [self updateProfile];
 }
 
 -(void)updateLocationFromNotification:(CKQueryNotification*)queryNotification {
@@ -258,10 +277,10 @@
     CKFetchRecordsOperation *fetchOperation = [[CKFetchRecordsOperation alloc] initWithRecordIDs:@[recordID]];
     fetchOperation.perRecordCompletionBlock = ^(CKRecord *record, CKRecordID *recordID, NSError *error) {
         if (!error) {
-            Location *location = [self findLocationInCoreDataWithLocationIdentifier:record.recordID.recordName];
+            Location *location = [self findLocationInCoreDataWithLocationIdentifierOrRecordName:record.recordID.recordName];
             location.reports = record[reportsKey];
             [self saveToCoreData];
-            [self updateUI];
+            [self updateProfile];
         }
     };
     [[LocationController publicDatabase] addOperation:fetchOperation];
@@ -276,10 +295,10 @@
     operation.modifyRecordsCompletionBlock = ^(NSArray *savedRecords, NSArray *deletedRecordIDs, NSError *error) {
         if (!error) {
             //delete in CoreData
-            Location *locationToDelete = [self findLocationInCoreDataWithLocationIdentifier:recordName];
+            Location *locationToDelete = [self findLocationInCoreDataWithLocationIdentifierOrRecordName:recordName];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:locationToDelete];
-                [self updateUI];
+                [self updateProfile];
             });
             [self deleteLocationInCoreData:locationToDelete];
         } else {
@@ -295,9 +314,9 @@
 }
 
 #pragma mark fetch
-- (Location *)findLocationInCoreDataWithLocationIdentifier:(NSString*)identifier {
+- (Location *)findLocationInCoreDataWithLocationIdentifierOrRecordName:(NSString*)string {
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Location"];
-    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"identifier == %@ || recordName == %@", identifier, identifier]];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"identifier == %@ || recordName == %@", string, string]];
     NSError *error;
     NSArray *array = [[Stack sharedInstance].managedObjectContext executeFetchRequest:fetchRequest error:&error];
     if (error) {
@@ -369,10 +388,10 @@
                 completion(false);
                 NSLog(@"error saving location report, %@", error);
             } else {
-                Location *location = [self findLocationInCoreDataWithLocationIdentifier:record.recordID.recordName];
+                Location *location = [self findLocationInCoreDataWithLocationIdentifierOrRecordName:record.recordID.recordName];
                 location.reports = record[reportsKey];
                 [self saveToCoreData];
-                [self updateUI];
+                [self updateProfile];
                 completion(true);
                 NSLog(@"successfully saved user's repor, %@", record);
             }
@@ -396,10 +415,10 @@
                 completion(false);
                 NSLog(@"error cancelling report for location, %@", error);
             } else {
-                Location *location = [self findLocationInCoreDataWithLocationIdentifier:record.recordID.recordName];
+                Location *location = [self findLocationInCoreDataWithLocationIdentifierOrRecordName:record.recordID.recordName];
                 location.reports = record[reportsKey];
                 [self saveToCoreData];
-                [self updateUI];
+                [self updateProfile];
                 completion(true);
                 NSLog(@"successfully cancelled user's reported location, %@", record);
             }

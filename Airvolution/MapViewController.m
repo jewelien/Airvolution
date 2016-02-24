@@ -71,7 +71,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 -(void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated {
 //    CLLocation *location = [[CLLocation alloc]initWithLatitude:mapView.region.center.latitude longitude:mapView.region.center.longitude];
-//    [[LocationController sharedInstance]loadLocationsFromLocation:location completion:^(NSArray *locations) {
+//    [[LocationController sharedInstance]fetchLocationsnearLocation completion:^(NSArray *locations) {
 //        dispatch_async(dispatch_get_main_queue(), ^{
 //            [self updateMapWithSavedLocations];
 //        });
@@ -80,10 +80,10 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 -(void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation{
     CLLocation *location = [[CLLocation alloc]initWithLatitude:userLocation.location.coordinate.latitude longitude:userLocation.location.coordinate.longitude];
-    [[LocationController sharedInstance]loadLocationsFromLocation:location completion:^(NSArray *locations) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self updateMapWithSavedLocations];
-        });
+    [[LocationController sharedInstance]fetchLocationsnearLocation:location completion:^(NSArray *locations) {
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            [self updateMapWithSavedLocations];
+//        });
     }];
 }
 
@@ -260,7 +260,8 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 -(void)registerForNotifications
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notLoggedIniCloudAlert) name:NotLoggedIniCloudNotificationKey object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateMapWithSavedLocations) name:updateMapKey object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadMapWithSavedLocations) name:updateMapKey object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addAnnotationForLocation:) name:locationAddedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitFailedAlert) name:newLocationSaveFailedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitSuccess) name:newLocationSavedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeAnnotationForDeletedLocation:) name:locationDeletedNotificationKey object:nil];
@@ -315,7 +316,20 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     return [self.mapView.annotations filteredArrayUsingPredicate:predicate];
 }
 
-- (void)updateMapWithSavedLocations
+-(void)addAnnotationForLocation:(NSNotification*)notification {
+    NSString *locationRecordName = notification.object;
+    Location *location = [[LocationController sharedInstance] findLocationInCoreDataWithLocationIdentifierOrRecordName:locationRecordName];
+    MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
+    annotation.coordinate = CLLocationCoordinate2DMake(location.location.coordinate.latitude, location.location.coordinate.longitude);
+    annotation.title = location.locationName;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.mapView addAnnotation:annotation];
+        [self.mapView reloadInputViews];
+        [self removeLaunchScreen];
+    });
+}
+
+- (void)loadMapWithSavedLocations
 {
     NSMutableArray *locationsArray = [NSMutableArray new];
     for (Location *location in [LocationController sharedInstance].locations) {
@@ -525,7 +539,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
         [mapView selectAnnotation:self.droppedPinAnnotation animated:YES];
     }
 }
-
 
 -(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view didChangeDragState:(MKAnnotationViewDragState)newState fromOldState:(MKAnnotationViewDragState)oldState
 {
