@@ -287,8 +287,8 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func successReportAlert() {
-        let alert = UIAlertController(title: "Report Sent", message: "Thank you for reporting this location.", preferredStyle: UIAlertControllerStyle.Alert)
-        let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default) { (action) -> Void in
+        let alert = UIAlertController(title: "Reported", message: "Thank you for reporting this location.", preferredStyle: UIAlertControllerStyle.Alert)
+        let ok = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default) { (action) -> Void in
             alert.removeFromParentViewController()
             self.navigationController?.popViewControllerAnimated(true)
         }
@@ -298,7 +298,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     
     func failedReportAlert() {
         let alert = UIAlertController(title: "Failed to Report", message: "Location report failed. Please try again later.", preferredStyle: UIAlertControllerStyle.Alert)
-        let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default) { (action) -> Void in
+        let ok = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default) { (action) -> Void in
             alert.removeFromParentViewController()
             self.navigationController?.popViewControllerAnimated(true)
         }
@@ -307,8 +307,8 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func cancelReportSuccessAlert () {
-        let alert = UIAlertController(title: "Report cancelled", message: "Your report has been cancelled. Thank you. ", preferredStyle: UIAlertControllerStyle.Alert)
-        let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default) { (action) -> Void in
+        let alert = UIAlertController(title: "Report Cancelled", message: "Your report has been cancelled. Thank you.", preferredStyle: UIAlertControllerStyle.Alert)
+        let ok = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default) { (action) -> Void in
             alert.removeFromParentViewController()
             self.navigationController?.popViewControllerAnimated(true)
         }
@@ -317,8 +317,8 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func cancelReportFailedAlert() {
-        let alert = UIAlertController(title: "Cancel Report failed", message: "Failed to cancel your report. Please try again later.", preferredStyle: UIAlertControllerStyle.Alert)
-        let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default) { (action) -> Void in
+        let alert = UIAlertController(title: "Cancel Report Failed", message: "Failed to cancel your report. Please try again later.", preferredStyle: UIAlertControllerStyle.Alert)
+        let ok = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default) { (action) -> Void in
             alert.removeFromParentViewController()
             self.navigationController?.popViewControllerAnimated(true)
         }
@@ -422,7 +422,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
 // MARK: SaveLocation
     func confirmSaveAlert() {
-        let saveAlert = UIAlertController(title: "Confirm Save", message: "Please only save locations with a FREE air pump", preferredStyle: UIAlertControllerStyle.Alert)
+        let saveAlert = UIAlertController(title: "Confirm Save", message: "Please only save locations with a FREE air pump.", preferredStyle: UIAlertControllerStyle.Alert)
         let cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { (action) -> Void in
             saveAlert.removeFromParentViewController()
         }

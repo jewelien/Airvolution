@@ -263,13 +263,13 @@
 -(void)deleteLocationFromNotification:(CKQueryNotification*)queryNotification{
     CKRecordID *recordID = [queryNotification recordID];
     Location *location = [self findLocationInCoreDataWithLocationIdentifierOrRecordName:recordID.recordName];
-    [self deleteLocationInCoreData:location];
     if ([location.userRecordName isEqualToString:[UserController sharedInstance].currentUserRecordName]) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:location];
+            [self deleteLocationInCoreData:location];
+            [self updateProfile];
         });
     }
-    [self updateProfile];
 }
 
 -(void)updateLocationFromNotification:(CKQueryNotification*)queryNotification {
@@ -298,9 +298,10 @@
             Location *locationToDelete = [self findLocationInCoreDataWithLocationIdentifierOrRecordName:recordName];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:locationToDelete];
+                [self deleteLocationInCoreData:locationToDelete];
                 [self updateProfile];
             });
-            [self deleteLocationInCoreData:locationToDelete];
+
         } else {
             NSLog(@"Error: %@",error);
         }
@@ -430,7 +431,7 @@
 //directions alert
 -(UIAlertController*)alertForDirectionsToPlacemark:(MKPlacemark*)placemark {
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Directions" message:@"You will be taken to the maps app for directions." preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [controller removeFromParentViewController];
     }];
     [controller addAction:cancelAction];

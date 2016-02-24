@@ -78,12 +78,12 @@
 
 -(void)deleteLocationCheckAlert:(NSNotification *)notification {
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Confirm Delete" message:@"Are you sure you want delete this location?" preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [controller removeFromParentViewController];
     }];
     [controller addAction:cancelAction];
     
-    UIAlertAction *deleteAction = [UIAlertAction actionWithTitle:@"delete" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+    UIAlertAction *deleteAction = [UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
 //        NSLog(@"location.recordID %@", notification.object);
         self.deletingLocationView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         self.deletingLocationView.frame = self.view.bounds;
@@ -98,7 +98,7 @@
 
 -(void)locationDeletedAlert {
     UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Deleted" message:@"The location you selected was deleted." preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [self.deletingLocationView stopAnimating];
         [self.tableView reloadData];
         [controller removeFromParentViewController];

@@ -349,7 +349,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 - (void)savedToCloudKitFailedAlert {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Location failed to save. Please make sure you have a network connection and logged in to your iCloud account in your iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:nil];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
     [alert addAction:action];
     
     [self presentViewController:alert animated:YES completion:nil];
@@ -357,7 +357,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 - (void)savedToCloudKitSuccess {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Success" message:@"Location saved. Thank you!" preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [self.mapView removeAnnotation:self.droppedPinAnnotation];
         [self.mapView removeAnnotations:self.searchedAnnotations];
         self.droppedPinAnnotation = nil;
@@ -608,8 +608,8 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 }
 
 -(void)locationAlreadySavedAlert{
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Error." message:@"The location you are trying to add has already been saved." preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *ok = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Error" message:@"The location you are trying to add has already been saved." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
         [controller removeFromParentViewController];
     }];
     [controller addAction:ok];
