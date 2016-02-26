@@ -10,7 +10,7 @@ import Foundation
 import GoogleMobileAds
 
 let adUnitIDtest = "ca-app-pub-3940256099942544/2934735716";
-let adUnitIDBannerAdOnShared = "ca-app-pub-3012240931853239/1747853102";
+let adUnitIDBannerAd = "ca-app-pub-3012240931853239/1747853102";
 
 class StyleController :NSObject {
     static let sharedInstance = StyleController()
