@@ -264,7 +264,7 @@
 -(void)deleteLocationFromNotification:(CKQueryNotification*)queryNotification{
     CKRecordID *recordID = [queryNotification recordID];
     Location *location = [self findLocationInCoreDataWithLocationIdentifierOrRecordName:recordID.recordName];
-    if ([location.userRecordName isEqualToString:[UserController sharedInstance].currentUserRecordName]) {
+    if (![location.userRecordName isEqualToString:[UserController sharedInstance].currentUserRecordName]) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [[NSNotificationCenter defaultCenter] postNotificationName:locationDeletedNotificationKey object:location];
             [self deleteLocationInCoreData:location];
