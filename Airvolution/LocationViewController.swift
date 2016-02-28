@@ -202,6 +202,10 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         return 40
     }
     
+    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0.1
+    }
+    
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let cell = self.tableView.cellForRowAtIndexPath(indexPath)
         let cellLabelText = cell?.textLabel?.text
@@ -242,6 +246,10 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func reportLocationAlert() {
+        if !UserController.sharedInstance().isLoggedInToiCloud {
+            NSNotificationCenter.defaultCenter().postNotificationName(NotLoggedIniCloudNotificationKey, object: nil)
+            return
+        }
         let alert = UIAlertController(title: "Are you sure?", message: "By reporting this location you are requesting it to be removed. \n Please report the following: \n -Location does not exist. \n -Location does not have a FREE air pump.", preferredStyle: UIAlertControllerStyle.Alert)
         
         let confirm = UIAlertAction(title: "Report", style: UIAlertActionStyle.Default) { (action) -> Void in

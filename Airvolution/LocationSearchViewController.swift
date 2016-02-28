@@ -66,6 +66,10 @@ class LocationSearchViewController: UIViewController, UITableViewDelegate, UITab
         NSNotificationCenter.defaultCenter().postNotificationName("goToSearchedLocation", object: self.mapItems[indexPath.row])
     }
     
+    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 40
+    }
+    
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if isDroppedPin {
             return "gas stations near dropped pin"

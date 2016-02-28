@@ -34,18 +34,23 @@
 
 - (void)load:(BOOL)isInitialLoad {
     [self fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
-        [self retrieveUserWithRecordName:userRecordName withCompletion:^(BOOL currentUserFetched) {
-            self.currentUser = [self findUserInCoreDataWithUserUserRecordName:userRecordName];
-            if (isInitialLoad) {
-                [[LocationController sharedInstance]fetchCurrentUserSavedLocationsWithCompletion:^(BOOL success) {
-                    
-                }];
-            }else {
-                [self reloadMapWithSavedLocations];
-            }
-            [self updateProfile];
+        if (userRecordName) {
+            [self retrieveUserWithRecordName:userRecordName withCompletion:^(BOOL currentUserFetched) {
+                self.currentUser = [self findUserInCoreDataWithUserUserRecordName:userRecordName];
+                if (isInitialLoad) {
+                    [[LocationController sharedInstance]fetchCurrentUserSavedLocationsWithCompletion:^(BOOL success) {
+                        
+                    }];
+                }else {
+                    [self reloadMapWithSavedLocations];
+                }
+                [self updateProfile];
+                [[LocationController sharedInstance]fetchAllLocationsIfNecessaryInBackground];
+            }];
+        } else {
+            [self reloadMapWithSavedLocations];
             [[LocationController sharedInstance]fetchAllLocationsIfNecessaryInBackground];
-        }];
+        }
     }];
 }
 
@@ -66,17 +71,20 @@
      //    [[CKContainer containerWithIdentifier:@"iCloud.com.julienguanzon.Airvolution"]
      fetchUserRecordIDWithCompletionHandler:^(CKRecordID *recordID, NSError *error) {
          if (recordID) {
+             self.isLoggedInToiCloud = true;
              [[LocationController sharedInstance] subscribe];
              self.currentUserRecordID = recordID;
              self.currentUserRecordName = recordID.recordName;
              NSLog(@"USER RECORD NAME Fetched %@", self.currentUserRecordName);
+             completion(self.currentUserRecordName);
          } else {
+             self.isLoggedInToiCloud = false;
              NSLog(@"User not logged in to iCloud");
              dispatch_async(dispatch_get_main_queue(), ^{
                  [[NSNotificationCenter defaultCenter] postNotificationName:NotLoggedIniCloudNotificationKey object:nil];
              });
+             completion(nil);
          }
-         completion(self.currentUserRecordName);
      }];
 }
 
@@ -114,14 +122,14 @@
     if (![user isInserted]) {
         [[Stack sharedInstance].managedObjectContext insertObject:user];
     }
-//    [user.managedObjectContext refreshObject:user mergeChanges:YES];
     [self saveToCoreData];
 }
 
 
 -(void)saveToCoreData {
-    [[Stack sharedInstance].managedObjectContext save:nil];
-}
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[Stack sharedInstance].managedObjectContext save:nil];
+    });}
 
 #pragma mark fetch CoreData
 - (User *)findUserInCoreDataWithUserUserRecordName:(NSString*)recordName {

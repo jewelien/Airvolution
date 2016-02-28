@@ -19,7 +19,7 @@ class StyleController :NSObject {
         let screenHeight = UIScreen.mainScreen().bounds.size.height
         let viewFrame = CGRectMake(0, screenHeight - 100, 380, 50)
         let bannerView = GADBannerView(frame: viewFrame)
-        bannerView.adUnitID = adUnitIDtest
+        bannerView.adUnitID = adUnitIDBannerAd
         return bannerView
     }
 }

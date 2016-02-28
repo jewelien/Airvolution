@@ -83,7 +83,7 @@
 
 #pragma mark load
 //locations from location
-- (void)fetchLocationsnearLocation:(CLLocation*)location completion:(void (^)(NSArray *locations))completion {
+- (void)fetchLocationsnearLocation:(CLLocation*)location{
     CGFloat radius = 25000; //25K meters = 15 miles
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"distanceToLocation:fromLocation:(coordinates, %@) < %f", location, radius];
     CKQuery *query = [[CKQuery alloc] initWithRecordType:locationRecordKey predicate:predicate];
@@ -98,7 +98,6 @@
                     [self saveLocationToCoreData:record];
                 }
             }
-            completion(self.locations);
         }
     }];
 }
@@ -177,7 +176,9 @@
 
 
 -(void)saveToCoreData {
-    [[Stack sharedInstance].managedObjectContext save:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[Stack sharedInstance].managedObjectContext save:nil];
+    });
 }
 
 - (void)updateProfile {

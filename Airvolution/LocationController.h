@@ -33,7 +33,7 @@ static NSString *const locationAddedNotificationKey = @"location added";
                         zip:(NSString *)zip
                     country:(NSString *)country forBike:(BOOL)forBike;
 - (void)saveLocationToCoreData:(NSDictionary*)record;
-- (void)fetchLocationsnearLocation:(CLLocation*)location completion:(void (^)(NSArray *locations))completion;
+- (void)fetchLocationsnearLocation:(CLLocation*)location;
 -(void)fetchCurrentUserSavedLocationsWithCompletion:(void (^)(BOOL success))completion;
 - (void)deleteLocationWithRecordName:(NSString*)recordName;
 - (NSDictionary *)addressDictionaryForLocationWithCLLocation:(CLLocation *)location;

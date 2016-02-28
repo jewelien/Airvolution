@@ -26,6 +26,7 @@ static NSString * const AlphabeticalSort = @"alphabetical";
 @property (nonatomic, strong) User *currentUser;
 @property (nonatomic, strong) CKRecordID *currentUserRecordID; //User Record Type
 @property (nonatomic, strong) NSString *currentUserRecordName; //User Record Type
+@property (nonatomic) BOOL isLoggedInToiCloud;
 
 + (UserController *)sharedInstance;
 - (void)load:(BOOL)isInitialLoad;

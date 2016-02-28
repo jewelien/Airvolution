@@ -69,22 +69,9 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     [self loadingViewAtLaunch];
 }
 
--(void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated {
-//    CLLocation *location = [[CLLocation alloc]initWithLatitude:mapView.region.center.latitude longitude:mapView.region.center.longitude];
-//    [[LocationController sharedInstance]fetchLocationsnearLocation completion:^(NSArray *locations) {
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            [self updateMapWithSavedLocations];
-//        });
-//    }];
-}
-
 -(void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation{
     CLLocation *location = [[CLLocation alloc]initWithLatitude:userLocation.location.coordinate.latitude longitude:userLocation.location.coordinate.longitude];
-    [[LocationController sharedInstance]fetchLocationsnearLocation:location completion:^(NSArray *locations) {
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            [self updateMapWithSavedLocations];
-//        });
-    }];
+    [[LocationController sharedInstance]fetchLocationsnearLocation:location];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -278,9 +265,9 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     [self.initialLoadingIndicatorView stopAnimating];
     [[UIApplication sharedApplication] endIgnoringInteractionEvents];
     
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Required" message:@"To use this app please log in to your iCloud account in your iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Required" message:@"To add and report locations you must be logged in to your iCloud account. To do this go to your iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Not now" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [alert removeFromParentViewController];
         [self.indicatorView stopAnimating];
     }];
@@ -288,6 +275,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     
     UIAlertAction *action = [UIAlertAction actionWithTitle:@"Take me there" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+
     }];
     [alert addAction:action];
     
@@ -405,7 +393,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
             self.selectedPinZip  = [placemark.addressDictionary valueForKey:@"ZIP"];
             self.selectedPinCountry  = [placemark.addressDictionary valueForKey:@"CountryCode"];
             self.location = placemark.location;
-            annotation.subtitle = [NSString stringWithFormat:@"%@", self.selectedPinAddress[0]];
+            annotation.subtitle = [NSString stringWithFormat:@"%@", self.selectedPinStreet];
         }
     }];
 
@@ -581,6 +569,10 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 #pragma mark - add
 -(void) addLocationButtonClickedOn:(BOOL)droppedPin {
+    if (![UserController sharedInstance].isLoggedInToiCloud) {
+        [self notLoggedIniCloudAlert];
+        return;
+    }
     if (droppedPin) { //add button on dropped pin
         [self searchForGasNear:self.droppedPinAnnotation.coordinate withCompletion:^(NSArray *mapItems) {
             [self showSelectLocationViewWithItems:mapItems forDroppedPin:true];
@@ -618,9 +610,13 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 //add button in navigation bar
 -(void)addButtonTapped {
-    [self searchForGasNear:self.mapView.userLocation.coordinate withCompletion:^(NSArray *mapItems) {
-        [self showSelectLocationViewWithItems:mapItems forDroppedPin:false];
-    }];
+    if (![UserController sharedInstance].isLoggedInToiCloud) {
+        [self notLoggedIniCloudAlert];
+    } else {
+        [self searchForGasNear:self.mapView.userLocation.coordinate withCompletion:^(NSArray *mapItems) {
+            [self showSelectLocationViewWithItems:mapItems forDroppedPin:false];
+        }];
+    }
 }
 
 -(void)showSelectLocationViewWithItems:(NSArray*)items forDroppedPin:(BOOL)droppedPin{

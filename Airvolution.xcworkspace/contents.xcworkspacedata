@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:screenShotLocation.gpx">
+   </FileRef>
+   <FileRef
       location = "group:Airvolution.xcodeproj">
    </FileRef>
    <FileRef
