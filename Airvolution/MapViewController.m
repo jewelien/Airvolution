@@ -246,7 +246,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 #pragma mark - notification observers
 -(void)registerForNotifications
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notLoggedIniCloudAlert) name:NotLoggedIniCloudNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadMapWithSavedLocations) name:updateMapKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addAnnotationForLocation:) name:locationAddedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitFailedAlert) name:newLocationSaveFailedNotificationKey object:nil];
@@ -259,27 +258,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 - (void)removeLaunchScreen {
     [self.initialLoadingIndicatorView stopAnimating];
     [[UIApplication sharedApplication] endIgnoringInteractionEvents];
-}
-
-- (void)notLoggedIniCloudAlert {
-    [self.initialLoadingIndicatorView stopAnimating];
-    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
-    
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Required" message:@"To add and report locations you must be logged in to your iCloud account. To do this go to your iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Not now" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [alert removeFromParentViewController];
-        [self.indicatorView stopAnimating];
-    }];
-    [alert addAction:cancelAction];
-    
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"Take me there" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-
-    }];
-    [alert addAction:action];
-    
-    [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)removeAnnotationForDeletedLocation:(NSNotification*)notification {
@@ -569,10 +547,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 #pragma mark - add
 -(void) addLocationButtonClickedOn:(BOOL)droppedPin {
-    if (![UserController sharedInstance].isLoggedInToiCloud) {
-        [self notLoggedIniCloudAlert];
-        return;
-    }
     if (droppedPin) { //add button on dropped pin
         [self searchForGasNear:self.droppedPinAnnotation.coordinate withCompletion:^(NSArray *mapItems) {
             [self showSelectLocationViewWithItems:mapItems forDroppedPin:true];
@@ -610,13 +584,9 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 
 //add button in navigation bar
 -(void)addButtonTapped {
-    if (![UserController sharedInstance].isLoggedInToiCloud) {
-        [self notLoggedIniCloudAlert];
-    } else {
-        [self searchForGasNear:self.mapView.userLocation.coordinate withCompletion:^(NSArray *mapItems) {
-            [self showSelectLocationViewWithItems:mapItems forDroppedPin:false];
-        }];
-    }
+    [self searchForGasNear:self.mapView.userLocation.coordinate withCompletion:^(NSArray *mapItems) {
+        [self showSelectLocationViewWithItems:mapItems forDroppedPin:false];
+    }];
 }
 
 -(void)showSelectLocationViewWithItems:(NSArray*)items forDroppedPin:(BOOL)droppedPin{

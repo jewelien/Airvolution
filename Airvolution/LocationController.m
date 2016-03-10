@@ -326,7 +326,10 @@
     if (error) {
         NSLog(@"%@", error);
     }
-    return array.firstObject;
+    if (array.count > 0) {
+        return array.firstObject;
+    }
+    return nil;
 }
 
 

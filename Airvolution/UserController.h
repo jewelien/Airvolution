@@ -11,7 +11,6 @@
 #import "User.h"
 
 static NSString * const updateProfileKey = @"users shared locations updated";
-static NSString * const NotLoggedIniCloudNotificationKey = @"iCloud user not found";
 static NSString * const UsernameSavedNotificationKey = @"new username saved";
 static NSString * const UserImageNotificationKey = @"profile image saved";
 static NSString * const AscendingSort = @"acendingDate";

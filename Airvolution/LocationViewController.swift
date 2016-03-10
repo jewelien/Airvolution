@@ -247,7 +247,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     
     func reportLocationAlert() {
         if !UserController.sharedInstance().isLoggedInToiCloud {
-            NSNotificationCenter.defaultCenter().postNotificationName(NotLoggedIniCloudNotificationKey, object: nil)
+            notLoggedIniCloudAlert()
             return
         }
         let alert = UIAlertController(title: "Are you sure?", message: "By reporting this location you are requesting it to be removed. \n Please report the following: \n -Location does not exist. \n -Location does not have a FREE air pump.", preferredStyle: UIAlertControllerStyle.Alert)
@@ -430,6 +430,10 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
 // MARK: SaveLocation
     func confirmSaveAlert() {
+        if !UserController.sharedInstance().isLoggedInToiCloud {
+            notLoggedIniCloudAlert()
+            return
+        }
         let saveAlert = UIAlertController(title: "Confirm Save", message: "Please only save locations with a FREE air pump.", preferredStyle: UIAlertControllerStyle.Alert)
         let cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { (action) -> Void in
             saveAlert.removeFromParentViewController()
@@ -444,6 +448,22 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     }
     func saveLocation() {
         LocationController.sharedInstance().saveLocationWithName(locationName(), location: self.selectedMapItem.placemark.location, streetAddress: self.street, city: self.city, state: self.state, zip: self.zip, country: self.country, forBike:self.isForBike)
+    }
+
+    func notLoggedIniCloudAlert() {
+        let alertController = UIAlertController(title: "Notice", message: "To add and report locations you must be logged in to your iCloud account. To do this go to your iPhone Settings > iCloud.", preferredStyle: UIAlertControllerStyle.Alert)
+        let notNowAction = UIAlertAction(title: "Not Now", style: UIAlertActionStyle.Default) { (action) -> Void in
+            alertController.removeFromParentViewController()
+        }
+        let goToSettingsAction = UIAlertAction(title: "Take Me There", style: UIAlertActionStyle.Default) { (action) -> Void in
+            alertController.removeFromParentViewController()
+            UIApplication.sharedApplication().openURL(NSURL(string: UIApplicationOpenSettingsURLString)!)
+        }
+        alertController.addAction(notNowAction)
+        alertController.addAction(goToSettingsAction)
+        
+        self.presentViewController(alertController, animated: true, completion: nil)
+        
     }
     
     override func didReceiveMemoryWarning() {
