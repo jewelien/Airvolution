@@ -39,6 +39,10 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
         super.viewDidLoad()
         self.screenWidth = UIScreen.mainScreen().bounds.width
         setupTableView()
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(true)
         addAdView()
         if let savedLoc = self.selectedLocation {
             self.savedLocation = (savedLoc as! Location)

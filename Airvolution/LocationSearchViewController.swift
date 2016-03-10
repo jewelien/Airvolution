@@ -18,13 +18,14 @@ class LocationSearchViewController: UIViewController, UITableViewDelegate, UITab
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpTableView()
-        addAdView()
         let cancel = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Cancel, target: self, action: Selector("cancelAction"))
         self.navigationItem.rightBarButtonItem = cancel
     }
     
     override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(true)
         self.title = "Select Location"
+        addAdView()
     }
     
     func cancelAction() {
