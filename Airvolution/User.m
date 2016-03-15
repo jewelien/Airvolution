@@ -7,33 +7,44 @@
 //
 
 #import "User.h"
-
-@interface User ()
-    @property (nonatomic, strong) CKAsset *image;
-@end
+#import "UserController.h"
 
 @implementation User
 
--(instancetype)initWithDictionary:(NSDictionary *)dictionary {
-    
-    self = [super init];
-    if (self) {
-        self.recordID = dictionary[RecordIDKey];
-        self.recordName = self.recordID.recordName;
-        self.identifier = dictionary[IdentifierKey];
-        self.points = dictionary[PointsKey];
-        self.username = dictionary[UsernameKey];
-        
-        self.image = dictionary[ImageKey];
-        self.profileImage = [UIImage imageWithContentsOfFile:self.image.fileURL.path];
-        
-    }
-//    NSLog(@"%@, %@, %@, %@, %@", self.recordID, self.recordName, self.identifier, self.points, self.username);
-    return  self;
+//@dynamic recordID;
+@dynamic recordName;
+@dynamic identifier;
+@dynamic points;
+@dynamic username;
+@dynamic profileImage;
+@dynamic locations;
+@dynamic filter;
+
+- (NSArray *)sortedLocations {
+    NSSortDescriptor *sortDescriptor = [self sortLocationsForFilter:self.filter];
+    NSArray *sortedArray = [self.locations sortedArrayUsingDescriptors:@[ sortDescriptor ]];
+    return sortedArray;
 }
 
+- (NSSortDescriptor*)sortLocationsForFilter:(NSString*)filter {
+    if ([filter isEqualToString:AscendingSort]) {
+        return [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:YES];
+    } else if ([filter isEqualToString:DescendingSort]) {
+        return [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:NO];
+    } else if ([filter isEqualToString:AlphabeticalSort]) {
+        return [[NSSortDescriptor alloc] initWithKey:@"locationName" ascending:YES];
+    } else {
+        return [[NSSortDescriptor alloc] initWithKey:@"creationDate" ascending:NO];
+    }
+}
 
-
+-(NSSet *)locations{
+    NSArray *array = [[UserController sharedInstance] fetchLocationsForUser:self];
+    return [NSSet setWithArray: array];
+}
+-(NSString *)points{
+    return [NSString stringWithFormat:@"%lu", (unsigned long)self.locations.count];
+}
 
 
 /*

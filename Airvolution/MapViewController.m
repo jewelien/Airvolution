@@ -9,66 +9,53 @@
 #import "MapViewController.h"
 #import "LocationController.h"
 #import "UserController.h"
-#import "MapTableViewDataSource.h"
 #import "UIColor+Color.h"
+#import "ProfileTableViewDatasource.h"
+#import <Airvolution-Swift.h>
+#import "Airvolution-Swift.h"
 
+    
 @interface MapViewController () <CLLocationManagerDelegate, MKMapViewDelegate, UISearchBarDelegate, UITableViewDelegate>
 
 @property (nonatomic, strong) UIActivityIndicatorView *initialLoadingIndicatorView;
-
-
 @property (nonatomic) CLLocationManager *locationManager;
-
 @property (nonatomic, strong) UIButton *dropPinButton;
 @property (nonatomic, strong) UISearchBar *searchBar;
-
 @property (nonatomic) CLLocation *location;
 @property (nonatomic, strong) MKPointAnnotation *droppedPinAnnotation;
-
 @property (nonatomic, strong) NSMutableArray *searchedAnnotations;
-
 @property (nonatomic, strong) NSArray *selectedPinAddress;
 @property (nonatomic, strong) NSString *selectedPinStreet;
 @property (nonatomic, strong) NSString *selectedPinCity;
 @property (nonatomic, strong) NSString *selectedPinState;
 @property (nonatomic, strong) NSString *selectedPinZip;
 @property (nonatomic, strong) NSString *selectedPinCountry;
-
 @property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
-
 @property (nonatomic, strong) NSArray *allLocations;
 @property (nonatomic, strong) MKPointAnnotation *selectedAnnotation;
-
-@property (nonatomic, strong) UITableView *tableView;
-@property (nonatomic, strong) MapTableViewDataSource *datasource;
 @property (nonatomic, strong) UIView *locationInfoBackgroundView;
-
+@property (nonatomic, strong) NSMutableArray *searchedItems;
+@property (nonatomic, strong) NSString *selectedPhoneNumber;
 
 @end
 
-static NSString * const droppedPinTitle = @"cancel or add";
+static NSString * const droppedPinTitle = @"Dropped Pin";
 
 
 @implementation MapViewController
 
-
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
-    [self setTitle:@"AIRVOLUTION"];
-    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor],
-                                                                    };
+    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor], };
 //    UIImage *logoImage = [UIImage imageNamed:@"logo"];
 //    UIImageView *logoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 10, 20)];
 //    logoImageView.image = logoImage;
 //    self.navigationItem.titleView = [[UIImageView alloc] initWithImage:logoImage];
 //    self.navigationItem.titleView.frame = CGRectMake(0, 0, 0, 15);
-    
     self.navigationController.navigationBar.barTintColor = [UIColor airvolutionRed];
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
-    //    self.view.backgroundColor = [UIColor colorWithWhite:0.96 alpha:5.0];
+//        self.view.backgroundColor = [UIColor colorWithWhite:0.96 alpha:5.0];
     self.view.backgroundColor = [UIColor airvolutionRed];
-    
     
     [self setupMap];
     [self navigationBarButtonItems];
@@ -80,7 +67,25 @@ static NSString * const droppedPinTitle = @"cancel or add";
 //    [self.navigationItem setLeftBarButtonItem:searchButton];
 
     [self loadingViewAtLaunch];
+}
 
+-(void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation{
+    CLLocation *location = [[CLLocation alloc]initWithLatitude:userLocation.location.coordinate.latitude longitude:userLocation.location.coordinate.longitude];
+    [[LocationController sharedInstance]fetchLocationsnearLocation:location];
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:true];
+    self.navigationController.navigationBar.topItem.title = @"AIRVOLUTION";
+}
+
+-(UINavigationController*)navControllerWithTitle:(NSString*)title andRootVC:(UIViewController*)rootVC {
+    UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:rootVC];
+    nav.navigationBar.barTintColor = [UIColor airvolutionRed];
+    nav.navigationBar.tintColor = [UIColor whiteColor];
+    nav.navigationBar.topItem.title = title;
+    nav.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor],};
+    return nav;
 }
 
 - (void)loadingViewAtLaunch {
@@ -105,25 +110,12 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [self.view addSubview:self.mapView];
     self.mapView.showsUserLocation = YES;
     self.mapView.userTrackingMode = MKUserTrackingModeFollow;
+    NSLog(@"user loc = %@", self.mapView.userLocation.location);
 }
 
 - (void)navigationBarButtonItems{
-    //    self.dropPinButton = [[UIButton alloc] initWithFrame:CGRectMake(260, 400, 45, 55)];
-    ////    self.dropPinButton.backgroundColor = [UIColor grayColor];
-    //    [self.dropPinButton setImage:[UIImage imageNamed:@"location"] forState:UIControlStateNormal];
-    //    [self.view addSubview:self.dropPinButton];
-    //    [self.dropPinButton addTarget:self action:@selector(dropPinAtCurrentLocation) forControlEvents:UIControlEventTouchUpInside];
-    
-    
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
-    self.dropPinButton = [[UIButton alloc] initWithFrame:view.frame];
-    [self.dropPinButton setImage:[UIImage imageNamed:@"marker"] forState:UIControlStateNormal];
-    
-    [self.dropPinButton addTarget:self action:@selector(dropPinAtCenterOfMap) forControlEvents:UIControlEventTouchUpInside];
-    [view addSubview:self.dropPinButton];
-    UIBarButtonItem *pinDrop = [[UIBarButtonItem alloc] initWithCustomView:view];
-    [self.navigationItem setRightBarButtonItem:pinDrop];
-    
+    UIBarButtonItem *add = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonTapped)];
+    [self.navigationItem setRightBarButtonItem:add];
     
     UILongPressGestureRecognizer *dropPinPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(addPinWithGestureRecognizer:)];
     dropPinPress.minimumPressDuration = 1.0;
@@ -138,8 +130,7 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 }
 
-#pragma mark - mapSearch
-
+#pragma mark - search
 - (void)showSearchBar
 {
     [UIView animateWithDuration:1.0 animations:^{
@@ -150,18 +141,22 @@ static NSString * const droppedPinTitle = @"cancel or add";
         self.searchBar.backgroundColor = [UIColor whiteColor];
             self.searchBar.barTintColor = [UIColor lightGrayColor];
         self.searchBar.delegate = self;
-        self.searchBar.showsCancelButton = YES;
+        self.searchBar.placeholder = @"Search for place to add.";
         [self.view addSubview:self.searchBar];
     }];
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapAction)];
+    [self.view addGestureRecognizer:tap];
 }
 
--(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
-    [searchBar resignFirstResponder];
-    [self.mapView removeAnnotations:self.searchedAnnotations];
-//    [UIView animateWithDuration:1.0 animations:^{
-//        self.searchBar.frame = CGRectMake(20, -30, 285, 30);
-//        self.searchBar.text = @"";
-//    }];
+-(void)tapAction {
+    [self.searchBar resignFirstResponder];
+}
+
+-(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText{
+    if (!searchText.length){
+        [self.mapView removeAnnotations:self.searchedAnnotations];
+    }
 }
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
@@ -180,11 +175,13 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [search startWithCompletionHandler:^(MKLocalSearchResponse *response, NSError *error)
      {
          self.searchedAnnotations = [NSMutableArray new];
+         if (!self.searchedItems) {
+             self.searchedItems = [[NSMutableArray alloc]init];
+         }
          
          for (MKMapItem *item in response.mapItems) {
-             MKPointAnnotation *searchedAnnotation = [[MKPointAnnotation alloc] init];
-             searchedAnnotation.coordinate = item.placemark.coordinate;
-             searchedAnnotation.title = item.name;
+             [self.searchedItems addObject:item];
+             MKPointAnnotation *searchedAnnotation = [self createAnnotationForMapItem:item];
              [self.searchedAnnotations addObject:searchedAnnotation];
          }
          
@@ -192,16 +189,70 @@ static NSString * const droppedPinTitle = @"cancel or add";
      }];
 }
 
+-(MKPointAnnotation*)createAnnotationForMapItem:(MKMapItem*)item {
+    MKPointAnnotation *searchedAnnotation = [[MKPointAnnotation alloc] init];
+    searchedAnnotation.coordinate = item.placemark.coordinate;
+    searchedAnnotation.title = item.name;
+    return searchedAnnotation;
+}
+
+- (void)searchForGasNear:(CLLocationCoordinate2D)locationCoordinate withCompletion: (void(^)(NSArray *mapItems))completion {
+    MKLocalSearchRequest *request = [[MKLocalSearchRequest alloc] init];
+    request.naturalLanguageQuery = @"gas";
+//    request.region = self.mapView.region;
+    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(locationCoordinate, 10, 10);
+    request.region = region;
+    MKLocalSearch *search = [[MKLocalSearch alloc] initWithRequest:request];
+    [search startWithCompletionHandler:^(MKLocalSearchResponse *response, NSError *error)
+     {
+         if (!error) {
+             completion(response.mapItems);
+         } else {
+             NSLog(@"Nearby locations search error; %@", error);
+         }
+     }];
+}
+
+-(void)searchBusinessPhoneForSavedLocation:(Location*)location withCompletion:(void (^)(NSString *phoneString))completion {
+    CLLocationCoordinate2D locationCoordinates = location.location.coordinate;
+    NSString *locationStreet = location.street;
+    MKLocalSearchRequest *request = [[MKLocalSearchRequest alloc] init];
+    request.naturalLanguageQuery = location.locationName;
+    request.region = self.mapView.region;
+    MKLocalSearch *search = [[MKLocalSearch alloc] initWithRequest:request];
+    [search startWithCompletionHandler:^(MKLocalSearchResponse * _Nullable response, NSError * _Nullable error) {
+        NSString *phoneFound;
+        for (MKMapItem *item in response.mapItems) {
+            NSString *itemStreet = item.placemark.addressDictionary[@"Street"];
+            if ((item.placemark.coordinate.latitude == locationCoordinates.latitude && item.placemark.coordinate.longitude == locationCoordinates.longitude) || [itemStreet isEqualToString:locationStreet]) {
+                phoneFound = item.phoneNumber;
+            }
+        }
+        completion(phoneFound);
+    }];
+}
+
+-(MKMapItem*)findMapItemFromSearchedList:(MKPointAnnotation*)annotation{
+    for (MKMapItem *item in self.searchedItems) {
+        if (item.placemark.coordinate.latitude == annotation.coordinate.latitude && item.placemark.coordinate.longitude == annotation.coordinate.longitude) {
+            self.selectedPhoneNumber = item.phoneNumber;
+            return item;
+        }
+    }
+    self.selectedPhoneNumber = nil;
+    return nil;
+}
+
 #pragma mark - notification observers
 -(void)registerForNotifications
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notLoggedIniCloudAlert) name:NotLoggedIniCloudNotificationKey object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateMapWithSavedLocations) name:allLocationsFetchedNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadMapWithSavedLocations) name:updateMapKey object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addAnnotationForLocation:) name:locationAddedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitFailedAlert) name:newLocationSaveFailedNotificationKey object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savedToCloudKitSuccess) name:newLocationSavedNotificationKey object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeMapAnnotations) name:locationDeletedNotificationKey object:nil];
-    
-//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeLaunchScreen) name:removeLoadingLaunchScreenNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeAnnotationForDeletedLocation:) name:locationDeletedNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(goToSavedLocation:) name:goToSavedLocationNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(goToSearchedMapItem:) name:@"goToSearchedLocation" object:nil];
 }
 
 - (void)removeLaunchScreen {
@@ -209,51 +260,62 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [[UIApplication sharedApplication] endIgnoringInteractionEvents];
 }
 
-- (void)notLoggedIniCloudAlert {
-    [self.initialLoadingIndicatorView stopAnimating];
-    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
-    
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Required" message:@"To use this app please log in to your iCloud account in your iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [alert removeFromParentViewController];
-        [self.indicatorView stopAnimating];
-    }];
-    [alert addAction:cancelAction];
-    
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"Take me there" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-    }];
-    [alert addAction:action];
-    
-    [self presentViewController:alert animated:YES completion:nil];
+-(void)removeAnnotationForDeletedLocation:(NSNotification*)notification {
+    Location *deletedLocation = notification.object;
+    NSArray *queriedAnnotations = [self findAnnotationsWithCoordinate:deletedLocation.location.coordinate];
+    [self.mapView removeAnnotations:queriedAnnotations];
+    [self.mapView reloadInputViews];
 }
 
--(void)removeMapAnnotations {
-    [self.mapView removeAnnotations:self.mapView.annotations];
-    [self updateMapWithSavedLocations];
+
+
+-(NSArray*)findAnnotationsWithCoordinate:(CLLocationCoordinate2D)coordinate {
+    NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+        id<MKAnnotation> annotation = evaluatedObject;
+        if ([annotation coordinate].latitude == coordinate.latitude
+            && [annotation coordinate].longitude == coordinate.longitude) {
+            return YES;
+        } else {
+            return NO;
+        }
+    }];
+    return [self.mapView.annotations filteredArrayUsingPredicate:predicate];
 }
 
-- (void)updateMapWithSavedLocations
+-(void)addAnnotationForLocation:(NSNotification*)notification {
+    NSString *locationRecordName = notification.object;
+    Location *location = [[LocationController sharedInstance] findLocationInCoreDataWithLocationIdentifierOrRecordName:locationRecordName];
+    MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
+    annotation.coordinate = CLLocationCoordinate2DMake(location.location.coordinate.latitude, location.location.coordinate.longitude);
+    annotation.title = location.locationName;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.mapView addAnnotation:annotation];
+        [self.mapView reloadInputViews];
+        [self removeLaunchScreen];
+    });
+}
+
+- (void)loadMapWithSavedLocations
 {
     NSMutableArray *locationsArray = [NSMutableArray new];
     for (Location *location in [LocationController sharedInstance].locations) {
         MKPointAnnotation *savedAnnotation = [[MKPointAnnotation alloc] init];
         savedAnnotation.coordinate = CLLocationCoordinate2DMake(location.location.coordinate.latitude, location.location.coordinate.longitude);
         savedAnnotation.title = location.locationName;
-        
         [locationsArray addObject:savedAnnotation];
     }
     self.allLocations = locationsArray;
-    [self.mapView addAnnotations:locationsArray];
-    [self.mapView reloadInputViews];
-    
-    [self removeLaunchScreen];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.mapView removeAnnotations:self.mapView.annotations];
+        [self.mapView addAnnotations:locationsArray];
+        [self.mapView reloadInputViews];
+        [self removeLaunchScreen];
+    });
 }
 
 - (void)savedToCloudKitFailedAlert {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Location failed to save. Please make sure you have a network connection and logged in to your iCloud account in your iPhone Settings > iCloud." preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:nil];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
     [alert addAction:action];
     
     [self presentViewController:alert animated:YES completion:nil];
@@ -261,8 +323,10 @@ static NSString * const droppedPinTitle = @"cancel or add";
 
 - (void)savedToCloudKitSuccess {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Success" message:@"Location saved. Thank you!" preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [self.mapView removeAnnotation:self.droppedPinAnnotation];
+        [self.mapView removeAnnotations:self.searchedAnnotations];
+        self.droppedPinAnnotation = nil;
         [self.indicatorView stopAnimating];
     }];
     [alert addAction:action];
@@ -289,7 +353,6 @@ static NSString * const droppedPinTitle = @"cancel or add";
         CLLocation *selectedLocation = [[CLLocation alloc] initWithLatitude:selectedAnnotation.coordinate.latitude longitude:selectedAnnotation.coordinate.longitude];
         [self reverseGeocode:selectedLocation forAnnotation:selectedAnnotation];
     }
-    
 }
 
 - (void)reverseGeocode:(CLLocation *)location forAnnotation:(MKPointAnnotation *)annotation
@@ -306,31 +369,31 @@ static NSString * const droppedPinTitle = @"cancel or add";
             self.selectedPinCity = [placemark.addressDictionary valueForKey:@"City"];
             self.selectedPinState = [placemark.addressDictionary valueForKey:@"State"];
             self.selectedPinZip  = [placemark.addressDictionary valueForKey:@"ZIP"];
-            self.selectedPinCountry  = [placemark.addressDictionary valueForKey:@"Country"];
-
-            annotation.subtitle = [NSString stringWithFormat:@"%@", self.selectedPinAddress[0]];
+            self.selectedPinCountry  = [placemark.addressDictionary valueForKey:@"CountryCode"];
+            self.location = placemark.location;
+            annotation.subtitle = [NSString stringWithFormat:@"%@", self.selectedPinStreet];
         }
     }];
 
 }
 
 #pragma mark - drop Pin Action
-- (void)dropPinAtCenterOfMap {
-    
-    self.droppedPinAnnotation = [[MKPointAnnotation alloc] init];
-//    self.droppedPinAnnotation.coordinate = self.mapView.userLocation.coordinate;
-    self.droppedPinAnnotation.coordinate = self.mapView.centerCoordinate;
-    self.droppedPinAnnotation.title = droppedPinTitle;
-    self.location = [[CLLocation alloc] initWithLatitude:self.droppedPinAnnotation.coordinate.latitude longitude:self.droppedPinAnnotation.coordinate.longitude];
-    NSLog(@"DROPPED %@", self.location);
-    
-    for (id annotation in self.mapView.annotations) {
-        if ([[annotation title] isEqualToString:droppedPinTitle]) {
-            [self.mapView removeAnnotation:annotation];
-        }
-    }
-    [self.mapView addAnnotation:self.droppedPinAnnotation];
-}
+//- (void)dropPinAtCenterOfMap {
+//    
+//    self.droppedPinAnnotation = [[MKPointAnnotation alloc] init];
+////    self.droppedPinAnnotation.coordinate = self.mapView.userLocation.coordinate;
+//    self.droppedPinAnnotation.coordinate = self.mapView.centerCoordinate;
+//    self.droppedPinAnnotation.title = droppedPinTitle;
+//    self.location = [[CLLocation alloc] initWithLatitude:self.droppedPinAnnotation.coordinate.latitude longitude:self.droppedPinAnnotation.coordinate.longitude];
+//    NSLog(@"DROPPED %@", self.location);
+//    
+//    for (id annotation in self.mapView.annotations) {
+//        if ([[annotation title] isEqualToString:droppedPinTitle]) {
+//            [self.mapView removeAnnotation:annotation];
+//        }
+//    }
+//    [self.mapView addAnnotation:self.droppedPinAnnotation];
+//}
 
 - (void)addPinWithGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
 {
@@ -352,62 +415,89 @@ static NSString * const droppedPinTitle = @"cancel or add";
     [self.mapView addAnnotation:self.droppedPinAnnotation];
 }
 
+- (void)goToSavedLocation:(NSNotification*)notification {
+    Location *profileSelectedLocation = notification.object;
+    [self.mapView setCenterCoordinate:profileSelectedLocation.location.coordinate];
+    NSArray *array = [self findAnnotationsWithCoordinate:profileSelectedLocation.location.coordinate];
+    [self.mapView selectAnnotation:array.firstObject animated:YES];
+}
+
+-(void)goToSearchedMapItem:(NSNotification*)notification {
+    if (self.droppedPinAnnotation) {
+        [self.mapView removeAnnotations:@[self.droppedPinAnnotation]];
+        self.droppedPinAnnotation = nil;
+    }
+    if (self.searchedAnnotations) {
+        [self.mapView removeAnnotations:self.searchedAnnotations];
+    }
+    MKMapItem *item = notification.object;
+    MKPointAnnotation *annotation = [self createAnnotationForMapItem:item];
+    self.searchedItems = [[NSMutableArray alloc]init];
+    self.searchedAnnotations = [[NSMutableArray alloc]init];
+    [self.searchedItems addObject:item];
+    [self.searchedAnnotations addObject:annotation];
+    [self.mapView setCenterCoordinate:annotation.coordinate];
+    [self.mapView addAnnotation:annotation];
+    [self.mapView showAnnotations:self.searchedAnnotations animated:true];
+    [self.mapView selectAnnotation:annotation animated:true];
+}
+
 #pragma mark - annotation views
 -(MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation
 {
     if ([annotation isKindOfClass:[MKUserLocation class]]) {
         return nil;
     }
-    
-    MKPinAnnotationView *pinView;
-//    pinView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"pin"];
-    
-//    if ([annotation isKindOfClass:[MKPlacemark class] ]) {
     if ([self.searchedAnnotations containsObject:annotation]) {
-        pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"searchedPin"];
-
-        pinView.pinColor = MKPinAnnotationColorGreen;
-        pinView.canShowCallout = YES;
+        return [self cancelAddViewWithAnnotation:annotation];
     } else if ([[annotation title] isEqualToString:droppedPinTitle]) {
-        if (pinView == nil) {
-            pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"droppedPin"];
-            pinView.draggable = YES;
-            pinView.canShowCallout = YES;
-            pinView.animatesDrop = YES;
-            pinView.pinColor = MKPinAnnotationColorPurple;
-            
-            UIButton *addLocationButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
-            addLocationButton.tag = 2;
-            pinView.rightCalloutAccessoryView = addLocationButton;
-            
-            UIImage *removePinImage = [UIImage imageNamed:@"remove"];
-            UIButton *removePinButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, removePinImage.size.width, removePinImage.size.height)];
-            [removePinButton setImage:removePinImage forState:UIControlStateNormal];
-            removePinButton.tag = 1;
-            pinView.leftCalloutAccessoryView = removePinButton;
-            
-        }     else {
-            pinView.annotation = annotation;
-        }
-    } else { //pinview for saved/shared locations
-        pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"sharedPin"];
+        MKAnnotationView *pinView = [self cancelAddViewWithAnnotation:annotation];
+        pinView.draggable = YES;
+        return pinView;
+    } else { //pinview for saved/shared locations]
+        MKAnnotationView *pinView = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
         pinView.canShowCallout = YES;
-    
+        
+        CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
+        Location *locationToCheck = [[LocationController sharedInstance]findLocationMatchingLocation:location];
+        if (locationToCheck.isForBike) {
+            pinView.image = [UIImage imageNamed:@"bike"];
+            pinView.frame =  CGRectMake(pinView.frame.origin.x, pinView.frame.origin.y, 25, 25);
+        } else {
+            pinView.image = [UIImage imageNamed:@"redMarker"];
+            pinView.frame =  CGRectMake(pinView.frame.origin.x, pinView.frame.origin.y, 30, 30);
+        }
+
         UIImage *directionsImage = [UIImage imageNamed:@"rightFilled"];
         UIButton *directionsButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, directionsImage.size.width, directionsImage.size.height)];
         [directionsButton setImage:directionsImage forState:UIControlStateNormal];
         directionsButton.tag = 3;
         pinView.leftCalloutAccessoryView = directionsButton;
         
-//        UIImage *moreInfo = [UIImage imageNamed:@"right"];
-//        UIButton *moreInfoButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, moreInfo.size.width, moreInfo.size.height)];
-//        [moreInfoButton setImage:moreInfo forState:UIControlStateNormal];
-        UIButton *moreInfoButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+        UIImage *moreInfo = [UIImage imageNamed:@"right"];
+        UIButton *moreInfoButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, moreInfo.size.width, moreInfo.size.height)];
+        [moreInfoButton setImage:moreInfo forState:UIControlStateNormal];
+//        UIButton *moreInfoButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
         moreInfoButton.tag = 4;
         pinView.rightCalloutAccessoryView = moreInfoButton;
+        return pinView;
     }
+}
+
+-(MKPinAnnotationView*)cancelAddViewWithAnnotation:(id<MKAnnotation>)annotation {
+   MKPinAnnotationView *pinAnnotation = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
+    pinAnnotation.canShowCallout = YES;
     
-    return pinView;
+    UIButton *addLocationButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
+    addLocationButton.tag = 2;
+    pinAnnotation.rightCalloutAccessoryView = addLocationButton;
+    
+    UIImage *removePinImage = [UIImage imageNamed:@"remove"];
+    UIButton *removePinButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, removePinImage.size.width, removePinImage.size.height)];
+    [removePinButton setImage:removePinImage forState:UIControlStateNormal];
+    removePinButton.tag = 1;
+    pinAnnotation.leftCalloutAccessoryView = removePinButton;
+    return pinAnnotation;
 }
 
 -(void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views {
@@ -416,10 +506,8 @@ static NSString * const droppedPinTitle = @"cancel or add";
     }
 }
 
-
 -(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view didChangeDragState:(MKAnnotationViewDragState)newState fromOldState:(MKAnnotationViewDragState)oldState
 {
-    
     if (newState == MKAnnotationViewDragStateEnding) {
         CLLocationCoordinate2D droppedAt = view.annotation.coordinate;
         self.location = [[CLLocation alloc] initWithLatitude:droppedAt.latitude longitude:droppedAt.longitude];
@@ -428,214 +516,112 @@ static NSString * const droppedPinTitle = @"cancel or add";
     }
 }
 
-
 -(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
 {
-    
     self.selectedAnnotation = view.annotation;
-    
     if ([control tag] == 2) {
-        [self addLocationButtonClicked];
-        
-    } else if ([control tag] == 1) {
-        [self.mapView removeAnnotation:self.droppedPinAnnotation];
-        
-    } else if ([control tag] == 3) {
-        //directions
-        [self directionsButtonPressedWithAnnotation:self.selectedAnnotation];
-        
-    } else if ([control tag] == 4) {
-        //more info
-        [self locationMoreInfoPressedForAnnotation:self.selectedAnnotation];
-    }
-    
-}
-
--(void) addLocationButtonClicked {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Enter Location" message:[NSString stringWithFormat:@"Address: %@, \n %@", self.selectedPinAddress[0], self.selectedPinAddress[1]]  preferredStyle:UIAlertControllerStyleAlert];
-    
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-        textField.placeholder = @"location name";
-        textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
-        textField.textAlignment = NSTextAlignmentCenter;
-    }];
-    
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-        textField.placeholder = @"notes (optional)";
-        textField.textAlignment = NSTextAlignmentCenter;
-    }];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [self removeFromParentViewController];
-    }];
-    [alertController addAction:cancelAction];
-    
-    UIAlertAction *saveAction = [UIAlertAction actionWithTitle:@"save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        UITextField *locationNameField = alertController.textFields[0];
-        UITextField *locationNotesField = alertController.textFields[1];
-        if ([locationNameField.text isEqualToString:@""]) {
-            NSLog(@"no text no save");
+        //add
+        if ([self.selectedAnnotation.title isEqualToString:droppedPinTitle]) {
+            [self addLocationButtonClickedOn:true];
         } else {
-            [self saveButtonPressedWithLocationName:locationNameField.text andLocationNotes:locationNotesField.text];
+            [self findMapItemFromSearchedList:self.selectedAnnotation];
+            [self addLocationButtonClickedOn:false];
         }
-    }];
-    [alertController addAction:saveAction];
-    
-    [self presentViewController:alertController animated:YES completion:nil];
-}
-
-
--(void)saveButtonPressedWithLocationName:(NSString *)locationName andLocationNotes:(NSString *)notes {
-    self.indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    self.indicatorView.frame = self.view.bounds;
-    self.indicatorView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
-    //                self.indicatorView.center = CGPointMake(160, 240);
-    [self.indicatorView startAnimating];
-    [self.view addSubview:self.indicatorView];
-    
-    if (![UserController sharedInstance].currentUserRecordID) {
-        [self notLoggedIniCloudAlert];
-    } else {
-        [[LocationController sharedInstance] saveLocationWithName:locationName
-                                                         location:self.location
-                                                    streetAddress:self.selectedPinStreet
-                                                             city:self.selectedPinCity state:self.selectedPinState zip:self.selectedPinZip
-                                                          country:self.selectedPinCountry
-                                                            notes:notes];
+    } else if ([control tag] == 1) {
+        //remove
+        [self.mapView removeAnnotation:self.selectedAnnotation];
+        self.droppedPinAnnotation = nil;
+    } else if ([control tag] == 3) {
+        //directions, saved location and searched item
+        [self directionsButtonPressedWithAnnotation:self.selectedAnnotation];
+    } else if ([control tag] == 4) {
+        //more info, saved location
+        CLLocation *location = [[CLLocation alloc] initWithLatitude:self.selectedAnnotation.coordinate.latitude longitude:self.selectedAnnotation.coordinate.longitude];
+        Location *selectedLocation = [[LocationController sharedInstance] findLocationMatchingLocation:location];
+        [self searchBusinessPhoneForSavedLocation:selectedLocation withCompletion:^(NSString *phoneString) {
+            self.selectedPhoneNumber = phoneString;
+            [self locationMoreInfoPressedForAnnotation:selectedLocation];
+        }];
     }
 }
-    
 
+#pragma mark - add
+-(void) addLocationButtonClickedOn:(BOOL)droppedPin {
+    if (droppedPin) { //add button on dropped pin
+        [self searchForGasNear:self.droppedPinAnnotation.coordinate withCompletion:^(NSArray *mapItems) {
+            [self showSelectLocationViewWithItems:mapItems forDroppedPin:true];
+        }];
+    } else { //add button on searched item
+        if ([self isAlreadyASavedLocation:self.selectedAnnotation]) {
+            [self locationAlreadySavedAlert];
+        } else {
+            LocationViewController *locationVC = [[LocationViewController alloc]init];
+            locationVC.isSavedLocation = false;
+            locationVC.selectedMapItem = [self findMapItemFromSearchedList:self.selectedAnnotation];
+            UINavigationController *nav = [self navControllerWithTitle:@"Add Location" andRootVC:locationVC];
+            [self presentViewController:nav animated:YES completion:nil];
+        }
+    }
+}
 
+-(BOOL)isAlreadyASavedLocation:(MKPointAnnotation*)annotation{
+    CLLocation *location = [[CLLocation alloc]initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
+    Location *savedLocation = [[LocationController sharedInstance]findLocationMatchingLocation:location];
+    if (savedLocation) {
+        return true;
+    }
+    return false;
+}
 
-
-#pragma mark - directions
--(void)directionsButtonPressedWithAnnotation:(MKPointAnnotation *)annotation
-{
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Directions" message:@"You will be taken to the maps app for directions." preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+-(void)locationAlreadySavedAlert{
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Error" message:@"The location you are trying to add has already been saved." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
         [controller removeFromParentViewController];
     }];
-    [controller addAction:cancelAction];
-    
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"Go" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [self goToMapsAppForDirectionsToAnnotation:annotation];
-    }];
-    [controller addAction: action];
-    
-    [self presentViewController:controller animated:YES completion:nil];
+    [controller addAction:ok];
+    [self presentViewController:controller animated:true completion:nil];
 }
 
--(void)goToMapsAppForDirectionsToAnnotation:(MKPointAnnotation *)annotation
+//add button in navigation bar
+-(void)addButtonTapped {
+    [self searchForGasNear:self.mapView.userLocation.coordinate withCompletion:^(NSArray *mapItems) {
+        [self showSelectLocationViewWithItems:mapItems forDroppedPin:false];
+    }];
+}
+
+-(void)showSelectLocationViewWithItems:(NSArray*)items forDroppedPin:(BOOL)droppedPin{
+    LocationSearchViewController *searchVC = [[LocationSearchViewController alloc]init];
+    searchVC.mapItems = items;
+    searchVC.isDroppedPin = droppedPin;
+    
+    UINavigationController *nav = [self navControllerWithTitle:@"Select Location" andRootVC:searchVC];
+    [self presentViewController:nav animated:true completion:nil];
+}
+
+#pragma mark - directions
+
+-(void)directionsButtonPressedWithAnnotation:(MKPointAnnotation *)annotation
 {
     CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
     NSDictionary *dictionary = [[LocationController sharedInstance]addressDictionaryForLocationWithCLLocation:location];
     MKPlacemark *placemark = [[MKPlacemark alloc] initWithCoordinate:annotation.coordinate addressDictionary:dictionary];
-    MKMapItem *mapItem = [[MKMapItem alloc] initWithPlacemark:placemark];
-    
-    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(location.coordinate, 10000, 10000);
-    [MKMapItem openMapsWithItems:@[mapItem] launchOptions:[NSDictionary dictionaryWithObjectsAndKeys: [NSValue valueWithMKCoordinate:region.center], MKLaunchOptionsMapCenterKey, [NSValue valueWithMKCoordinateSpan:region.span], MKLaunchOptionsMapSpanKey, nil]];
+    UIAlertController *controller = [[LocationController sharedInstance]alertForDirectionsToPlacemark:placemark];
+    [self presentViewController:controller animated:YES completion:nil];
 }
 
 #pragma mark - location info
--(void)locationMoreInfoPressedForAnnotation:(MKPointAnnotation *)annotation
-{
-    CLLocation *location = [[CLLocation alloc] initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
-    [[LocationController sharedInstance] findLocationMatchingLocation:location];
-
-    self.locationInfoBackgroundView = [[UIView alloc] initWithFrame:self.view.bounds];
-//    UIView *locationInfoBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, locationInfoBackgroundView.frame.size.width, 300)];
-    self.locationInfoBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
-    [self.view addSubview:self.locationInfoBackgroundView];
-
-    [UIView animateWithDuration:.25f animations:^{
-        self.locationInfoBackgroundView.frame = self.view.bounds;
-    }];
-    
-    int backgroundViewWidth = self.locationInfoBackgroundView.frame.size.width;
-    int locationInfoViewWidth = backgroundViewWidth - 40;
-    
-    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake((backgroundViewWidth / 2) - locationInfoViewWidth/2 , 125,  locationInfoViewWidth, 282)];
-//    UIView *locationInfoView = [[UIView alloc] initWithFrame:CGRectMake(0, 125, self.view.frame.size.width, 300)];
-    locationInfoView.backgroundColor = [UIColor colorWithWhite:.50 alpha:.75];
-//    locationInfoView.backgroundColor = [UIColor airvolutionRed];
-    [self.locationInfoBackgroundView addSubview:locationInfoView];
-    
-//    self.tableView = [[UITableView alloc] initWithFrame:locationInfoView.bounds style:UITableViewStyleGrouped];
-    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(10, 10, locationInfoView.frame.size.width-20, locationInfoView.frame.size.height-20)];
-
-    [locationInfoView addSubview:self.tableView];
-    self.tableView.scrollEnabled = NO;
-    self.datasource = [MapTableViewDataSource new];
-    self.tableView.dataSource = self.datasource;
-    [self.datasource registerTableView:self.tableView];
-    self.tableView.delegate = self;
-    
-}
-
-
-#pragma mark - tableView delegate
--(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    float rowHeight;
-    switch (indexPath.row) {
-        case 0:
-            rowHeight = 60;
-            break;
-            
-        case 1:
-//            UITableViewCell *notesCell = (tableView cell);
-//            if (tableView cellForRowAtIndexPath:indexPath) {
-                rowHeight = 20;
-//            }
-            break;
-            
-        case 2:
-            rowHeight = 90;
-            break;
-        default:// directions, backToMap
-            rowHeight = 40;
-            break;
-    }
-    return rowHeight;
-}
-
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    
-    switch (indexPath.row) {
-        case 2:
-            [self.locationInfoBackgroundView removeFromSuperview];
-            break;
-        case 3: //directions
-            [self directionsButtonPressedWithAnnotation:self.selectedAnnotation];
-            break;
-        case 4: //go back to map
-            [self.locationInfoBackgroundView removeFromSuperview];
-            break;
-        default:
-            break;
-    }
-}
-
--(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    BOOL command;
-    switch (indexPath.row) {
-        case 0:
-            return NO;
-            break;
-            
-        default: return YES;
-            break;
-    }
-    return command;
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+-(void)locationMoreInfoPressedForAnnotation:(Location*)location {
+    LocationViewController *locationVC = [[LocationViewController alloc]init];
+    locationVC.isSavedLocation = true;
+    locationVC.selectedLocation = location;
+    locationVC.savedLocationPhone = self.selectedPhoneNumber;
+    UIBarButtonItem *newBackButton =
+    [[UIBarButtonItem alloc] initWithTitle:@"Map"
+                                     style:UIBarButtonItemStylePlain
+                                    target:nil
+                                    action:nil];
+    [[self navigationItem] setBackBarButtonItem:newBackButton];
+    [self.navigationController pushViewController:locationVC animated:true];
 }
 
 @end

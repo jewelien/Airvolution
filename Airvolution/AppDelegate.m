@@ -10,17 +10,9 @@
 #import "MapViewController.h"
 #import "LocationController.h"
 #import "ProfileViewController.h"
-#import "LeaderboardViewController.h"
 #import "UserController.h"
 #import <MapKit/MapKit.h>
 #import "UIColor+Color.h"
-
-
-@interface AppDelegate ()
-
-@property (nonatomic, strong) UITabBarController *tabBarController;
-
-@end
 
 @implementation AppDelegate
 
@@ -30,14 +22,11 @@
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-
-    [[UserController sharedInstance]fetchUserRecordIDWithCompletion:^(NSString *userRecordName) {
-        [[LocationController sharedInstance]loadLocationsFromCloudKitWithCompletion:^(NSArray *array) {
-            [[UserController sharedInstance]checkUserinCloudKitUserList];
-            [[UserController sharedInstance]fetchUsersSavedLocationsFromArray:array withCompletion:^(NSArray *usersLocations) {
-            }];
-        }];
-    }];
+    if ([self isFirstTimeOpening] == true) {
+        [[UserController sharedInstance]load:YES];
+    }
+    
+    [application registerForRemoteNotifications];
 
     [[UITabBar appearance] setTintColor:[UIColor airvolutionRed]];
     
@@ -50,17 +39,11 @@
     
     ProfileViewController *profileViewController = [ProfileViewController new];
     UIImage *profileImage = [UIImage imageNamed:@"profileBlue"];
-    UITabBarItem *profileTabBar = [[UITabBarItem alloc] initWithTitle:@"Profile" image:profileImage selectedImage:nil];
+    UITabBarItem *profileTabBar = [[UITabBarItem alloc] initWithTitle:@"SHARED" image:profileImage selectedImage:nil];
     profileViewController.tabBarItem = profileTabBar;
     UINavigationController *profileNav = [[UINavigationController alloc] initWithRootViewController:profileViewController];
     
-    LeaderboardViewController *leaderboardViewController = [LeaderboardViewController new];
-    UIImage *leaderboardImage = [UIImage imageNamed:@"people"];
-    UITabBarItem *leaderboardTabBar = [[UITabBarItem alloc] initWithTitle:@"Leaderboard" image:leaderboardImage selectedImage:nil];
-    leaderboardViewController.tabBarItem = leaderboardTabBar;
-    UINavigationController *leaderboardNav = [[UINavigationController alloc] initWithRootViewController:leaderboardViewController];
-    
-    NSArray *controllers = [NSArray arrayWithObjects:profileNav, navigationController, leaderboardNav, nil];
+    NSArray *controllers = [NSArray arrayWithObjects: navigationController,profileNav,nil];
     
     self.tabBarController = [[UITabBarController alloc] init];
     self.tabBarController.viewControllers = controllers;
@@ -72,11 +55,24 @@
     [self.window makeKeyAndVisible];
     
     UITabBarController *tabBar = (UITabBarController *)self.window.rootViewController;
-    tabBar.selectedIndex = 1;
-    
-    
+    tabBar.selectedIndex = 0;
     
     return YES;
+}
+
+- (BOOL) isFirstTimeOpening {
+    NSUserDefaults *theDefaults = [NSUserDefaults standardUserDefaults];
+    if([theDefaults integerForKey:@"hasRun"] == 0) {
+        [theDefaults setInteger:1 forKey:@"hasRun"];
+        [theDefaults synchronize];
+        return true;
+    }
+    return false;
+}
+
+-(void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+    [[LocationController sharedInstance]didReceiveNotification:userInfo];
+    completionHandler(UIBackgroundFetchResultNewData);
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -95,6 +91,9 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    if ([self isFirstTimeOpening] == false) {
+        [[UserController sharedInstance]load:NO];
+    }
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {

@@ -9,28 +9,27 @@
 @import UIKit;
 #import <Foundation/Foundation.h>
 #import <CloudKit/CloudKit.h>
+#import <CoreData/CoreData.h>
 
-static NSString *const UserListRecordTypeKey = @"UserList";
-static NSString *const RecordNameKey = @"recordName";
-
+//static NSString *const RecordNameKey = @"recordName";
 static NSString *const RecordIDKey = @"recordID";
 static NSString *const IdentifierKey = @"identifier";
 static NSString *const PointsKey = @"points";
 static NSString *const UsernameKey = @"username";
-
 static NSString *const ImageKey = @"profileImage";
 
-@interface User : NSObject
 
-@property (nonatomic, strong) CKRecordID *recordID;
-@property (nonatomic, strong) NSString *recordName;
-@property (nonatomic, strong) NSString *identifier;
-@property (nonatomic, strong) NSString *points;
-@property (nonatomic, strong) NSString *username;
+@interface User : NSManagedObject
 
-@property (nonatomic, strong) UIImage *profileImage;
+//@property (nonatomic, retain) NSString *recordID;
+@property (nonatomic, retain) NSString *recordName;
+@property (nonatomic, retain) NSString *identifier;
+@property (nonatomic, retain) NSString *points;
+@property (nonatomic, retain) NSString *username;
+@property (nonatomic, retain) UIImage *profileImage;
+@property (nonatomic, retain) NSSet *locations; //relationship
+@property (nonatomic, strong) NSString *filter;
 
-
--(instancetype)initWithDictionary:(NSDictionary *)dictionary;
+- (NSArray *)sortedLocations;
 
 @end

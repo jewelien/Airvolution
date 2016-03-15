@@ -7,21 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FC0BCBD41AD48F9200EAF9BF /* UserCustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FC0BCBD31AD48F9200EAF9BF /* UserCustomCell.m */; };
+		525BB170B59F3A7F354BF3D5 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C7B7E3CBB7D48C12B9FDB5E /* libPods.a */; };
 		FC0BCBDA1AD59DA600EAF9BF /* LocationCustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FC0BCBD91AD59DA600EAF9BF /* LocationCustomCell.m */; };
+		FC1D2DDD1C7B8C960037FB8C /* StyleController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1D2DDC1C7B8C960037FB8C /* StyleController.swift */; };
 		FC1F21CD1AC342AB00A8DCD8 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */; };
 		FC1F21CF1AC3563300A8DCD8 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC1F21CE1AC3563300A8DCD8 /* CoreLocation.framework */; };
 		FC366CB51AE4753A00B28D68 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC366CB41AE4753A00B28D68 /* CloudKit.framework */; };
 		FC3A1BFB1AE46D18001E9B82 /* Airvolution.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = FC3A1BFA1AE46D18001E9B82 /* Airvolution.entitlements */; };
 		FC58E8FF1ACDE33B00CF6A0C /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = FC58E8FE1ACDE33B00CF6A0C /* User.m */; };
 		FC799E411AC5D6F800F8BD70 /* Location.m in Sources */ = {isa = PBXBuildFile; fileRef = FC799E401AC5D6F800F8BD70 /* Location.m */; };
+		FC835FEB1C3DB3A1006CDC97 /* Stack.m in Sources */ = {isa = PBXBuildFile; fileRef = FC835FEA1C3DB3A1006CDC97 /* Stack.m */; };
+		FC835FEE1C3DB425006CDC97 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FC835FEC1C3DB425006CDC97 /* Model.xcdatamodeld */; };
 		FC8B18F61AC4B7E000051693 /* LocationController.m in Sources */ = {isa = PBXBuildFile; fileRef = FC8B18F51AC4B7E000051693 /* LocationController.m */; };
 		FCA0ECA41ACC662A006E1B8B /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCA0ECA31ACC662A006E1B8B /* ProfileViewController.m */; };
-		FCA0ECA71ACC663B006E1B8B /* LeaderboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */; };
+		FCB3E4061C6138DE000F20CD /* LocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB3E4051C6138DE000F20CD /* LocationViewController.swift */; };
 		FCBB5A761ACDF4000059AC3C /* UserController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCBB5A751ACDF4000059AC3C /* UserController.m */; };
 		FCBB5AAB1ACDF5D20059AC3C /* ProfileTableViewDatasource.m in Sources */ = {isa = PBXBuildFile; fileRef = FCBB5AAA1ACDF5D20059AC3C /* ProfileTableViewDatasource.m */; };
 		FCBCA31F1ADDC322000D4F49 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCBCA31E1ADDC322000D4F49 /* AddressBook.framework */; };
-		FCBCA3221ADEC323000D4F49 /* MapTableViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = FCBCA3211ADEC323000D4F49 /* MapTableViewDataSource.m */; };
 		FCBCA3281AE16122000D4F49 /* UIColor+Color.m in Sources */ = {isa = PBXBuildFile; fileRef = FCBCA3271AE16122000D4F49 /* UIColor+Color.m */; };
 		FCE4012E1AC0C9E800DBB19A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FCE4012D1AC0C9E800DBB19A /* main.m */; };
 		FCE401311AC0C9E800DBB19A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FCE401301AC0C9E800DBB19A /* AppDelegate.m */; };
@@ -29,6 +31,7 @@
 		FCE401391AC0C9E800DBB19A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FCE401381AC0C9E800DBB19A /* Images.xcassets */; };
 		FCE4013C1AC0C9E800DBB19A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = FCE4013A1AC0C9E800DBB19A /* LaunchScreen.xib */; };
 		FCE401481AC0C9E800DBB19A /* AirvolutionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FCE401471AC0C9E800DBB19A /* AirvolutionTests.m */; };
+		FCEAA3471C651B08003B659C /* LocationSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCEAA3461C651B08003B659C /* LocationSearchViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,31 +45,36 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		FC0BCBD21AD48F9200EAF9BF /* UserCustomCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserCustomCell.h; sourceTree = "<group>"; };
-		FC0BCBD31AD48F9200EAF9BF /* UserCustomCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserCustomCell.m; sourceTree = "<group>"; };
+		0C7B7E3CBB7D48C12B9FDB5E /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		72B32833914128E8DAB139AF /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		D841105802BD502782618C14 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		FC0BCBD81AD59DA600EAF9BF /* LocationCustomCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationCustomCell.h; sourceTree = "<group>"; };
 		FC0BCBD91AD59DA600EAF9BF /* LocationCustomCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationCustomCell.m; sourceTree = "<group>"; };
+		FC1D2DDC1C7B8C960037FB8C /* StyleController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StyleController.swift; sourceTree = "<group>"; };
 		FC1F21CC1AC342AB00A8DCD8 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		FC1F21CE1AC3563300A8DCD8 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		FC366CB41AE4753A00B28D68 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		FC3A1BFA1AE46D18001E9B82 /* Airvolution.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Airvolution.entitlements; sourceTree = "<group>"; };
+		FC52E8501C448CD0001BCA6B /* Model 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 3.xcdatamodel"; sourceTree = "<group>"; };
 		FC58E8FD1ACDE33B00CF6A0C /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
 		FC58E8FE1ACDE33B00CF6A0C /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
 		FC799E3F1AC5D6F800F8BD70 /* Location.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Location.h; sourceTree = "<group>"; };
 		FC799E401AC5D6F800F8BD70 /* Location.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Location.m; sourceTree = "<group>"; };
+		FC835FE91C3DB3A1006CDC97 /* Stack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Stack.h; sourceTree = "<group>"; };
+		FC835FEA1C3DB3A1006CDC97 /* Stack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Stack.m; sourceTree = "<group>"; };
+		FC835FED1C3DB425006CDC97 /* Model.xcdatamodel */ = {isa = PBXFileReference; explicitFileType = wrapper.xcdatamodeld; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		FC835FF51C3E0A68006CDC97 /* Model 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 2.xcdatamodel"; sourceTree = "<group>"; };
 		FC8B18F41AC4B7E000051693 /* LocationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationController.h; sourceTree = "<group>"; };
 		FC8B18F51AC4B7E000051693 /* LocationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationController.m; sourceTree = "<group>"; };
 		FCA0ECA21ACC662A006E1B8B /* ProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileViewController.h; sourceTree = "<group>"; };
 		FCA0ECA31ACC662A006E1B8B /* ProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileViewController.m; sourceTree = "<group>"; };
-		FCA0ECA51ACC663B006E1B8B /* LeaderboardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LeaderboardViewController.h; sourceTree = "<group>"; };
-		FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LeaderboardViewController.m; sourceTree = "<group>"; };
+		FCB3E4041C6138DE000F20CD /* Airvolution-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Airvolution-Bridging-Header.h"; sourceTree = "<group>"; };
+		FCB3E4051C6138DE000F20CD /* LocationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationViewController.swift; sourceTree = "<group>"; };
 		FCBB5A741ACDF4000059AC3C /* UserController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserController.h; sourceTree = "<group>"; };
 		FCBB5A751ACDF4000059AC3C /* UserController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserController.m; sourceTree = "<group>"; };
 		FCBB5AA91ACDF5D20059AC3C /* ProfileTableViewDatasource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileTableViewDatasource.h; sourceTree = "<group>"; };
 		FCBB5AAA1ACDF5D20059AC3C /* ProfileTableViewDatasource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileTableViewDatasource.m; sourceTree = "<group>"; };
 		FCBCA31E1ADDC322000D4F49 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
-		FCBCA3201ADEC323000D4F49 /* MapTableViewDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapTableViewDataSource.h; sourceTree = "<group>"; };
-		FCBCA3211ADEC323000D4F49 /* MapTableViewDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapTableViewDataSource.m; sourceTree = "<group>"; };
 		FCBCA3261AE16122000D4F49 /* UIColor+Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Color.h"; sourceTree = "<group>"; };
 		FCBCA3271AE16122000D4F49 /* UIColor+Color.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Color.m"; sourceTree = "<group>"; };
 		FCE401281AC0C9E800DBB19A /* Airvolution.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Airvolution.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,6 +89,7 @@
 		FCE401411AC0C9E800DBB19A /* AirvolutionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AirvolutionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FCE401461AC0C9E800DBB19A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FCE401471AC0C9E800DBB19A /* AirvolutionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AirvolutionTests.m; sourceTree = "<group>"; };
+		FCEAA3461C651B08003B659C /* LocationSearchViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationSearchViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +101,7 @@
 				FC366CB51AE4753A00B28D68 /* CloudKit.framework in Frameworks */,
 				FC1F21CF1AC3563300A8DCD8 /* CoreLocation.framework in Frameworks */,
 				FC1F21CD1AC342AB00A8DCD8 /* MapKit.framework in Frameworks */,
+				525BB170B59F3A7F354BF3D5 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -105,19 +115,53 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		FCB55F711AD9ECD800FDEF0A /* Profile */ = {
+		33C5E83C74A511473D2854C6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0C7B7E3CBB7D48C12B9FDB5E /* libPods.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		FC835FE61C3DB098006CDC97 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				FC799E3F1AC5D6F800F8BD70 /* Location.h */,
+				FC799E401AC5D6F800F8BD70 /* Location.m */,
+				FC58E8FD1ACDE33B00CF6A0C /* User.h */,
+				FC58E8FE1ACDE33B00CF6A0C /* User.m */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		FC835FE71C3DB0C2006CDC97 /* VIew */ = {
+			isa = PBXGroup;
+			children = (
+				FCE401321AC0C9E800DBB19A /* MapViewController.h */,
+				FCE401331AC0C9E800DBB19A /* MapViewController.m */,
 				FCA0ECA21ACC662A006E1B8B /* ProfileViewController.h */,
 				FCA0ECA31ACC662A006E1B8B /* ProfileViewController.m */,
 				FCBB5AA91ACDF5D20059AC3C /* ProfileTableViewDatasource.h */,
 				FCBB5AAA1ACDF5D20059AC3C /* ProfileTableViewDatasource.m */,
-				FC0BCBD21AD48F9200EAF9BF /* UserCustomCell.h */,
-				FC0BCBD31AD48F9200EAF9BF /* UserCustomCell.m */,
 				FC0BCBD81AD59DA600EAF9BF /* LocationCustomCell.h */,
 				FC0BCBD91AD59DA600EAF9BF /* LocationCustomCell.m */,
+				FCEAA3461C651B08003B659C /* LocationSearchViewController.swift */,
+				FCB3E4051C6138DE000F20CD /* LocationViewController.swift */,
+				FCB3E4041C6138DE000F20CD /* Airvolution-Bridging-Header.h */,
 			);
-			name = Profile;
+			name = VIew;
+			sourceTree = "<group>";
+		};
+		FC835FE81C3DB33B006CDC97 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				FC8B18F41AC4B7E000051693 /* LocationController.h */,
+				FC8B18F51AC4B7E000051693 /* LocationController.m */,
+				FCBB5A741ACDF4000059AC3C /* UserController.h */,
+				FCBB5A751ACDF4000059AC3C /* UserController.m */,
+				FC1D2DDC1C7B8C960037FB8C /* StyleController.swift */,
+			);
+			name = Controller;
 			sourceTree = "<group>";
 		};
 		FCE4011F1AC0C9E800DBB19A = {
@@ -130,6 +174,8 @@
 				FCE4012A1AC0C9E800DBB19A /* Airvolution */,
 				FCE401441AC0C9E800DBB19A /* AirvolutionTests */,
 				FCE401291AC0C9E800DBB19A /* Products */,
+				FD7FEC326C2897DE2795A1A5 /* Pods */,
+				33C5E83C74A511473D2854C6 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -148,23 +194,14 @@
 				FC3A1BFA1AE46D18001E9B82 /* Airvolution.entitlements */,
 				FCE4012F1AC0C9E800DBB19A /* AppDelegate.h */,
 				FCE401301AC0C9E800DBB19A /* AppDelegate.m */,
-				FCE401321AC0C9E800DBB19A /* MapViewController.h */,
-				FCE401331AC0C9E800DBB19A /* MapViewController.m */,
-				FCBCA3201ADEC323000D4F49 /* MapTableViewDataSource.h */,
-				FCBCA3211ADEC323000D4F49 /* MapTableViewDataSource.m */,
+				FC835FE91C3DB3A1006CDC97 /* Stack.h */,
+				FC835FEA1C3DB3A1006CDC97 /* Stack.m */,
+				FC835FEC1C3DB425006CDC97 /* Model.xcdatamodeld */,
+				FC835FE81C3DB33B006CDC97 /* Controller */,
+				FC835FE61C3DB098006CDC97 /* Model */,
+				FC835FE71C3DB0C2006CDC97 /* VIew */,
 				FCBCA3261AE16122000D4F49 /* UIColor+Color.h */,
 				FCBCA3271AE16122000D4F49 /* UIColor+Color.m */,
-				FCB55F711AD9ECD800FDEF0A /* Profile */,
-				FCA0ECA51ACC663B006E1B8B /* LeaderboardViewController.h */,
-				FCA0ECA61ACC663B006E1B8B /* LeaderboardViewController.m */,
-				FC8B18F41AC4B7E000051693 /* LocationController.h */,
-				FC8B18F51AC4B7E000051693 /* LocationController.m */,
-				FC799E3F1AC5D6F800F8BD70 /* Location.h */,
-				FC799E401AC5D6F800F8BD70 /* Location.m */,
-				FCBB5A741ACDF4000059AC3C /* UserController.h */,
-				FCBB5A751ACDF4000059AC3C /* UserController.m */,
-				FC58E8FD1ACDE33B00CF6A0C /* User.h */,
-				FC58E8FE1ACDE33B00CF6A0C /* User.m */,
 				FCE401381AC0C9E800DBB19A /* Images.xcassets */,
 				FCE4013A1AC0C9E800DBB19A /* LaunchScreen.xib */,
 				FCE4012B1AC0C9E800DBB19A /* Supporting Files */,
@@ -198,6 +235,15 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		FD7FEC326C2897DE2795A1A5 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				72B32833914128E8DAB139AF /* Pods.debug.xcconfig */,
+				D841105802BD502782618C14 /* Pods.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -205,9 +251,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FCE4014B1AC0C9E800DBB19A /* Build configuration list for PBXNativeTarget "Airvolution" */;
 			buildPhases = (
+				083FFC34660D688EE07F6D96 /* Check Pods Manifest.lock */,
 				FCE401241AC0C9E800DBB19A /* Sources */,
 				FCE401251AC0C9E800DBB19A /* Frameworks */,
 				FCE401261AC0C9E800DBB19A /* Resources */,
+				8B3BB6EDD1B05CFBFE07D87E /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -242,7 +290,7 @@
 		FCE401201AC0C9E800DBB19A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0620;
+				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = "Julien Guanzon";
 				TargetAttributes = {
 					FCE401271AC0C9E800DBB19A = {
@@ -302,6 +350,39 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		083FFC34660D688EE07F6D96 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		8B3BB6EDD1B05CFBFE07D87E /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		FCE401241AC0C9E800DBB19A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -310,13 +391,15 @@
 				FC8B18F61AC4B7E000051693 /* LocationController.m in Sources */,
 				FC799E411AC5D6F800F8BD70 /* Location.m in Sources */,
 				FC0BCBDA1AD59DA600EAF9BF /* LocationCustomCell.m in Sources */,
+				FC835FEB1C3DB3A1006CDC97 /* Stack.m in Sources */,
+				FCB3E4061C6138DE000F20CD /* LocationViewController.swift in Sources */,
 				FCBB5A761ACDF4000059AC3C /* UserController.m in Sources */,
 				FC58E8FF1ACDE33B00CF6A0C /* User.m in Sources */,
+				FC1D2DDD1C7B8C960037FB8C /* StyleController.swift in Sources */,
+				FCEAA3471C651B08003B659C /* LocationSearchViewController.swift in Sources */,
 				FCBB5AAB1ACDF5D20059AC3C /* ProfileTableViewDatasource.m in Sources */,
-				FCA0ECA71ACC663B006E1B8B /* LeaderboardViewController.m in Sources */,
-				FC0BCBD41AD48F9200EAF9BF /* UserCustomCell.m in Sources */,
-				FCBCA3221ADEC323000D4F49 /* MapTableViewDataSource.m in Sources */,
 				FCE401341AC0C9E800DBB19A /* MapViewController.m in Sources */,
+				FC835FEE1C3DB425006CDC97 /* Model.xcdatamodeld in Sources */,
 				FCA0ECA41ACC662A006E1B8B /* ProfileViewController.m in Sources */,
 				FCE401311AC0C9E800DBB19A /* AppDelegate.m in Sources */,
 				FCE4012E1AC0C9E800DBB19A /* main.m in Sources */,
@@ -374,6 +457,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -432,29 +516,42 @@
 		};
 		FCE4014C1AC0C9E800DBB19A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 72B32833914128E8DAB139AF /* Pods.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Airvolution/Airvolution.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEFINES_MODULE = YES;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Airvolution/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.julienguanzon.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Airvolution/Airvolution-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		FCE4014D1AC0C9E800DBB19A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D841105802BD502782618C14 /* Pods.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Airvolution/Airvolution.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEFINES_MODULE = YES;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Airvolution/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.julienguanzon.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Airvolution/Airvolution-Bridging-Header.h";
 			};
 			name = Release;
 		};
@@ -462,16 +559,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = AirvolutionTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.julienguanzon.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Airvolution.app/Airvolution";
 			};
@@ -481,12 +575,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
 				INFOPLIST_FILE = AirvolutionTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.julienguanzon.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Airvolution.app/Airvolution";
 			};
@@ -523,6 +614,21 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		FC835FEC1C3DB425006CDC97 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				FC52E8501C448CD0001BCA6B /* Model 3.xcdatamodel */,
+				FC835FF51C3E0A68006CDC97 /* Model 2.xcdatamodel */,
+				FC835FED1C3DB425006CDC97 /* Model.xcdatamodel */,
+			);
+			currentVersion = FC52E8501C448CD0001BCA6B /* Model 3.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = FCE401201AC0C9E800DBB19A /* Project object */;
 }
