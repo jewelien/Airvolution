@@ -70,7 +70,9 @@
 -(void)addAdView {
     GADBannerView *bannerView = [StyleController sharedInstance].bannerView;
     bannerView.rootViewController = self;
-    [bannerView loadRequest:[GADRequest request]];
+    GADRequest *request = [GADRequest request];
+    request.testDevices = @[kGADSimulatorID];
+    [bannerView loadRequest:request];
     [self.view addSubview:bannerView];
 }
 

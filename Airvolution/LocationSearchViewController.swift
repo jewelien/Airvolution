@@ -12,8 +12,9 @@ import GoogleMobileAds
 
 class LocationSearchViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     var tableView:UITableView!
-    var mapItems = [MKMapItem]()
+    var searchedMapItems = [MKMapItem]()
     var isDroppedPin:Bool = false
+    var mapItem = MKMapItem()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,38 +45,82 @@ class LocationSearchViewController: UIViewController, UITableViewDelegate, UITab
     func addAdView() {
         let bannerView = StyleController.sharedInstance.bannerView
         bannerView.rootViewController = self
-        bannerView.loadRequest(GADRequest())
+        let request = GADRequest()
+        request.testDevices = [kGADSimulatorID]
+        bannerView.loadRequest(request)
         bannerView.frame.origin.y = bannerView.frame.origin.y + 50
         self.view.addSubview(bannerView)
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return mapItems.count;
+        switch section {
+        case 0: return 1
+        case 1: return searchedMapItems.count
+        default: return 0
+        }
+    }
+    
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return 2
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCellWithIdentifier("cell")
         cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "cell")
-        let mapItem = mapItems[indexPath.row]
+        var mapItem: MKMapItem;
+        switch indexPath.section {
+            case 0: mapItem = self.mapItem
+            default: mapItem = searchedMapItems[indexPath.row]
+        }
         cell?.textLabel?.text = mapItem.name
         cell?.detailTextLabel?.text = niceAddress(mapItem)
+        if mapItem.name?.characters.count == 0 {
+            cell?.textLabel?.text = "cannot find address"
+        }
         return cell!
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        self.dismissViewControllerAnimated(false, completion: nil)
-        NSNotificationCenter.defaultCenter().postNotificationName("goToSearchedLocation", object: self.mapItems[indexPath.row])
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        switch indexPath.section {
+        case 0:
+            let addLocationVC = LocationViewController()
+            addLocationVC.selectedMapItem = self.mapItem
+            if (self.mapItem.name?.characters.count > 0) {
+                self.navigationController?.pushViewController(addLocationVC, animated: true)
+            } else {
+                return
+            }
+
+        case 1:
+            self.dismissViewControllerAnimated(false, completion: nil)
+            NSNotificationCenter.defaultCenter().postNotificationName("goToSearchedLocation", object: self.searchedMapItems[indexPath.row])
+        default: tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        }
     }
     
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 40
     }
     
+    func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 10
+    }
+    
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if isDroppedPin {
-            return "gas stations near dropped pin"
+        switch section {
+        case 0:
+            if isDroppedPin {
+                return "address at dropped pin"
+            }
+            return "address at current location"
+        case 1:
+            if isDroppedPin {
+                return "gas stations near dropped pin"
+            }
+            return "gas stations near you"
+        default: return ""
         }
-        return "gas stations near you"
     }
 
     func niceAddress(mapItem:MKMapItem) -> String {

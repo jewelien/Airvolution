@@ -95,8 +95,7 @@
         } else {
             NSLog(@"fetched locations successfully");
             for (NSDictionary *record in results) {
-                Location *existingLocation = [self findLocationInCoreDataWithLocationIdentifierOrRecordName:[record objectForKey:identifierKey]];
-                if (!existingLocation) {
+                if (![self isLocationSavedWithRecordName:[record objectForKey:identifierKey]]) {
                     [self saveLocationToCoreData:record];
                 }
             }
@@ -116,8 +115,7 @@
         } else {
             NSLog(@"fetched user's saved locations successfully");
             for (NSDictionary *record in results) {
-                Location *existingLocation = [self findLocationInCoreDataWithLocationIdentifierOrRecordName:[record objectForKey:identifierKey]];
-                if (!existingLocation) {
+                if (![self isLocationSavedWithRecordName:[record objectForKey:identifierKey]]) {
                     [self saveLocationToCoreData:record];
                 }
             }
@@ -136,8 +134,7 @@
             if (self.locations.count != results.count){
                 NSLog(@"fetched locations successfully");
                 for (NSDictionary *record in results) {
-                    Location *existingLocation = [self findLocationInCoreDataWithLocationIdentifierOrRecordName:[record objectForKey:identifierKey]];
-                    if (!existingLocation) {
+                    if (![[self.locations valueForKey:@"identifier"] containsObject:[record objectForKey:identifierKey]]) {
                         [self saveLocationToCoreData:record];
                     }
                 }
@@ -319,6 +316,7 @@
 
 #pragma mark fetch
 - (Location *)findLocationInCoreDataWithLocationIdentifierOrRecordName:(NSString*)string {
+
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Location"];
     [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"identifier == %@ || recordName == %@", string, string]];
     NSError *error;
@@ -330,6 +328,13 @@
         return array.firstObject;
     }
     return nil;
+}
+
+- (BOOL)isLocationSavedWithRecordName:(NSString*)recordName {
+    if ([[self.locations valueForKey:@"identifier"] containsObject:recordName]) {
+        return true;
+    }
+    return false;
 }
 
 
@@ -344,19 +349,19 @@
     Location *selectedLocation = [self findLocationMatchingLocation:location];
     NSMutableDictionary *dictionary = [[NSMutableDictionary alloc]init];
     if (selectedLocation.street) {
-        [dictionary setValue:selectedLocation.street forKey:(__bridge NSString *)kABPersonAddressStreetKey];
+        [dictionary setValue:selectedLocation.street forKey:CNPostalAddressStreetKey];
     }
     if (selectedLocation.city) {
-        [dictionary setValue:selectedLocation.city forKey:(__bridge NSString *)kABPersonAddressCityKey];
+        [dictionary setValue:selectedLocation.city forKey:CNPostalAddressCityKey];
     }
     if (selectedLocation.state) {
-        [dictionary setValue:selectedLocation.state forKey:(__bridge NSString *)kABPersonAddressStateKey];
+        [dictionary setValue:selectedLocation.state forKey:CNPostalAddressStateKey];
     }
     if (selectedLocation.zip) {
-        [dictionary setValue:selectedLocation.zip forKey:(__bridge NSString *)kABPersonAddressZIPKey];
+        [dictionary setValue:selectedLocation.zip forKey:CNPostalAddressPostalCodeKey];
     }
     if (selectedLocation.country) {
-        [dictionary setValue:selectedLocation.country forKey:(__bridge NSString *)kABPersonAddressCountryKey];
+        [dictionary setValue:selectedLocation.country forKey:CNPostalAddressCountryKey];
     }
     return dictionary;
 }

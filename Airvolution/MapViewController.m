@@ -36,6 +36,7 @@
 @property (nonatomic, strong) UIView *locationInfoBackgroundView;
 @property (nonatomic, strong) NSMutableArray *searchedItems;
 @property (nonatomic, strong) NSString *selectedPhoneNumber;
+@property (nonatomic, strong) NSDictionary *userLocationAddressDictionary;
 
 @end
 
@@ -72,6 +73,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 -(void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation{
     CLLocation *location = [[CLLocation alloc]initWithLatitude:userLocation.location.coordinate.latitude longitude:userLocation.location.coordinate.longitude];
     [[LocationController sharedInstance]fetchLocationsnearLocation:location];
+    [self reverseGeoCodeUserLocation];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -371,10 +373,37 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
             self.selectedPinZip  = [placemark.addressDictionary valueForKey:@"ZIP"];
             self.selectedPinCountry  = [placemark.addressDictionary valueForKey:@"CountryCode"];
             self.location = placemark.location;
-            annotation.subtitle = [NSString stringWithFormat:@"%@", self.selectedPinStreet];
+            if (self.selectedPinStreet.length > 0) {
+                annotation.subtitle = [NSString stringWithFormat:@"%@", self.selectedPinStreet];
+            } else {
+                annotation.subtitle = @"cannot find address";
+            }
         }
     }];
 
+}
+
+- (void)reverseGeoCodeUserLocation {
+    if (!self.userLocationAddressDictionary) {
+        self.userLocationAddressDictionary = [[NSDictionary alloc]init];
+    }
+    CLLocation *userLocation = [[CLLocation alloc]initWithLatitude:self.mapView.userLocation.coordinate.latitude longitude:self.mapView.userLocation.coordinate.longitude];
+    CLGeocoder *geoCoder = [[CLGeocoder alloc]init];
+    [geoCoder reverseGeocodeLocation:userLocation completionHandler:^(NSArray* placemarks, NSError *error) {
+        if (error) {
+            NSLog(@"Error puling user's location address. %@", error.description);
+        } else {
+            CLPlacemark *placemark = [placemarks lastObject];
+
+           self.userLocationAddressDictionary = @{
+              (NSString *) CNPostalAddressStreetKey : [placemark.addressDictionary valueForKey:@"Street"],
+              (NSString *) CNPostalAddressCityKey : [placemark.addressDictionary valueForKey:@"City"],
+              (NSString *) CNPostalAddressStateKey : [placemark.addressDictionary valueForKey:@"State"],
+              (NSString *) CNPostalAddressPostalCodeKey : [placemark.addressDictionary valueForKey:@"ZIP"],
+              (NSString *) CNPostalAddressCountryKey : [placemark.addressDictionary valueForKey:@"CountryCode"]
+              };
+        }
+    }];
 }
 
 #pragma mark - drop Pin Action
@@ -549,14 +578,13 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 -(void) addLocationButtonClickedOn:(BOOL)droppedPin {
     if (droppedPin) { //add button on dropped pin
         [self searchForGasNear:self.droppedPinAnnotation.coordinate withCompletion:^(NSArray *mapItems) {
-            [self showSelectLocationViewWithItems:mapItems forDroppedPin:true];
+            [self showSelectLocationViewWithItems:mapItems isForDroppedPin:true];
         }];
     } else { //add button on searched item
         if ([self isAlreadyASavedLocation:self.selectedAnnotation]) {
             [self locationAlreadySavedAlert];
         } else {
             LocationViewController *locationVC = [[LocationViewController alloc]init];
-            locationVC.isSavedLocation = false;
             locationVC.selectedMapItem = [self findMapItemFromSearchedList:self.selectedAnnotation];
             UINavigationController *nav = [self navControllerWithTitle:@"Add Location" andRootVC:locationVC];
             [self presentViewController:nav animated:YES completion:nil];
@@ -585,17 +613,48 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 //add button in navigation bar
 -(void)addButtonTapped {
     [self searchForGasNear:self.mapView.userLocation.coordinate withCompletion:^(NSArray *mapItems) {
-        [self showSelectLocationViewWithItems:mapItems forDroppedPin:false];
+        [self showSelectLocationViewWithItems:mapItems isForDroppedPin:false];
     }];
 }
 
--(void)showSelectLocationViewWithItems:(NSArray*)items forDroppedPin:(BOOL)droppedPin{
+-(void)showSelectLocationViewWithItems:(NSArray*)items isForDroppedPin:(BOOL)droppedPin{
     LocationSearchViewController *searchVC = [[LocationSearchViewController alloc]init];
-    searchVC.mapItems = items;
+    searchVC.searchedMapItems = items;
     searchVC.isDroppedPin = droppedPin;
     
+    NSDictionary *addressDict;
+    if (droppedPin == true) {
+        addressDict = [self addressDictionaryForDroppedPin];
+    } else {
+        addressDict = self.userLocationAddressDictionary;
+    }
+    MKPlacemark *placemark = [[MKPlacemark alloc]initWithCoordinate:self.droppedPinAnnotation.coordinate addressDictionary:addressDict];
+    MKMapItem *mapItem = [[MKMapItem alloc]initWithPlacemark:placemark];
+    NSString *street = [addressDict valueForKey:CNPostalAddressStreetKey];
+    if (street == nil) {
+        mapItem.name = @"";
+    } else {
+        mapItem.name = [NSString stringWithFormat: @"%@, %@", [addressDict valueForKey:CNPostalAddressStreetKey],[addressDict valueForKey:CNPostalAddressCityKey]] ;
+    }
+    searchVC.mapItem = mapItem;
+    
     UINavigationController *nav = [self navControllerWithTitle:@"Select Location" andRootVC:searchVC];
-    [self presentViewController:nav animated:true completion:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self presentViewController:nav animated:true completion:nil];
+    });
+}
+
+- (NSDictionary*)addressDictionaryForDroppedPin  {
+    if (self.selectedPinStreet.length == 0) {
+        return nil;
+    }
+    return @{
+      (NSString *) CNPostalAddressStreetKey : self.selectedPinStreet,
+      (NSString *) CNPostalAddressCityKey : self.selectedPinCity,
+      (NSString *) CNPostalAddressStateKey : self.selectedPinState,
+      (NSString *) CNPostalAddressPostalCodeKey : self.selectedPinZip,
+      (NSString *) CNPostalAddressCountryKey : self.selectedPinCountry,
+      };
 }
 
 #pragma mark - directions
@@ -612,8 +671,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
 #pragma mark - location info
 -(void)locationMoreInfoPressedForAnnotation:(Location*)location {
     LocationViewController *locationVC = [[LocationViewController alloc]init];
-    locationVC.isSavedLocation = true;
-    locationVC.selectedLocation = location;
+    locationVC.selectedSavedLocationObject = location;
     locationVC.savedLocationPhone = self.selectedPhoneNumber;
     UIBarButtonItem *newBackButton =
     [[UIBarButtonItem alloc] initWithTitle:@"Map"

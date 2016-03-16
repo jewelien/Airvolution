@@ -13,9 +13,8 @@ import GoogleMobileAds
 
 class LocationViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     var tableView:UITableView!
-    var isSavedLocation:Bool = true
     var selectedMapItem: MKMapItem = MKMapItem()
-    var selectedLocation:NSManagedObject?
+    var selectedSavedLocationObject:NSManagedObject?
     var savedLocation:Location?
     var savedLocationPhone:NSString = ""
     var screenWidth:CGFloat!
@@ -44,7 +43,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
         addAdView()
-        if let savedLoc = self.selectedLocation {
+        if let savedLoc = self.selectedSavedLocationObject {
             self.savedLocation = (savedLoc as! Location)
             self.tableView.frame.size.height = self.tableView.frame.size.height - 100
             self.navigationController?.navigationBar.backgroundColor = UIColor.airvolutionRed()
@@ -66,7 +65,9 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     func addAdView() {
         bannerView = StyleController.sharedInstance.bannerView
         bannerView.rootViewController = self
-        bannerView.loadRequest(GADRequest())
+        let request = GADRequest()
+        request.testDevices = [kGADSimulatorID]
+        bannerView.loadRequest(request)
         self.view.addSubview(bannerView)
     }
     
@@ -77,13 +78,13 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
         case 0:
-            if self.isSavedLocation {
+            if (self.savedLocation != nil) {
                 return 3
             } else {
                 return 4
             }
         case 1:
-            if self.isSavedLocation {
+            if (self.savedLocation != nil) {
                 return 1
             } else {
                 return 2
@@ -133,7 +134,7 @@ class LocationViewController: UIViewController, UITableViewDelegate, UITableView
             cell?.textLabel?.textColor = UIColor.whiteColor()
             switch indexPath.row {
             case 0:
-                if !self.isSavedLocation {
+                if (self.savedLocation == nil) {
                     cell!.textLabel?.text = self.cancelString
                 } else if (self.savedLocation?.userRecordName == UserController.sharedInstance().currentUserRecordName) {
                     cell!.textLabel?.text = self.deleteString
