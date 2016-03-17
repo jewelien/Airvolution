@@ -331,7 +331,7 @@
 }
 
 - (BOOL)isLocationSavedWithRecordName:(NSString*)recordName {
-    if ([[self.locations valueForKey:@"identifier"] containsObject:recordName]) {
+    if ([[self.locations valueForKey:@"identifier"] containsObject:recordName] || [[self.locations valueForKey:@"recordName"]containsObject:recordName]) {
         return true;
     }
     return false;
@@ -346,7 +346,6 @@
     }
     return false;
 }
-
 
 -(NSArray *)locations {
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Location"];

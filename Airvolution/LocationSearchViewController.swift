@@ -84,6 +84,20 @@ class LocationSearchViewController: UIViewController, UITableViewDelegate, UITab
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
         switch indexPath.section {
         case 0:
+            var street = ""
+            var city = ""
+            if let addressDict = self.mapItem.placemark.addressDictionary {
+                if let streetFromDict = addressDict["Street"] {
+                    street = streetFromDict as! String
+                }
+                if let cityFromDict = addressDict["City"] {
+                    city = cityFromDict as! String
+                }
+            }
+            if LocationController.sharedInstance().isLocationSavedWithStreet(street, andCity:city) == true {
+                self.alreadySavedAlert()
+                return
+            }
             let addLocationVC = LocationViewController()
             addLocationVC.selectedMapItem = self.mapItem
             if (self.mapItem.name?.characters.count > 0) {
@@ -143,6 +157,15 @@ class LocationSearchViewController: UIViewController, UITableViewDelegate, UITab
             }
         }
         return addressString
+    }
+
+    func alreadySavedAlert() {
+        let alertController = UIAlertController(title: "Error", message: "Location already saved.", preferredStyle: UIAlertControllerStyle.Alert)
+        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel) { (action) -> Void in
+            alertController .removeFromParentViewController()
+        }
+        alertController.addAction(okAction)
+        self.presentViewController(alertController, animated: true, completion: nil)
     }
 
     override func didReceiveMemoryWarning() {

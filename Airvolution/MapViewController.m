@@ -614,12 +614,14 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
     searchVC.isDroppedPin = droppedPin;
     
     NSDictionary *addressDict;
+    MKPlacemark *placemark;
     if (droppedPin == true) {
         addressDict = [self addressDictionaryForDroppedPin];
+        placemark = [[MKPlacemark alloc]initWithCoordinate:self.droppedPinAnnotation.coordinate addressDictionary:addressDict];
     } else {
         addressDict = self.userLocationAddressDictionary;
+        placemark = [[MKPlacemark alloc]initWithCoordinate:self.mapView.userLocation.coordinate addressDictionary:addressDict];
     }
-    MKPlacemark *placemark = [[MKPlacemark alloc]initWithCoordinate:self.droppedPinAnnotation.coordinate addressDictionary:addressDict];
     MKMapItem *mapItem = [[MKMapItem alloc]initWithPlacemark:placemark];
     NSString *street = [addressDict valueForKey:CNPostalAddressStreetKey];
     if (street == nil) {
