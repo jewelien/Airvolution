@@ -581,7 +581,7 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
             [self showSelectLocationViewWithItems:mapItems isForDroppedPin:true];
         }];
     } else { //add button on searched item
-        if ([self isAlreadyASavedLocation:self.selectedAnnotation]) {
+        if ([[LocationController sharedInstance]isLocationSavedWithStreet:self.selectedPinStreet andCity:self.selectedPinCity]) {
             [self locationAlreadySavedAlert];
         } else {
             LocationViewController *locationVC = [[LocationViewController alloc]init];
@@ -590,15 +590,6 @@ static NSString * const droppedPinTitle = @"Dropped Pin";
             [self presentViewController:nav animated:YES completion:nil];
         }
     }
-}
-
--(BOOL)isAlreadyASavedLocation:(MKPointAnnotation*)annotation{
-    CLLocation *location = [[CLLocation alloc]initWithLatitude:annotation.coordinate.latitude longitude:annotation.coordinate.longitude];
-    Location *savedLocation = [[LocationController sharedInstance]findLocationMatchingLocation:location];
-    if (savedLocation) {
-        return true;
-    }
-    return false;
 }
 
 -(void)locationAlreadySavedAlert{

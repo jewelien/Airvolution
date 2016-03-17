@@ -338,6 +338,16 @@
 }
 
 
+- (BOOL)isLocationSavedWithStreet:(NSString*)street andCity:(NSString*)city {
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"street == %@ && city == %@", street, city];
+    NSArray *filteredLocations = [self.locations filteredArrayUsingPredicate:pred];
+    if (filteredLocations.count > 0) {
+        return true;
+    }
+    return false;
+}
+
+
 -(NSArray *)locations {
     NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Location"];
     NSArray *array = [[Stack sharedInstance].managedObjectContext executeFetchRequest:fetchRequest error:NULL];
